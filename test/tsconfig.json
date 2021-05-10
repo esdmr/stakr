@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "checkJs": true,
+    "noEmit": true,
+    "outDir": "../build/test"
+  },
+  "include": ["**/*"],
+  "references": [
+    {
+      "path": "../src"
+    }
+  ]
+}

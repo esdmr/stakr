@@ -3,8 +3,8 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf build .nyc_output coverage",
-    "build": "tsc -p .",
-    "watch": "tsc -w -p .",
+    "build": "tsc -b",
+    "watch": "tsc -b -w",
     "prepare": "npm run clean && npm run build",
     "lint": "xo src/**/*.ts test/**/*.js",
     "lint:fix": "npm run lint -- --fix",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.1.2",
     "@types/node": "^15.0.2",
+    "@types/tap": "^15.0.1",
     "rimraf": "^3.0.2",
     "tap": "^15.0.6",
     "typescript": "^4.2.4",

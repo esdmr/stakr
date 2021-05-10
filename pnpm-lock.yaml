@@ -3,6 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@istanbuljs/esm-loader-hook': ^0.1.2
   '@types/node': ^15.0.2
+  '@types/tap': ^15.0.1
   rimraf: ^3.0.2
   tap: ^15.0.6
   typescript: ^4.2.4
@@ -11,6 +12,7 @@ specifiers:
 devDependencies:
   '@istanbuljs/esm-loader-hook': 0.1.2
   '@types/node': 15.0.2
+  '@types/tap': 15.0.1
   rimraf: 3.0.2
   tap: 15.0.6_typescript@4.2.4
   typescript: 4.2.4
@@ -420,6 +422,12 @@ packages:
 
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
+    dev: true
+
+  /@types/tap/15.0.1:
+    resolution: {integrity: sha512-gJYWkWFy+T+JyfWiUaVYNmn88PTv3AnmCPR9JF7vcFQuxy1/F33A6Np10dJS/35tjIuzNFfhAjtxdr/38inmPA==}
+    dependencies:
+      '@types/node': 15.0.2
     dev: true
 
   /@typescript-eslint/eslint-plugin/4.22.1_f2cf9a191be19a59b06aad4f4e4a9af1:
