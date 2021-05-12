@@ -4,10 +4,14 @@ specifiers:
   '@istanbuljs/esm-loader-hook': ^0.1.2
   '@types/node': ^15.0.2
   '@types/tap': ^15.0.1
+  dependency-graph: ^0.11.0
   rimraf: ^3.0.2
   tap: ^15.0.6
   typescript: ^4.2.4
   xo: ^0.39.1
+
+dependencies:
+  dependency-graph: 0.11.0
 
 devDependencies:
   '@istanbuljs/esm-loader-hook': 0.1.2
@@ -1488,6 +1492,11 @@ packages:
     resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}
     engines: {node: '>=0.4.0'}
     dev: true
+
+  /dependency-graph/0.11.0:
+    resolution: {integrity: sha512-JeMq7fEshyepOWDfcfHK06N3MhyPhz++vtqWhMT5O9A3K42rdsEDpfdVqjaqaAhsw6a+ZqeDvQVtD0hFHQWrzg==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
 
   /des.js/1.0.1:
     resolution: {integrity: sha512-Q0I4pfFrv2VPd34/vfLrFOoRmlYj3OV50i7fskps1jZWK1kApMWWT9G6RRUeYedLcBDIhnSDaUvJMb3AhUlaEA==}

@@ -75,7 +75,6 @@ class Refer extends Reference {
 }
 
 class Declare extends Reference {
-	/** @param {Label['name']} lastLabel */
 	getTrueName (lastLabel: Label['name']) {
 		return this.name.startsWith(':') ? lastLabel + this.name : this.name;
 	}
@@ -87,7 +86,6 @@ class Label extends Reference {
 	execute = (_: AssemblerData) => undefined;
 }
 
-/** @param {AssemblyItem[][]} source */
 const assemble = (source: AssemblyItem[][]) => {
 	for (const item of source) {
 		item.reverse();
