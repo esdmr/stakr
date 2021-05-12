@@ -2,3 +2,4 @@ ts: true
 coverage: true
 coverage-map: "coverage-map.cjs"
 reporter: "specy"
+test-regex: "^build/test/.*\\.js$"

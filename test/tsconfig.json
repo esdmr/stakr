@@ -2,9 +2,11 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "checkJs": true,
-    "noEmit": true,
-    "outDir": "../build/test"
+    "outDir": "../build/test",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["../src/*"]
+    }
   },
   "include": ["**/*"],
   "references": [
