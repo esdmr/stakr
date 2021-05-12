@@ -63,7 +63,12 @@ export const if_ = (name = 'if') => (arg: ExecuteArg) => {
 		throw new TypeError(`${name} statement on non-boolean, got ${typeof condition}`);
 	}
 
-	if (!condition) {
+	if (condition) {
+		// Check if offset is valid.
+		const { offset } = arg;
+		goto_(arg);
+		arg.offset = offset;
+	} else {
 		goto_(arg);
 	}
 };

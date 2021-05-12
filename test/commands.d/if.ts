@@ -11,9 +11,11 @@ const arg: Stakr.ExecuteArg = { context, source, offset: 0 };
 _.throws(command.bind(null, arg), 'expected to throw if stack is empty');
 context.push('abc');
 _.throws(command.bind(null, arg), 'expected to throw if poped value is not a boolean');
-context.push(true);
+context.stack.length = 0;
+context.push(123, true);
 command(arg);
 _.equal(arg.offset, 0, 'expected to not jump if poped value is true');
+_.strictSame(arg.context, [], 'expected to pop twice from the stack even if the condition is true');
 
 void _.test('goto', (_) => {
 	testGoto(_, () => {
