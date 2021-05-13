@@ -10,7 +10,7 @@
     "lint": "xo src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "tap": "tap --no-coverage",
-    "tap:coverage": "NODE_OPTIONS=\"--experimental-loader @istanbuljs/esm-loader-hook\" tap",
+    "tap:coverage": "NODE_OPTIONS=\"--no-warnings --experimental-loader @istanbuljs/esm-loader-hook\" tap",
     "tap:coverage-report": "npm run tap:coverage -- --no-check-coverage --reporter silent && npm run tap:coverage -- --coverage-report=html",
     "test": "npm run lint && npm run tap:coverage"
   },
