@@ -8,10 +8,12 @@
 			- [Stack](#stack)
 			- [Auxiliary Stack](#auxiliary-stack)
 			- [Offset](#offset)
+			- [Literal](#literal)
 		- [Commands](#commands)
 			- [`call`](#call)
 			- [`if`](#if)
 			- [`goto`](#goto)
+			- [`while`](#while)
 			- [`return`](#return)
 
 ## Internal API
@@ -31,6 +33,19 @@ commands. Literals will be pushed to the stack.
 
 #### Offset
 A unsigned integer representing the index within the source array. Starts at 0.
+
+#### Literal
+A fixed constant value stored in [stack](#stack) or [aux](#auxiliary-stack).
+Every literal is stored in a single index of stack. An implementation may use a
+pointer in the stack refering to the literal in the [heap][wp-heap]. A literal
+can have any of the following types:
+
+- String (Array of unicode characters)
+- Number (64-bit binary float)
+- Boolean
+- Null (empty value)
+
+[wp-heap]: https://en.wikipedia.org/wiki/Memory_management#HEAP
 
 ### Commands
 
@@ -58,6 +73,10 @@ Jumps to a given [offset](#offset) in the current source.
 
 It pops a value from the [stack](#stack) — aborting if it is not a valid offset
 — and will jump to that offset value.
+
+#### `while`
+During assembly and execution it operates similiarly to [if](#if) command. During
+parsing it will convert the end of block to end of while.
 
 #### `return`
 Jumps to the last [offset](#offset) in the [aux](#auxiliary-stack).
