@@ -197,6 +197,10 @@ export class Source {
 				return offset;
 			},
 			set offset (value) {
+				if (!Number.isSafeInteger(value) || value < 0) {
+					throw new RangeError(`'${value}' is not a valid offset.`);
+				}
+
 				offset = value;
 			},
 		};

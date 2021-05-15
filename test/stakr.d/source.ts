@@ -104,8 +104,28 @@ void _.test('execute', (_) => {
 		},
 		// @ts-expect-error
 		{
-			execute () {
+			execute (arg: Stakr.ExecuteArg) {
 				_.ok(jumped, 'expected to jump on set offset');
+
+				_.throws(() => {
+					arg.offset = -1;
+				}, 'expected to throw if offset is set to a negative value');
+
+				_.throws(() => {
+					arg.offset = 1.1;
+				}, 'expected to throw if offset is set to a fractional value');
+
+				_.throws(() => {
+					arg.offset = Number.NaN;
+				}, 'expected to throw if offset is set to NaN');
+
+				_.throws(() => {
+					arg.offset = Number.POSITIVE_INFINITY;
+				}, 'expected to throw if offset is set to Infinity');
+
+				_.throws(() => {
+					arg.offset = Number.MAX_SAFE_INTEGER + 1;
+				}, 'expected to throw if offset is set to a non-safe integer');
 			},
 		},
 		// @ts-expect-error
