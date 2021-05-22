@@ -4,6 +4,7 @@
       "error",
       "always"
     ],
+    "no-await-in-loop": "off",
     "node/no-unsupported-features/es-syntax": [
       "error",
       {
