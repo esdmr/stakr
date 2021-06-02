@@ -1,90 +1,120 @@
+<!-- omit in toc -->
 # Specifications
 
 <!-- omit in toc -->
 ## Table of contents
-- [Specifications](#specifications)
-	- [Internal API](#internal-api)
-		- [Definitions](#definitions)
-			- [Stack](#stack)
-			- [Auxiliary Stack](#auxiliary-stack)
-			- [Offset](#offset)
-			- [Literal](#literal)
-		- [Commands](#commands)
-			- [`call`](#call)
-			- [`if`](#if)
-			- [`goto`](#goto)
-			- [`while`](#while)
-			- [`return`](#return)
+- [Internal API](#internal-api)
+  - [Definitions](#definitions)
+  - [Commands](#commands)
+    - [`call`](#call)
+    - [`goto`](#goto)
+    - [`if`](#if)
+    - [`return`](#return)
+    - [`while`](#while)
 
 ## Internal API
 
 ### Definitions
 
-#### Stack
-A LIFO [stack][wp-stack] array. The stack pointer is equal to the length of the
-stack array. Used to store arguments and return values for functions and
-commands. Literals will be pushed to the stack.
-
-[wp-stack]: https://en.wikipedia.org/wiki/Stack_(abstract_data_type)
-
-#### Auxiliary Stack
-(Aux for short) A secondary LIFO stack array. Used to store function call return
-[offset](#offset)s and internal function variables.
-
-#### Offset
-A unsigned integer representing the index within the source array. Starts at 0.
-
-#### Literal
-A fixed constant value stored in [stack](#stack) or [aux](#auxiliary-stack).
-Every literal is stored in a single index of stack. An implementation may use a
-pointer in the stack refering to the literal in the [heap][wp-heap]. A literal
-can have any of the following types:
-
-- String (Array of unicode characters)
-- Number (64-bit binary float)
-- Boolean
-- Null (empty value)
-
-[wp-heap]: https://en.wikipedia.org/wiki/Memory_management#HEAP
+<dl>
+    <dt>Main Stack</dt>
+    <dd>
+        The <dfn>main stack</dfn> (<abbr>main</abbr> for short) is a LIFO stack
+        array. It is used to store arguments and return values for functions and
+        commands. Literals are pushed to this stack. Popping will cause the
+        stack to shrink.
+    </dd>
+    <dt>Auxiliary Stack</dt>
+    <dd>
+        The <dfn>auxiliary stack</dfn> (<abbr>aux</abbr> for short) is a
+        secondary LIFO stack array. It is used to store function return offsets,
+        and internal function variables. It is limited to a maximum of 1024
+        (2\^10) elements by default. This limit may be changed or withdrawn in
+        later versions of the specification.
+    </dd>
+    <dt>Source Address</dt>
+    <dd>
+        The <dfn>source address</dfn> (<abbr>offset</abbr> for short) is an
+        unsigned integer representing an index within the source array. It
+        starts at 0. Offsets may not have equal values in different
+        implementations.
+    </dd>
+    <dt>Stack Address</dt>
+    <dd>
+        The <dfn>stack address</dfn> (<abbr>address</abbr> for short) is a
+        signed integer representing an index within a stack. The stack is
+        implied through operators. If a negative value is provided, the length
+        of that stack will be added. If the address is out of bounds, it will
+        abort.
+    </dd>
+    <dt>Literal</dt>
+    <dd>
+        A <dfn>literal</dfn> is a fixed constant value. A literal can have any
+		of the following types:
+        <ul>
+            <li>String (Array of unicode characters)</li>
+            <li>Number (64-bit binary floating-point)</li>
+            <li>Boolean</li>
+            <li>Null (empty value)</li>
+        </ul>
+    </dd>
+</dl>
 
 ### Commands
 
 #### `call`
-Pushes the current [offset](#offset) to the [Aux](#auxiliary-stack) and jumps to
-a given offset. The offset may also be outside of the current source.
-
-It pops a value from the [stack](#stack).
-- If this value is a string, it will be used as the target source. It will then
-  pop a value from the stack — aborting if it is not a valid offset — and jump
-  to that source and offset.
-- If however this value is a number, — aborting if it is not a valid
-  [offset](#offset) — it will jump to that offset in the current source.
-- Otherwise it will abort.
-
-#### `if`
-Conditionally jumps to a given [offset](#offset) if a given boolean is false.
-
-It pops two values from the [stack](#stack) — aborting if they are not, in
-order: a boolean, and a valid offset. If the boolean is false, it jumps to the
-offset.
+- Let <var>SO</var> be pop().
+- If <var>SO</var> is a String, then
+  - Let <var>S</var> be <var>SO</var>.
+  - Let <var>O</var> be pop().
+  - Assert: <var>O</var> is a valid offset.
+  - xmove(nextOffset).
+  - xmove(sourceName).
+  - Jump to <var>O</var> at source <var>S</var>.
+- Else,
+  - Let <var>O</var> be <var>SO</var>.
+  - Assert: <var>O</var> is valid offset.
+  - xmove(nextOffset).
+  - Jump to <var>O</var>.
 
 #### `goto`
-Jumps to a given [offset](#offset) in the current source.
+- Let <var>SO</var> be pop().
+- If <var>SO</var> is a String, then
+  - Let <var>S</var> be <var>SO</var>.
+  - Assert: <var>S</var> is a valid source name.
+  - Let <var>O</var> be pop().
+  - Assert: <var>O</var> is a valid offset.
+  - Jump to <var>O</var> at source <var>S</var>.
+- Else,
+  - Let <var>O</var> be <var>SO</var>.
+  - Assert: <var>O</var> is valid offset.
+  - Jump to <var>O</var>.
 
-It pops a value from the [stack](#stack) — aborting if it is not a valid offset
-— and will jump to that offset value.
-
-#### `while`
-During assembly and execution it operates similiarly to [if](#if) command. During
-parsing it will convert the end of block to end of while.
+#### `if`
+- Let <var>C</var> be pop().
+- Assert: <var>C</var> is a Boolean.
+- If <var>C</var>, then
+  - Let <var>SO</var> be pop().
+  - If <var>SO</var> is a String, then
+    - Assert: <var>SO</var> is a valid source name.
+    - Assert: pop() is a valid offset.
+  - Else,
+    - Assert: <var>SO</var> is valid offset.
+- Else,
+  - Forward to [`goto`](#goto)
 
 #### `return`
-Jumps to the last [offset](#offset) in the [aux](#auxiliary-stack).
+- Let <var>SO</var> be xpop().
+- If <var>SO</var> is a String, then
+  - Let <var>S</var> be <var>SO</var>.
+  - Assert: <var>S</var> is a valid source name.
+  - Let <var>O</var> be xpop().
+  - Assert: <var>O</var> is a valid offset.
+  - Jump to <var>O</var> at source <var>S</var>.
+- Else,
+  - Let <var>O</var> be <var>SO</var>.
+  - Assert: <var>O</var> is valid offset.
+  - Jump to <var>O</var>.
 
-It pops a value from the aux.
-- If this value is a string, it will be used as the target source. It will then
-  pop another value from the aux — aborting if it is not a valid offset — and
-  jump to that source and offset.
-- If however this value is a number, — aborting if it is not a valid
-  [offset](#offset) — it will jump to that offset in the current source.
-- Otherwise it will abort.
+#### `while`
+- Forward to [`If`](#if)
