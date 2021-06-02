@@ -17,7 +17,7 @@
   "author": "Saeed M Rad",
   "license": "MIT",
   "engines": {
-    "node": ">=12.17"
+    "node": ">=16.0.0"
   },
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.1.2",
