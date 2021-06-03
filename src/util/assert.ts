@@ -1,3 +1,7 @@
+class AssertionError extends Error {
+	name = 'AssertionError';
+}
+
 export function assert (condition: boolean, message = 'Assertion failed', ...args: any[]): asserts condition {
 	if (condition) {
 		return;
@@ -7,5 +11,5 @@ export function assert (condition: boolean, message = 'Assertion failed', ...arg
 		message = message.replace('{}', String(item));
 	}
 
-	throw new Error(message);
+	throw new AssertionError(message);
 }
