@@ -4,7 +4,7 @@ const enum Message {
 	STACK_IS_FULL = 'Stack is full',
 	STACK_IS_EMPTY = 'Stack is empty',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
-	VALUE_IS_NULLISH = 'Nullish values are not allowed in a SafeArray',
+	VALUE_IS_UNDEFINED = 'Nullish values are not allowed in a SafeArray',
 	INDEX_IS_NOT_INT = 'Index is not a safe integer',
 }
 
@@ -34,7 +34,7 @@ export default class SafeArray<T> {
 		}
 
 		for (const item of items) {
-			this.assertNonNullish(item);
+			this.assertNotUndefined(item);
 		}
 
 		this._length = this.array.push(...items);
@@ -62,7 +62,7 @@ export default class SafeArray<T> {
 
 	set (index: number, value: T): void {
 		const normalized = this.normalizeIndex(index);
-		this.assertNonNullish(value);
+		this.assertNotUndefined(value);
 
 		if (normalized >= this.length) {
 			throw new RangeError(Message.INDEX_OUT_OF_BOUNDS);
@@ -71,9 +71,9 @@ export default class SafeArray<T> {
 		this.array[normalized] = value;
 	}
 
-	private assertNonNullish (value: T) {
-		if (value === undefined || value === null) {
-			throw new TypeError(Message.VALUE_IS_NULLISH);
+	private assertNotUndefined (value: T) {
+		if (value === undefined) {
+			throw new TypeError(Message.VALUE_IS_UNDEFINED);
 		}
 	}
 
