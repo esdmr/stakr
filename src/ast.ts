@@ -1,32 +1,18 @@
 import * as commands from './commands.js';
-import type * as Stakr from './stakr.js';
+import * as Types from './types.d';
 
-export type Item =
-	| Literal
-	| Label
-	| Operator
-	| Refer
-	| BlockStart
-	| BlockEnd
-	| WhileEnd
-	| FunctionEnd
-	| FunctionStatement
-	| ImportStatement;
+export class Literal implements Types.ASTNode {
+	constructor (readonly value: Types.StackItem) {}
 
-export type Source = readonly Item[];
-
-export class Literal implements Stakr.Executable {
-	constructor (readonly value: Stakr.StackItem) {}
-
-	execute ({ context }: Stakr.ExecuteArg) {
+	execute ({ context }: Types.ExecuteArg) {
 		context.push(this.value);
 	}
 }
 
-export class Label implements Stakr.Assemblable {
+export class Label implements Types.ASTNode {
 	constructor (readonly name: string) {}
 
-	assemble ({ source, offset }: Stakr.AssembleArg) {
+	assemble ({ source, offset }: Types.AssembleArg) {
 		if (source.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' already defined.`);
 		}
@@ -35,10 +21,10 @@ export class Label implements Stakr.Assemblable {
 	}
 }
 
-export class Operator implements Stakr.Executable {
+export class Operator implements Types.ASTNode {
 	constructor (readonly name: string) {}
 
-	execute (arg: Stakr.ExecuteArg) {
+	execute (arg: Types.ExecuteArg) {
 		const operator = arg.context.commandMap.get(this.name);
 
 		if (operator === undefined) {
@@ -49,10 +35,10 @@ export class Operator implements Stakr.Executable {
 	}
 }
 
-export class Refer implements Stakr.Executable {
+export class Refer implements Types.ASTNode {
 	constructor (readonly name: string) {}
 
-	execute (arg: Stakr.ExecuteArg) {
+	execute (arg: Types.ExecuteArg) {
 		const definition = arg.source.identifiers.get(this.name);
 
 		if (definition === undefined) {
@@ -75,7 +61,7 @@ export class Refer implements Stakr.Executable {
 	}
 }
 
-export class BlockStart implements Stakr.Assemblable, Stakr.Executable {
+export class BlockStart implements Types.ASTNode {
 	endOffset?: number;
 
 	get offset () {
@@ -86,16 +72,16 @@ export class BlockStart implements Stakr.Assemblable, Stakr.Executable {
 		return this.endOffset;
 	}
 
-	assemble ({ blockStack, offset }: Stakr.AssembleArg) {
+	assemble ({ blockStack, offset }: Types.AssembleArg) {
 		blockStack.push(offset);
 	}
 
-	execute ({ context }: Stakr.ExecuteArg) {
+	execute ({ context }: Types.ExecuteArg) {
 		context.push(this.offset);
 	}
 }
 
-export class BlockEnd implements Stakr.Assemblable {
+export class BlockEnd implements Types.ASTNode {
 	startOffset?: number;
 
 	get offset () {
@@ -106,7 +92,7 @@ export class BlockEnd implements Stakr.Assemblable {
 		return this.startOffset;
 	}
 
-	assemble ({ source, blockStack, offset }: Stakr.AssembleArg) {
+	assemble ({ source, blockStack, offset }: Types.AssembleArg) {
 		const startOffset = blockStack.pop();
 
 		if (startOffset === undefined) {
@@ -114,26 +100,26 @@ export class BlockEnd implements Stakr.Assemblable {
 		}
 
 		this.startOffset = startOffset;
-		(source.source[startOffset] as BlockStart).endOffset = offset + 1;
+		(source.ast[startOffset] as BlockStart).endOffset = offset + 1;
 	}
 }
 
-export class WhileEnd extends BlockEnd implements Stakr.Executable {
-	execute (arg: Stakr.ExecuteArg) {
+export class WhileEnd extends BlockEnd implements Types.ASTNode {
+	execute (arg: Types.ExecuteArg) {
 		arg.offset = this.offset;
 	}
 }
 
-export class FunctionEnd extends BlockEnd implements Stakr.Executable {
-	execute (arg: Stakr.ExecuteArg) {
+export class FunctionEnd extends BlockEnd implements Types.ASTNode {
+	execute (arg: Types.ExecuteArg) {
 		commands.return_(arg);
 	}
 }
 
-export class FunctionStatement implements Stakr.Assemblable, Stakr.Executable {
+export class FunctionStatement implements Types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, offset }: Stakr.AssembleArg) {
+	assemble ({ source, offset }: Types.AssembleArg) {
 		if (source.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' is already defined`);
 		}
@@ -146,15 +132,15 @@ export class FunctionStatement implements Stakr.Assemblable, Stakr.Executable {
 		}
 	}
 
-	execute (arg: Stakr.ExecuteArg) {
+	execute (arg: Types.ExecuteArg) {
 		commands.goto_(arg);
 	}
 }
 
-export class ImportStatement implements Stakr.Assemblable, Stakr.PostAssemblable {
+export class ImportStatement implements Types.ASTNode {
 	constructor (readonly prefix: string, readonly source: string) {}
 
-	assemble ({ source }: Stakr.AssembleArg) {
+	assemble ({ source }: Types.AssembleArg) {
 		if (source.imports.has(this.source)) {
 			throw new Error(`Source '${this.source}' already imported`);
 		}
@@ -162,7 +148,7 @@ export class ImportStatement implements Stakr.Assemblable, Stakr.PostAssemblable
 		source.imports.add(this.source);
 	}
 
-	postAssemble ({ context, source }: Readonly<Stakr.ExecuteArg>) {
+	link ({ context, source }: Types.LinkArg) {
 		const other = context.sourceMap.get(this.source);
 
 		if (other === undefined) {

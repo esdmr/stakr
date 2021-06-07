@@ -39,8 +39,8 @@ void _.test('assemble', (_) => {
 	_.strictSame(context.assemble(new Set(['test'])), ['test-lib', 'test'], 'expected to return dependency graph');
 	_.equal(lib.isAssembled, true, 'expected to assemble library');
 	_.equal(lib.isAssembled, true, 'expected to assemble source');
-	_.equal(lib.isPostAssembled, true, 'expected to postAssemble library');
-	_.equal(lib.isPostAssembled, true, 'expected to postAssemble source');
+	_.equal(lib.isLinked, true, 'expected to link library');
+	_.equal(lib.isLinked, true, 'expected to link source');
 
 	_.end();
 });
@@ -49,7 +49,6 @@ void _.test('execute', (_) => {
 	const instance = new Stakr.ExecutionContext();
 
 	const source = new Stakr.Source('test', [
-		// @ts-expect-error
 		{
 			execute () {
 				called = true;

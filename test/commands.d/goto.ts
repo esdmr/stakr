@@ -2,11 +2,12 @@ import * as _ from 'tap';
 import * as Stakr from 'src/stakr.js';
 import url from 'url';
 import { goto_ } from 'src/commands.js';
+import { ExecuteArg } from 'src/types';
 
 export function testGoto (
 	_: Tap.Test,
 	command: () => void,
-	arg: Stakr.ExecuteArg,
+	arg: ExecuteArg,
 ) {
 	const { context } = arg;
 	context.stack.length = 0;
@@ -26,7 +27,7 @@ export function testGoto (
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
 	const context = new Stakr.ExecutionContext();
 	const source = new Stakr.Source('test', []);
-	const arg: Stakr.ExecuteArg = { context, source, offset: 0 };
+	const arg: ExecuteArg = { context, source, offset: 0 };
 
 	testGoto(_, () => {
 		goto_(arg);

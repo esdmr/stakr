@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { ExecuteArg } from 'src/types';
 
 void _.test('Refer', (_) => {
 	void _.test('name', (_) => {
@@ -18,7 +19,7 @@ void _.test('Refer', (_) => {
 				instance,
 			]);
 
-			const arg: Stakr.ExecuteArg = { context, source, offset: 2 };
+			const arg: ExecuteArg = { context, source, offset: 2 };
 
 			context.addSource(source);
 
@@ -43,7 +44,7 @@ void _.test('Refer', (_) => {
 				instance,
 			]);
 
-			const arg: Stakr.ExecuteArg = { context, source, offset: 4 };
+			const arg: ExecuteArg = { context, source, offset: 4 };
 
 			context.addSource(source);
 
@@ -92,7 +93,7 @@ void _.test('Refer', (_) => {
 			const instance = new AST.Refer('test-function');
 			const context = new Stakr.ExecutionContext();
 			const source = new Stakr.Source('test', [instance]);
-			const arg: Stakr.ExecuteArg = { context, source, offset: 1 };
+			const arg: ExecuteArg = { context, source, offset: 1 };
 
 			context.addSource(source);
 

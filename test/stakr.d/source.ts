@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import * as Types from 'src/types.d';
 
 void _.test('name', (_) => {
 	_.equal(new Stakr.Source('test', []).name, 'test', 'expected to preserve name');
@@ -9,16 +10,15 @@ void _.test('name', (_) => {
 
 void _.test('source', (_) => {
 	const source = [] as const;
-	_.equal(new Stakr.Source('test', source).source, source, 'expected to preserve source list');
+	_.equal(new Stakr.Source('test', source).ast, source, 'expected to preserve source list');
 	_.end();
 });
 
 void _.test('assemble', (_) => {
 	let called = false;
 	const source = new Stakr.Source('test', [
-		// @ts-expect-error
 		{
-			assemble (arg: Stakr.AssembleArg) {
+			assemble (arg: Types.AssembleArg) {
 				called = true;
 				_.strictSame(arg, {
 					source,
@@ -27,7 +27,6 @@ void _.test('assemble', (_) => {
 				}, 'expected to provide an assemble argument');
 			},
 		},
-		// @ts-expect-error
 		{},
 	]);
 
@@ -46,35 +45,33 @@ void _.test('assemble', (_) => {
 	_.end();
 });
 
-void _.test('postAssemble', (_) => {
+void _.test('link', (_) => {
 	let called = false;
 	const context = new Stakr.ExecutionContext();
 	const source = new Stakr.Source('test', [
-		// @ts-expect-error
 		{
-			postAssemble (arg: Readonly<Stakr.ExecuteArg>) {
+			link (arg: Types.LinkArg) {
 				called = true;
 				_.strictSame(arg, {
 					context,
 					source,
 					offset: 0,
-				}, 'expected to provide an post-assemble argument');
+				}, 'expected to provide a link argument');
 			},
 		},
-		// @ts-expect-error
 		{},
 	]);
 
 	_.throws(() => {
-		source.postAssemble(context);
+		source.link(context);
 	}, 'expected to throw if not assembled');
 
 	source.assemble();
-	source.postAssemble(context);
-	_.ok(called, 'expected to call postAssemble');
+	source.link(context);
+	_.ok(called, 'expected to call link');
 	called = false;
-	source.postAssemble(context);
-	_.notOk(called, 'expected to not call postAssemble again');
+	source.link(context);
+	_.notOk(called, 'expected to not call link again');
 	_.end();
 });
 
@@ -83,9 +80,8 @@ void _.test('execute', (_) => {
 	let jumped = true;
 	const context = new Stakr.ExecutionContext();
 	const source = new Stakr.Source('test', [
-		// @ts-expect-error
 		{
-			execute (arg: Stakr.ExecuteArg) {
+			execute (arg: Types.ExecuteArg) {
 				called = true;
 				_.strictSame(arg, {
 					context,
@@ -96,15 +92,13 @@ void _.test('execute', (_) => {
 				_.equal(arg.offset, 2, 'expected to preserve offset');
 			},
 		},
-		// @ts-expect-error
 		{
 			execute () {
 				jumped = false;
 			},
 		},
-		// @ts-expect-error
 		{
-			execute (arg: Stakr.ExecuteArg) {
+			execute (arg: Types.ExecuteArg) {
 				_.ok(jumped, 'expected to jump on set offset');
 
 				_.throws(() => {
@@ -128,7 +122,6 @@ void _.test('execute', (_) => {
 				}, 'expected to throw if offset is set to a non-safe integer');
 			},
 		},
-		// @ts-expect-error
 		{},
 	]);
 

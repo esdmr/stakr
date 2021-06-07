@@ -2,11 +2,12 @@ import * as _ from 'tap';
 import * as Stakr from 'src/stakr.js';
 import { if_ } from 'src/commands.js';
 import { testGoto } from './goto.js';
+import { ExecuteArg } from 'src/types.js';
 
 const command = if_();
 const context = new Stakr.ExecutionContext();
 const source = new Stakr.Source('test', []);
-const arg: Stakr.ExecuteArg = { context, source, offset: 0 };
+const arg: ExecuteArg = { context, source, offset: 0 };
 
 _.throws(command.bind(null, arg), 'expected to throw if stack is empty');
 context.push('abc');

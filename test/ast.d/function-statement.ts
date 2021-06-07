@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { AssembleArg, ExecuteArg } from 'src/types';
 
 void _.test('FunctionStatement', (_) => {
 	void _.test('name', (_) => {
@@ -16,7 +17,7 @@ void _.test('FunctionStatement', (_) => {
 	void _.test('assemble', (_) => {
 		const instance = new AST.FunctionStatement('test-function', true);
 		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
+		const arg: AssembleArg = { source, blockStack: [], offset: 0 };
 
 		instance.assemble(arg);
 
@@ -37,7 +38,7 @@ void _.test('FunctionStatement', (_) => {
 		const instance = new AST.FunctionStatement('test-function', false);
 		const context = new Stakr.ExecutionContext();
 		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.ExecuteArg = { context, source, offset: 1 };
+		const arg: ExecuteArg = { context, source, offset: 1 };
 
 		context.addSource(source);
 		source.assemble();

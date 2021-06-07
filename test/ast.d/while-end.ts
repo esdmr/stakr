@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { ExecuteArg } from 'src/types';
 
 void _.test('WhileEnd', (_) => {
 	void _.test('execute', (_) => {
@@ -12,7 +13,7 @@ void _.test('WhileEnd', (_) => {
 			instance,
 		]);
 
-		const arg: Stakr.ExecuteArg = { context, source, offset: 2 };
+		const arg: ExecuteArg = { context, source, offset: 2 };
 
 		context.addSource(source);
 		source.assemble();

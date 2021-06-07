@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { ExecuteArg } from 'src/types';
 
 void _.test('Operator', (_) => {
 	void _.test('name', (_) => {
@@ -12,7 +13,7 @@ void _.test('Operator', (_) => {
 		const instance = new AST.Operator('test-operator');
 		const context = new Stakr.ExecutionContext();
 		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.ExecuteArg = { context, source, offset: 1 };
+		const arg: ExecuteArg = { context, source, offset: 1 };
 		let operatorCalled = false;
 
 		context.addSource(source);

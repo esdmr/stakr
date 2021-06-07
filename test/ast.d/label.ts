@@ -1,6 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { AssembleArg } from 'src/types';
 
 void _.test('Label', (_) => {
 	void _.test('name', (_) => {
@@ -11,7 +12,7 @@ void _.test('Label', (_) => {
 	void _.test('assemble', (_) => {
 		const instance = new AST.Label('test-label');
 		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
+		const arg: AssembleArg = { source, blockStack: [], offset: 0 };
 
 		instance.assemble(arg);
 

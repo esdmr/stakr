@@ -1,49 +1,17 @@
 import { DepGraph } from 'dependency-graph';
-import * as AST from './ast.js';
 import commandMap from './commands.js';
-
-export type StackItem = string | number | boolean | null;
-
-interface Definition {
-	readonly call: boolean;
-	readonly offset: number;
-	readonly source?: string;
-}
-
-export interface AssembleArg {
-	readonly source: Source;
-	readonly blockStack: number[];
-	offset: number;
-}
-
-export interface Assemblable {
-	assemble (arg: AssembleArg): void;
-}
-
-export interface ExecuteArg {
-	readonly context: ExecutionContext;
-	readonly source: Source;
-	offset: number;
-}
-
-export interface PostAssemblable {
-	postAssemble (arg: Readonly<ExecuteArg>): void;
-}
-
-export interface Executable {
-	execute (arg: ExecuteArg): void;
-}
+import * as Types from './types.d';
 
 export class ExecutionContext {
-	readonly stack: StackItem[] = [];
-	readonly aux: StackItem[] = [];
+	readonly stack: Types.StackItem[] = [];
+	readonly aux: Types.StackItem[] = [];
 	readonly sourceMap = new Map<string, Source>();
 	nextSource?: string = undefined;
 	nextOffset?: number = undefined;
 	halted = true;
 	readonly commandMap = new Map(commandMap);
 
-	push (...items: StackItem[]) {
+	push (...items: Types.StackItem[]) {
 		this.stack.push(...items);
 	}
 
@@ -76,7 +44,7 @@ export class ExecutionContext {
 
 		for (const sourceName of sources) {
 			const source = deps.getNodeData(sourceName);
-			source.postAssemble(this);
+			source.link(this);
 
 			for (const target of source.imports) {
 				deps.addDependency(sourceName, target);
@@ -126,13 +94,13 @@ export class ExecutionContext {
 }
 
 export class Source {
-	readonly identifiers = new Map<string, Definition>();
-	readonly exports = new Map<string, Definition>();
+	readonly identifiers = new Map<string, Types.Definition>();
+	readonly exports = new Map<string, Types.Definition>();
 	readonly imports = new Set<string>();
 	readonly namespaces = new Set<string>();
 	isAssembled = false;
-	isPostAssembled = false;
-	constructor (readonly name: string, readonly source: AST.Source) {}
+	isLinked = false;
+	constructor (readonly name: string, readonly ast: Types.ASTTree) {}
 
 	assemble () {
 		if (this.isAssembled) {
@@ -146,11 +114,9 @@ export class Source {
 			offset: 0,
 		};
 
-		for (const [offset, item] of this.source.entries()) {
-			if ('assemble' in item) {
-				arg.offset = offset;
-				item.assemble(arg);
-			}
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.assemble?.(arg);
 		}
 
 		const lastBlock = blockStack.pop();
@@ -163,34 +129,32 @@ export class Source {
 		return this;
 	}
 
-	postAssemble (context: ExecutionContext) {
+	link (context: ExecutionContext) {
 		if (!this.isAssembled) {
-			throw new Error('Called postassemble before assemble');
+			throw new Error('Called link before assemble');
 		}
 
-		if (this.isPostAssembled) {
+		if (this.isLinked) {
 			return this;
 		}
 
-		const arg: ExecuteArg = {
+		const arg: Types.ExecuteArg = {
 			context,
 			source: this,
 			offset: 0,
 		};
 
-		for (const [offset, item] of this.source.entries()) {
-			if ('postAssemble' in item) {
-				arg.offset = offset;
-				item.postAssemble(arg);
-			}
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.link?.(arg);
 		}
 
-		this.isPostAssembled = true;
+		this.isLinked = true;
 		return this;
 	}
 
 	execute (context: ExecutionContext, offset: number) {
-		const arg: ExecuteArg = {
+		const arg: Types.ExecuteArg = {
 			context,
 			source: this,
 			get offset () {
@@ -206,15 +170,13 @@ export class Source {
 		};
 
 		while (arg.context.halted) {
-			const item = this.source[offset++];
+			const item = this.ast[offset++];
 
 			if (item === undefined) {
 				break;
 			}
 
-			if ('execute' in item) {
-				item.execute(arg);
-			}
+			item.execute?.(arg);
 		}
 	}
 }

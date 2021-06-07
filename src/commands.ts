@@ -1,4 +1,4 @@
-import { Executable, ExecuteArg } from './stakr.js';
+import { Executable, ExecuteArg } from './types.d';
 
 function newTypeErrorForJumpTarget (offset: string) {
 	return new TypeError(`Jump target not a number, got ${offset}`);
@@ -73,7 +73,7 @@ export const if_ = (name = 'if') => (arg: ExecuteArg) => {
 	}
 };
 
-const commandMap = new Map<string, Executable['execute']>([
+const commandMap = new Map<string, Executable>([
 	['goto', goto_],
 	['call', call_],
 	['return', return_],

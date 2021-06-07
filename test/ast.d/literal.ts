@@ -1,6 +1,6 @@
-import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import * as _ from 'tap';
 
 void _.test('Literal', (_) => {
 	void _.test('value', (_) => {
