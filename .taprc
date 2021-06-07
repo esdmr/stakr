@@ -2,4 +2,4 @@ ts: true
 coverage: true
 coverage-map: "coverage-map.cjs"
 reporter: "base"
-test-regex: "^build/test/.*\\.js$"
+test-regex: "^build/test/(?!util/).*\\.js$"

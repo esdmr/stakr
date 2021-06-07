@@ -1,7 +1,7 @@
 import * as _ from 'tap';
 import * as Stakr from 'src/stakr.js';
 import { return_ } from 'src/commands.js';
-import { ExecuteArg } from 'src/types';
+import { ExecuteArg } from 'src/types.d';
 
 const context = new Stakr.ExecutionContext();
 const source = new Stakr.Source('test', []);

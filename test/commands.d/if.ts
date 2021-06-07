@@ -1,8 +1,8 @@
 import * as _ from 'tap';
 import * as Stakr from 'src/stakr.js';
 import { if_ } from 'src/commands.js';
-import { testGoto } from './goto.js';
 import { ExecuteArg } from 'src/types.js';
+import { testGoto } from '../util/goto.js';
 
 const command = if_();
 const context = new Stakr.ExecutionContext();

@@ -1,7 +1,7 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
-import { ExecuteArg } from 'src/types';
+import { ExecuteArg } from 'src/types.d';
 
 void _.test('WhileEnd', (_) => {
 	void _.test('execute', (_) => {
