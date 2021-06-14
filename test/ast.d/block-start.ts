@@ -3,8 +3,8 @@ import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
 import { AssembleArg } from 'src/types.d';
 
-void _.test('BlockStart', (_) => {
-	void _.test('offset', (_) => {
+await _.test('BlockStart', async (_) => {
+	await _.test('offset', async (_) => {
 		const instance = new AST.BlockStart();
 
 		_.throws(() => instance.offset, 'expected to throw if not initialized');
@@ -13,24 +13,30 @@ void _.test('BlockStart', (_) => {
 		_.end();
 	});
 
-	void _.test('assemble', (_) => {
+	await _.test('assemble', async (_) => {
 		const instance = new AST.BlockStart();
 		const source = new Stakr.Source('test', [instance]);
-		const arg: AssembleArg = { source, blockStack: [], offset: 0 };
+		const arg: AssembleArg = {
+			source,
+			blockStack: [],
+			data: new Stakr.AssembleData(),
+			offset: 0,
+		};
 
 		instance.assemble(arg);
 		_.strictSame(arg.blockStack, [0], 'expected to push offset');
 		_.end();
 	});
 
-	void _.test('execute', (_) => {
+	await _.test('execute', async (_) => {
 		const instance = new AST.BlockStart();
 		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
+		const data = new Stakr.ExecuteData();
+		context.addSource(new Stakr.Source('test', [instance, new AST.BlockEnd()]));
 
 		instance.endOffset = 123;
-		source.execute(context, 0);
-		_.strictSame(context.stack, [123], 'expected to push offset');
+		context.execute(['test'], data);
+		_.strictSame(data.stack.toNewArray(), [123], 'expected to push offset');
 		_.end();
 	});
 

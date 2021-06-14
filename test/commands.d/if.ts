@@ -7,20 +7,26 @@ import { testGoto } from '../util/goto.js';
 const command = if_();
 const context = new Stakr.ExecutionContext();
 const source = new Stakr.Source('test', []);
-const arg: ExecuteArg = { context, source, offset: 0 };
+const data = new Stakr.ExecuteData();
+const arg: ExecuteArg = {
+	context,
+	source,
+	data,
+	offset: 0,
+};
 
 _.throws(command.bind(null, arg), 'expected to throw if stack is empty');
-context.push('abc');
+data.stack.push('abc');
 _.throws(command.bind(null, arg), 'expected to throw if poped value is not a boolean');
-context.stack.length = 0;
-context.push(123, true);
+data.stack.clear();
+data.stack.push(123, true);
 command(arg);
 _.equal(arg.offset, 0, 'expected to not jump if poped value is true');
-_.strictSame(arg.context.stack, [], 'expected to pop twice from the stack even if the condition is true');
+_.strictSame(data.stack.toNewArray(), [], 'expected to pop twice from the stack even if the condition is true');
 
-void _.test('goto', (_) => {
+await _.test('goto', async (_) => {
 	testGoto(_, () => {
-		context.push(false);
+		data.stack.push(false);
 		command(arg);
 	}, arg);
 

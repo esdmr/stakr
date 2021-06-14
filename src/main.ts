@@ -21,9 +21,16 @@ context.addSource(new S.Source('b', [
 	new A.Literal('After Call'),
 ]));
 
-const sourceList = context.assemble(new Set(['b']));
-context.execute(sourceList);
-console.log(sourceList, inspect(context, {
+const sourceList = context.link(new Set(['b']));
+const data = new S.ExecuteData();
+context.execute(sourceList, data);
+
+console.log(inspect({
+	sourceList,
+	context,
+	linkData: [...context.sourceMap.values()].map(s => s.linkData.get(context)),
+	data,
+}, {
 	colors: true,
 	depth: Number.POSITIVE_INFINITY,
 }));

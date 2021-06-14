@@ -1,31 +1,31 @@
 import { DepGraph } from 'dependency-graph';
 import commandMap from './commands.js';
 import * as Types from './types.d';
+import SafeArray from './util/safe-array.js';
 
-export class ExecutionContext {
-	readonly stack: Types.StackItem[] = [];
-	readonly aux: Types.StackItem[] = [];
-	readonly sourceMap = new Map<string, Source>();
+export class AssembleData {
+	readonly identifiers = new Map<string, Types.Definition>();
+	readonly imports = new Set<string>();
+	readonly namespaces = new Set<string>();
+}
+
+export class LinkData {
+	readonly identifiers = new Map<string, Types.Definition>();
+}
+
+export class ExecuteData {
+	readonly stack = new SafeArray<Types.StackItem>();
+	readonly aux = new SafeArray<Types.StackItem>();
+	readonly commandMap = new Map(commandMap);
 	nextSource?: string = undefined;
 	nextOffset?: number = undefined;
 	halted = true;
-	readonly commandMap = new Map(commandMap);
+}
 
-	push (...items: Types.StackItem[]) {
-		this.stack.push(...items);
-	}
+export class ExecutionContext {
+	readonly sourceMap = new Map<string, Source>();
 
-	pop () {
-		const value = this.stack.pop();
-
-		if (value === undefined) {
-			throw new RangeError('Can not pop empty stack');
-		}
-
-		return value;
-	}
-
-	assemble (sources: Set<string>) {
+	link (sources: Set<string>) {
 		const deps = new DepGraph<Source>();
 
 		if (sources.size === 0) {
@@ -35,18 +35,17 @@ export class ExecutionContext {
 		for (const sourceName of sources) {
 			const source = this.resolveSource(sourceName);
 			deps.addNode(sourceName, source);
-			source.assemble();
 
-			for (const target of source.imports) {
+			for (const target of source.assemble().imports) {
 				sources.add(target);
 			}
 		}
 
 		for (const sourceName of sources) {
 			const source = deps.getNodeData(sourceName);
-			source.link(this);
+			this.linkSource(source);
 
-			for (const target of source.imports) {
+			for (const target of source.assemble().imports) {
 				deps.addDependency(sourceName, target);
 			}
 		}
@@ -54,21 +53,21 @@ export class ExecutionContext {
 		return deps.overallOrder();
 	}
 
-	execute (sourceList: string[]) {
+	execute (sourceList: string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
 			throw new Error('Empty source list');
 		}
 
 		for (const sourceName of sourceList) {
-			this.nextSource = sourceName;
-			this.nextOffset = 0;
-			this.halted = false;
+			data.nextSource = sourceName;
+			data.nextOffset = 0;
+			data.halted = false;
 
-			while (!this.halted) {
-				const source = this.resolveSource(this.nextSource);
+			while (!data.halted) {
+				const source = this.resolveSource(data.nextSource);
 
-				this.halted = true;
-				source.execute(this, this.nextOffset);
+				data.halted = true;
+				this.executeSource(source, data, data.nextOffset);
 			}
 		}
 	}
@@ -79,6 +78,7 @@ export class ExecutionContext {
 			throw new Error(`The same name '${source.name}' was registered with a different source`);
 		}
 
+		source.assemble();
 		this.sourceMap.set(source.name, source);
 	}
 
@@ -91,72 +91,41 @@ export class ExecutionContext {
 
 		return source;
 	}
-}
 
-export class Source {
-	readonly identifiers = new Map<string, Types.Definition>();
-	readonly exports = new Map<string, Types.Definition>();
-	readonly imports = new Set<string>();
-	readonly namespaces = new Set<string>();
-	isAssembled = false;
-	isLinked = false;
-	constructor (readonly name: string, readonly ast: Types.ASTTree) {}
-
-	assemble () {
-		if (this.isAssembled) {
-			return this;
+	private linkSource (
+		source: Source,
+	) {
+		if (source.linkData.has(this)) {
+			return source.linkData.get(this);
 		}
 
-		const blockStack: number[] = [];
-		const arg = {
-			source: this,
-			blockStack,
+		source.assemble();
+
+		const arg: Types.Writable<Types.LinkArg> = {
+			context: this,
+			source,
+			data: new LinkData(),
 			offset: 0,
 		};
 
-		for (const [offset, item] of this.ast.entries()) {
-			arg.offset = offset;
-			item.assemble?.(arg);
-		}
-
-		const lastBlock = blockStack.pop();
-
-		if (lastBlock !== undefined) {
-			throw new Error(`Extraneous start of block at ${lastBlock}`);
-		}
-
-		this.isAssembled = true;
-		return this;
-	}
-
-	link (context: ExecutionContext) {
-		if (!this.isAssembled) {
-			throw new Error('Called link before assemble');
-		}
-
-		if (this.isLinked) {
-			return this;
-		}
-
-		const arg: Types.ExecuteArg = {
-			context,
-			source: this,
-			offset: 0,
-		};
-
-		for (const [offset, item] of this.ast.entries()) {
+		for (const [offset, item] of source.ast.entries()) {
 			arg.offset = offset;
 			item.link?.(arg);
 		}
 
-		this.isLinked = true;
-		return this;
+		source.linkData.set(this, arg.data);
+		return arg.data;
 	}
 
-	execute (context: ExecutionContext, offset: number) {
+	private executeSource (
+		source: Source,
+		data: ExecuteData,
+		offset: number,
+	) {
 		const arg: Types.ExecuteArg = {
-			context,
-			source: this,
+			context: this,
+			source,
+			data,
 			get offset () {
 				return offset;
 			},
@@ -169,8 +138,8 @@ export class Source {
 			},
 		};
 
-		while (arg.context.halted) {
-			const item = this.ast[offset++];
+		while (arg.data.halted) {
+			const item = source.ast[offset++];
 
 			if (item === undefined) {
 				break;
@@ -178,5 +147,39 @@ export class Source {
 
 			item.execute?.(arg);
 		}
+	}
+}
+
+export class Source {
+	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
+	private assembleData?: AssembleData = undefined;
+
+	constructor (readonly name: string, readonly ast: Types.ASTTree) {}
+
+	assemble () {
+		if (this.assembleData) {
+			return this.assembleData;
+		}
+
+		const arg: Types.Writable<Types.AssembleArg> = {
+			source: this,
+			blockStack: [] as number[],
+			data: new AssembleData(),
+			offset: 0,
+		};
+
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.assemble?.(arg);
+		}
+
+		const lastBlock = arg.blockStack.pop();
+
+		if (lastBlock !== undefined) {
+			throw new Error(`Extraneous start of block at ${lastBlock}`);
+		}
+
+		this.assembleData = arg.data;
+		return this.assembleData;
 	}
 }

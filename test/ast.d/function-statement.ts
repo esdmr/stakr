@@ -1,48 +1,54 @@
-import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
-import { AssembleArg, ExecuteArg } from 'src/types.d';
+import { ExecuteArg } from 'src/types.d';
+import * as _ from 'tap';
 
-void _.test('FunctionStatement', (_) => {
-	void _.test('name', (_) => {
+await _.test('FunctionStatement', async (_) => {
+	await _.test('name', async (_) => {
 		_.equal(new AST.FunctionStatement('test', false).name, 'test', 'expected to preserve name');
 		_.end();
 	});
 
-	void _.test('exported', (_) => {
+	await _.test('exported', async (_) => {
 		_.equal(new AST.FunctionStatement('test', true).exported, true, 'expected to preserve exported flag');
 		_.end();
 	});
 
-	void _.test('assemble', (_) => {
+	await _.test('assemble', async (_) => {
 		const instance = new AST.FunctionStatement('test-function', true);
 		const source = new Stakr.Source('test', [instance]);
-		const arg: AssembleArg = { source, blockStack: [], offset: 0 };
+		const definition = source.assemble().identifiers.get('test-function');
 
-		instance.assemble(arg);
+		_.strictSame(definition, {
+			offset: 1,
+			sourceName: 'test',
+			implicitlyCalled: true,
+			exported: true,
+		}, 'expected to correctly add a definition');
 
-		const definition = source.identifiers.get('test-function');
-		const exported = source.exports.get('test-function');
-
-		_.strictSame(definition, { call: true, offset: 0 + 1 }, 'expected to correctly add a definition');
-		_.strictSame(exported, { call: true, offset: 0 + 1, source: 'test' }, 'expected to correctly add a export');
+		const sourceDup = new Stakr.Source('test', [instance, instance]);
 
 		_.throws(() => {
-			instance.assemble(arg);
+			sourceDup.assemble();
 		}, 'expected to throw if identifier already exists');
 
 		_.end();
 	});
 
-	void _.test('execute', (_) => {
+	await _.test('execute', async (_) => {
 		const instance = new AST.FunctionStatement('test-function', false);
 		const context = new Stakr.ExecutionContext();
 		const source = new Stakr.Source('test', [instance]);
-		const arg: ExecuteArg = { context, source, offset: 1 };
+		const arg: ExecuteArg = {
+			context,
+			source,
+			data: new Stakr.ExecuteData(),
+			offset: 1,
+		};
 
 		context.addSource(source);
 		source.assemble();
-		context.push(123);
+		arg.data.stack.push(123);
 		instance.execute(arg);
 		_.equal(arg.offset, 123, 'expected to jump');
 		_.end();

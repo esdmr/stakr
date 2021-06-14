@@ -4,20 +4,25 @@ import * as Types from './types.d';
 export class Literal implements Types.ASTNode {
 	constructor (readonly value: Types.StackItem) {}
 
-	execute ({ context }: Types.ExecuteArg) {
-		context.push(this.value);
+	execute ({ data }: Types.ExecuteArg) {
+		data.stack.push(this.value);
 	}
 }
 
 export class Label implements Types.ASTNode {
-	constructor (readonly name: string) {}
+	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, offset }: Types.AssembleArg) {
-		if (source.identifiers.has(this.name)) {
+	assemble ({ source, data, offset }: Types.AssembleArg) {
+		if (data.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' already defined.`);
 		}
 
-		source.identifiers.set(this.name, { call: false, offset });
+		data.identifiers.set(this.name, {
+			offset,
+			sourceName: source.name,
+			exported: this.exported,
+			implicitlyCalled: false,
+		});
 	}
 }
 
@@ -25,7 +30,7 @@ export class Operator implements Types.ASTNode {
 	constructor (readonly name: string) {}
 
 	execute (arg: Types.ExecuteArg) {
-		const operator = arg.context.commandMap.get(this.name);
+		const operator = arg.data.commandMap.get(this.name);
 
 		if (operator === undefined) {
 			throw new Error(`Undefined operator '${this.name}'`);
@@ -39,23 +44,20 @@ export class Refer implements Types.ASTNode {
 	constructor (readonly name: string) {}
 
 	execute (arg: Types.ExecuteArg) {
-		const definition = arg.source.identifiers.get(this.name);
+		const definition = arg.source.assemble().identifiers.get(this.name) ??
+			arg.source.linkData.get(arg.context)?.identifiers.get(this.name);
 
 		if (definition === undefined) {
 			throw new Error(`Undefined identifier '${this.name}'`);
 		}
 
-		arg.context.push(definition.offset);
+		arg.data.stack.push(definition.offset);
 
-		if (definition.source !== undefined) {
-			if (!definition.call) {
-				throw new Error('Uncallable external label referred');
-			}
-
-			arg.context.push(definition.source);
+		if (definition.sourceName !== arg.source.name) {
+			arg.data.stack.push(definition.sourceName);
 		}
 
-		if (definition.call) {
+		if (definition.implicitlyCalled) {
 			commands.call_(arg);
 		}
 	}
@@ -76,8 +78,8 @@ export class BlockStart implements Types.ASTNode {
 		blockStack.push(offset);
 	}
 
-	execute ({ context }: Types.ExecuteArg) {
-		context.push(this.offset);
+	execute ({ data }: Types.ExecuteArg) {
+		data.stack.push(this.offset);
 	}
 }
 
@@ -119,17 +121,17 @@ export class FunctionEnd extends BlockEnd implements Types.ASTNode {
 export class FunctionStatement implements Types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, offset }: Types.AssembleArg) {
-		if (source.identifiers.has(this.name)) {
+	assemble ({ source, data, offset }: Types.AssembleArg) {
+		if (data.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' is already defined`);
 		}
 
-		const definition = { call: true, offset: offset + 1 };
-		source.identifiers.set(this.name, definition);
-
-		if (this.exported) {
-			source.exports.set(this.name, { ...definition, source: source.name });
-		}
+		data.identifiers.set(this.name, {
+			sourceName: source.name,
+			offset: offset + 1,
+			exported: this.exported,
+			implicitlyCalled: true,
+		});
 	}
 
 	execute (arg: Types.ExecuteArg) {
@@ -138,35 +140,32 @@ export class FunctionStatement implements Types.ASTNode {
 }
 
 export class ImportStatement implements Types.ASTNode {
-	constructor (readonly prefix: string, readonly source: string) {}
+	constructor (readonly namespace: string, readonly source: string) {}
 
-	assemble ({ source }: Types.AssembleArg) {
-		if (source.imports.has(this.source)) {
+	assemble ({ data }: Types.AssembleArg) {
+		if (data.imports.has(this.source)) {
 			throw new Error(`Source '${this.source}' already imported`);
 		}
 
-		source.imports.add(this.source);
+		if (data.namespaces.has(this.namespace)) {
+			throw new Error(`Namespace '${this.namespace}' is already defined`);
+		}
+
+		data.imports.add(this.source);
+		data.namespaces.add(this.namespace);
 	}
 
-	link ({ context, source }: Types.LinkArg) {
+	link ({ context, data }: Types.LinkArg) {
 		const other = context.sourceMap.get(this.source);
 
 		if (other === undefined) {
 			throw new Error(`Undefined source '${this.source}'`);
 		}
 
-		if (!other.isAssembled) {
-			throw new Error(`Importing unassembled source '${this.source}'`);
-		}
-
-		if (source.namespaces.has(this.prefix)) {
-			throw new Error(`Namespace '${this.prefix}' is already defined`);
-		}
-
-		source.namespaces.add(this.prefix);
-
-		for (const [key, value] of other.exports) {
-			source.identifiers.set(`${this.prefix}:${key}`, value);
+		for (const [key, value] of other.assemble().identifiers) {
+			if (value.exported) {
+				data.identifiers.set(`${this.namespace}:${key}`, value);
+			}
 		}
 	}
 }

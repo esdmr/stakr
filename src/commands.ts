@@ -5,7 +5,7 @@ function newTypeErrorForJumpTarget (offset: string) {
 }
 
 export const goto_ = (arg: ExecuteArg) => {
-	const offset = arg.context.pop();
+	const offset = arg.data.stack.pop();
 
 	if (typeof offset !== 'number') {
 		throw newTypeErrorForJumpTarget(typeof offset);
@@ -15,21 +15,21 @@ export const goto_ = (arg: ExecuteArg) => {
 };
 
 export const call_ = (arg: ExecuteArg) => {
-	const offsetOrSource = arg.context.pop();
+	const offsetOrSource = arg.data.stack.pop();
 
 	if (typeof offsetOrSource === 'string') {
-		const offset = arg.context.pop();
+		const offset = arg.data.stack.pop();
 
 		if (typeof offset !== 'number') {
 			throw newTypeErrorForJumpTarget(typeof offset);
 		}
 
-		arg.context.aux.push(arg.offset, arg.source.name);
-		arg.context.nextSource = offsetOrSource;
-		arg.context.nextOffset = offset;
-		arg.context.halted = false;
+		arg.data.aux.push(arg.offset, arg.source.name);
+		arg.data.nextSource = offsetOrSource;
+		arg.data.nextOffset = offset;
+		arg.data.halted = false;
 	} else if (typeof offsetOrSource === 'number') {
-		arg.context.aux.push(arg.offset);
+		arg.data.aux.push(arg.offset);
 		arg.offset = offsetOrSource;
 	} else {
 		throw newTypeErrorForJumpTarget(typeof offsetOrSource);
@@ -37,18 +37,18 @@ export const call_ = (arg: ExecuteArg) => {
 };
 
 export const return_ = (arg: ExecuteArg) => {
-	const offsetOrSource = arg.context.aux.pop();
+	const offsetOrSource = arg.data.aux.pop();
 
 	if (typeof offsetOrSource === 'string') {
-		const offset = arg.context.aux.pop();
+		const offset = arg.data.aux.pop();
 
 		if (typeof offset !== 'number') {
 			throw newTypeErrorForJumpTarget(typeof offset);
 		}
 
-		arg.context.nextSource = offsetOrSource;
-		arg.context.nextOffset = offset;
-		arg.context.halted = false;
+		arg.data.nextSource = offsetOrSource;
+		arg.data.nextOffset = offset;
+		arg.data.halted = false;
 	} else if (typeof offsetOrSource === 'number') {
 		arg.offset = offsetOrSource;
 	} else {
@@ -57,7 +57,7 @@ export const return_ = (arg: ExecuteArg) => {
 };
 
 export const if_ = (name = 'if') => (arg: ExecuteArg) => {
-	const condition = arg.context.pop();
+	const condition = arg.data.stack.pop();
 
 	if (typeof condition !== 'boolean') {
 		throw new TypeError(`${name} statement on non-boolean, got ${typeof condition}`);

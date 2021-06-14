@@ -4,15 +4,18 @@ const enum Message {
 	STACK_IS_FULL = 'Stack is full',
 	STACK_IS_EMPTY = 'Stack is empty',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
-	VALUE_IS_UNDEFINED = 'Nullish values are not allowed in a SafeArray',
+	VALUE_IS_UNDEFINED = 'Undefined values are not allowed in a SafeArray',
 	INDEX_IS_NOT_INT = 'Index is not a safe integer',
 }
 
+/**
+ * Dense array with bound checks, negative indexing, maximum-length limiting.
+ */
 export default class SafeArray<T> {
 	private readonly array: T[] = [];
 	private _length = 0;
 
-	get length () {
+	get length (): number {
 		return this._length;
 	}
 
@@ -26,6 +29,10 @@ export default class SafeArray<T> {
 		if (maxLength < 0) {
 			throw new RangeError(Message.MAX_IS_NEGATIVE);
 		}
+	}
+
+	toNewArray (): T[] {
+		return [...this.array];
 	}
 
 	push (...items: readonly T[]): void {
@@ -69,6 +76,11 @@ export default class SafeArray<T> {
 		}
 
 		this.array[normalized] = value;
+	}
+
+	clear (): void {
+		this.array.length = 0;
+		this._length = 0;
 	}
 
 	private assertNotUndefined (value: T) {

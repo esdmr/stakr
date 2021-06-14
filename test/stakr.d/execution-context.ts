@@ -1,24 +1,20 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { ExecuteArg } from 'src/types';
 
-void _.test('push', (_) => {
-	const instance = new Stakr.ExecutionContext();
-	instance.push(123, 456);
-	_.strictSame(instance.stack, [123, 456], 'expected to push onto the stack');
-	_.end();
+await _.test('link', async (_) => {
+	const context = new Stakr.ExecutionContext();
+	const source = new Stakr.Source('test', []);
+	context.addSource(source);
+	context.link(new Set(['test']));
+
+	_.doesNotThrow(() => {
+		context.link(new Set(['test']));
+	}, 'expected to not throw if linked twice');
 });
 
-void _.test('pop', (_) => {
-	const instance = new Stakr.ExecutionContext();
-	instance.push(123);
-	const item = instance.pop();
-	_.strictSame({ item, stack: instance.stack }, { item: 123, stack: [] }, 'expected to pop from stack');
-	_.throws(() => instance.pop(), 'expected to throw if stack is empty');
-	_.end();
-});
-
-void _.test('assemble', (_) => {
+await _.test('assemble', async (_) => {
 	const context = new Stakr.ExecutionContext();
 
 	const lib = new Stakr.Source('test-lib', [
@@ -33,42 +29,84 @@ void _.test('assemble', (_) => {
 	context.addSource(source);
 
 	_.throws(() => {
-		context.assemble(new Set());
+		context.link(new Set());
 	}, 'expected to throw if given no source');
 
-	_.strictSame(context.assemble(new Set(['test'])), ['test-lib', 'test'], 'expected to return dependency graph');
-	_.equal(lib.isAssembled, true, 'expected to assemble library');
-	_.equal(lib.isAssembled, true, 'expected to assemble source');
-	_.equal(lib.isLinked, true, 'expected to link library');
-	_.equal(lib.isLinked, true, 'expected to link source');
+	_.strictSame(context.link(new Set(['test'])), ['test-lib', 'test'], 'expected to return dependency graph');
+	// @ts-expect-error Accessing private property
+	_.ok(lib.assembleData, 'expected to assemble library');
+	// @ts-expect-error Accessing private property
+	_.ok(source.assembleData, 'expected to assemble source');
+	_.ok(lib.linkData.has(context), 'expected to link library');
+	_.ok(source.linkData.has(context), 'expected to link source');
 
 	_.end();
 });
 
 void _.test('execute', (_) => {
+	let called = false;
+	let jumped = true;
+	const data = new Stakr.ExecuteData();
 	const instance = new Stakr.ExecutionContext();
 
 	const source = new Stakr.Source('test', [
 		{
-			execute () {
+			execute (arg: ExecuteArg) {
 				called = true;
+				_.strictSame(arg, {
+					context: instance,
+					source,
+					data,
+					offset: 1,
+				}, 'expected to provide an execute argument');
+				arg.offset = 2;
+				_.equal(arg.offset, 2, 'expected to preserve offset');
 			},
 		},
+		{
+			execute () {
+				jumped = false;
+			},
+		},
+		{
+			execute (arg: ExecuteArg) {
+				_.ok(jumped, 'expected to jump on set offset');
+
+				_.throws(() => {
+					arg.offset = -1;
+				}, 'expected to throw if offset is set to a negative value');
+
+				_.throws(() => {
+					arg.offset = 1.1;
+				}, 'expected to throw if offset is set to a fractional value');
+
+				_.throws(() => {
+					arg.offset = Number.NaN;
+				}, 'expected to throw if offset is set to NaN');
+
+				_.throws(() => {
+					arg.offset = Number.POSITIVE_INFINITY;
+				}, 'expected to throw if offset is set to Infinity');
+
+				_.throws(() => {
+					arg.offset = Number.MAX_SAFE_INTEGER + 1;
+				}, 'expected to throw if offset is set to a non-safe integer');
+			},
+		},
+		{},
 	]);
 
-	let called = false;
-
 	_.throws(() => {
-		instance.execute([]);
+		instance.execute([], data);
 	}, 'expected to throw if given no source');
 
 	instance.addSource(source);
-	instance.execute(['test']);
+	instance.execute(['test'], data);
 	_.ok(called, 'expected to execute sources');
 	_.end();
 });
 
-void _.test('addSource', (_) => {
+await _.test('addSource', async (_) => {
 	const source = new Stakr.Source('test', []);
 	const context = new Stakr.ExecutionContext();
 	context.addSource(source);
@@ -82,7 +120,7 @@ void _.test('addSource', (_) => {
 	_.end();
 });
 
-void _.test('resolveSource', (_) => {
+await _.test('resolveSource', async (_) => {
 	const context = new Stakr.ExecutionContext();
 	const source = new Stakr.Source('test', []);
 

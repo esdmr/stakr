@@ -3,21 +3,31 @@ import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
 import { AssembleArg } from 'src/types.d';
 
-void _.test('Label', (_) => {
-	void _.test('name', (_) => {
-		_.equal(new AST.Label('test').name, 'test', 'expected to preserve name');
+await _.test('Label', async (_) => {
+	await _.test('name', async (_) => {
+		_.equal(new AST.Label('test', false).name, 'test', 'expected to preserve name');
 		_.end();
 	});
 
-	void _.test('assemble', (_) => {
-		const instance = new AST.Label('test-label');
+	await _.test('assemble', async (_) => {
+		const instance = new AST.Label('test-label', false);
 		const source = new Stakr.Source('test', [instance]);
-		const arg: AssembleArg = { source, blockStack: [], offset: 0 };
+		const arg: AssembleArg = {
+			source,
+			data: new Stakr.AssembleData(),
+			blockStack: [],
+			offset: 0,
+		};
 
 		instance.assemble(arg);
 
-		const definition = source.identifiers.get('test-label');
-		_.strictSame(definition, { call: false, offset: 0 }, 'expected to correctly add a definition');
+		const definition = arg.data.identifiers.get('test-label');
+		_.strictSame(definition, {
+			offset: 0,
+			sourceName: 'test',
+			implicitlyCalled: false,
+			exported: false,
+		}, 'expected to correctly add a definition');
 
 		_.throws(() => {
 			instance.assemble(arg);

@@ -8,7 +8,12 @@ import { testGoto } from '../util/goto.js';
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
 	const context = new Stakr.ExecutionContext();
 	const source = new Stakr.Source('test', []);
-	const arg: ExecuteArg = { context, source, offset: 0 };
+	const arg: ExecuteArg = {
+		context,
+		source,
+		data: new Stakr.ExecuteData(),
+		offset: 0,
+	};
 
 	testGoto(_, () => {
 		goto_(arg);

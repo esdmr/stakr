@@ -2,8 +2,8 @@ import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
 
-void _.test('BlockEnd', (_) => {
-	void _.test('offset', (_) => {
+await _.test('BlockEnd', async (_) => {
+	await _.test('offset', async (_) => {
 		const instance = new AST.BlockEnd();
 
 		_.throws(() => instance.offset, 'expected to throw if not initialized');
@@ -12,13 +12,18 @@ void _.test('BlockEnd', (_) => {
 		_.end();
 	});
 
-	void _.test('assemble', (_) => {
+	await _.test('assemble', async (_) => {
 		const start = new AST.BlockStart();
 		const instance = new AST.BlockEnd();
 		const source = new Stakr.Source('test', [start, instance]);
 
 		_.throws(() => {
-			instance.assemble({ source, blockStack: [], offset: 1 });
+			instance.assemble({
+				source,
+				blockStack: [],
+				data: new Stakr.AssembleData(),
+				offset: 1,
+			});
 		}, 'expected to throw if extraneous');
 
 		source.assemble();

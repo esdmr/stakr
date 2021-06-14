@@ -1,9 +1,10 @@
 import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import { ExecuteArg } from 'src/types';
 
-void _.test('FunctionEnd', (_) => {
-	void _.test('execute', (_) => {
+await _.test('FunctionEnd', async (_) => {
+	await _.test('execute', async (_) => {
 		const instance = new AST.FunctionEnd();
 		const context = new Stakr.ExecutionContext();
 
@@ -12,14 +13,19 @@ void _.test('FunctionEnd', (_) => {
 			instance,
 		]);
 
-		const arg = { context, source, offset: 2 };
+		const arg: ExecuteArg = {
+			context,
+			source,
+			data: new Stakr.ExecuteData(),
+			offset: 2,
+		};
 
 		context.addSource(source);
-		context.aux.push(123);
+		arg.data.aux.push(123);
 		source.assemble();
 		instance.execute(arg);
 		_.equal(arg.offset, 123, 'expected to return');
-		_.strictSame(context.aux, [], 'expected to pop value from aux');
+		_.strictSame(arg.data.aux.toNewArray(), [], 'expected to pop value from aux');
 		_.end();
 	});
 

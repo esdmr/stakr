@@ -3,8 +3,8 @@ import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
 
-void _.test('WhileEnd', (_) => {
-	void _.test('execute', (_) => {
+await _.test('WhileEnd', async (_) => {
+	await _.test('execute', async (_) => {
 		const instance = new AST.WhileEnd();
 		const context = new Stakr.ExecutionContext();
 
@@ -13,7 +13,12 @@ void _.test('WhileEnd', (_) => {
 			instance,
 		]);
 
-		const arg: ExecuteArg = { context, source, offset: 2 };
+		const arg: ExecuteArg = {
+			context,
+			source,
+			data: new Stakr.ExecuteData(),
+			offset: 2,
+		};
 
 		context.addSource(source);
 		source.assemble();
