@@ -1,15 +1,16 @@
 const enum Message {
 	MAX_IS_NOT_INT = 'Maximum length is not a safe (positive) integer',
-	MAX_IS_NEGATIVE = 'Maximum length can not be negative',
+	MAX_IS_NEGATIVE = 'Maximum length is negative',
 	STACK_IS_FULL = 'Stack is full',
 	STACK_IS_EMPTY = 'Stack is empty',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
 	VALUE_IS_UNDEFINED = 'Undefined values are not allowed in a SafeArray',
-	INDEX_IS_NOT_INT = 'Index is not a safe integer',
+	INDEX_IS_NOT_INT = 'Index is not a safe (positive) integer',
+	INDEX_IS_NEGATIVE = 'Index is negative',
 }
 
 /**
- * Dense array with bound checks, negative indexing, maximum-length limiting.
+ * Dense array with bound checks.
  */
 export default class SafeArray<T> {
 	private readonly array: T[] = [];
@@ -106,6 +107,10 @@ export default class SafeArray<T> {
 			throw new RangeError(Message.INDEX_IS_NOT_INT);
 		}
 
-		return index + (index < 0 ? this.length : 0);
+		if (index < 0) {
+			throw new RangeError(Message.INDEX_IS_NEGATIVE);
+		}
+
+		return index;
 	}
 }
