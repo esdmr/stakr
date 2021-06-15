@@ -83,6 +83,18 @@ export default class SafeArray<T> {
 		this._length = 0;
 	}
 
+	toString (): string {
+		return this.array.toString();
+	}
+
+	toLocaleString (): string {
+		return this.array.toLocaleString();
+	}
+
+	get [Symbol.iterator] () {
+		return this.array[Symbol.iterator];
+	}
+
 	private assertNotUndefined (value: T) {
 		if (value === undefined) {
 			throw new TypeError(Message.VALUE_IS_UNDEFINED);
