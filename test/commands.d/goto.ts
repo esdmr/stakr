@@ -3,7 +3,7 @@ import * as stakr from 'src/stakr.js';
 import url from 'url';
 import { goto_ } from 'src/commands.js';
 import { ExecuteArg } from 'src/types.d';
-import { testGoto } from '../util/goto.js';
+import { testGoto } from '../test-util/goto.js';
 
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
 	const context = new stakr.ExecutionContext();

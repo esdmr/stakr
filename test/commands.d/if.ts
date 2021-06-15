@@ -2,7 +2,7 @@ import * as _ from 'tap';
 import * as stakr from 'src/stakr.js';
 import { if_ } from 'src/commands.js';
 import { ExecuteArg } from 'src/types.js';
-import { testGoto } from '../util/goto.js';
+import { testGoto } from '../test-util/goto.js';
 
 const command = if_();
 const context = new stakr.ExecutionContext();
