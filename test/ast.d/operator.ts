@@ -1,22 +1,22 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
 
 await _.test('Operator', async (_) => {
 	await _.test('name', async (_) => {
-		_.equal(new AST.Operator('test').name, 'test', 'expected to preserve name');
+		_.equal(new ast.Operator('test').name, 'test', 'expected to preserve name');
 		_.end();
 	});
 
 	await _.test('execute', async (_) => {
-		const instance = new AST.Operator('test-operator');
-		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
+		const instance = new ast.Operator('test-operator');
+		const context = new stakr.ExecutionContext();
+		const source = new stakr.Source('test', [instance]);
 		const arg: ExecuteArg = {
 			context,
 			source,
-			data: new Stakr.ExecuteData(),
+			data: new stakr.ExecuteData(),
 			offset: 1,
 		};
 		let operatorCalled = false;

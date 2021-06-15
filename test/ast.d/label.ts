@@ -1,20 +1,20 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
 import { AssembleArg } from 'src/types.d';
 
 await _.test('Label', async (_) => {
 	await _.test('name', async (_) => {
-		_.equal(new AST.Label('test', false).name, 'test', 'expected to preserve name');
+		_.equal(new ast.Label('test', false).name, 'test', 'expected to preserve name');
 		_.end();
 	});
 
 	await _.test('assemble', async (_) => {
-		const instance = new AST.Label('test-label', false);
-		const source = new Stakr.Source('test', [instance]);
+		const instance = new ast.Label('test-label', false);
+		const source = new stakr.Source('test', [instance]);
 		const arg: AssembleArg = {
 			source,
-			data: new Stakr.AssembleData(),
+			data: new stakr.AssembleData(),
 			blockStack: [],
 			offset: 0,
 		};

@@ -1,22 +1,22 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
 
 await _.test('WhileEnd', async (_) => {
 	await _.test('execute', async (_) => {
-		const instance = new AST.WhileEnd();
-		const context = new Stakr.ExecutionContext();
+		const instance = new ast.WhileEnd();
+		const context = new stakr.ExecutionContext();
 
-		const source = new Stakr.Source('test', [
-			new AST.BlockStart(),
+		const source = new stakr.Source('test', [
+			new ast.BlockStart(),
 			instance,
 		]);
 
 		const arg: ExecuteArg = {
 			context,
 			source,
-			data: new Stakr.ExecuteData(),
+			data: new stakr.ExecuteData(),
 			offset: 2,
 		};
 

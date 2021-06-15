@@ -1,29 +1,29 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
-import * as Types from 'src/types.d';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
+import * as types from 'src/types.d';
 
 await _.test('name', async (_) => {
-	_.equal(new Stakr.Source('test', []).name, 'test', 'expected to preserve name');
+	_.equal(new stakr.Source('test', []).name, 'test', 'expected to preserve name');
 	_.end();
 });
 
 await _.test('source', async (_) => {
 	const source = [] as const;
-	_.equal(new Stakr.Source('test', source).ast, source, 'expected to preserve source list');
+	_.equal(new stakr.Source('test', source).ast, source, 'expected to preserve source list');
 	_.end();
 });
 
 await _.test('assemble', async (_) => {
 	let called = false;
-	const source = new Stakr.Source('test', [
+	const source = new stakr.Source('test', [
 		{
-			assemble (arg: Types.AssembleArg) {
+			assemble (arg: types.AssembleArg) {
 				called = true;
 				_.strictSame(arg, {
 					source,
 					offset: 0,
-					data: new Stakr.AssembleData(),
+					data: new stakr.AssembleData(),
 					blockStack: [],
 				}, 'expected to provide an assemble argument');
 			},
@@ -37,7 +37,7 @@ await _.test('assemble', async (_) => {
 	source.assemble();
 	_.notOk(called, 'expected to not call assemble again');
 
-	const source2 = new Stakr.Source('test', [new AST.BlockStart()]);
+	const source2 = new stakr.Source('test', [new ast.BlockStart()]);
 
 	_.throws(() => {
 		source2.assemble();

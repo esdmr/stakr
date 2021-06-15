@@ -1,10 +1,10 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
 
 await _.test('BlockEnd', async (_) => {
 	await _.test('offset', async (_) => {
-		const instance = new AST.BlockEnd();
+		const instance = new ast.BlockEnd();
 
 		_.throws(() => instance.offset, 'expected to throw if not initialized');
 		instance.startOffset = 123;
@@ -13,15 +13,15 @@ await _.test('BlockEnd', async (_) => {
 	});
 
 	await _.test('assemble', async (_) => {
-		const start = new AST.BlockStart();
-		const instance = new AST.BlockEnd();
-		const source = new Stakr.Source('test', [start, instance]);
+		const start = new ast.BlockStart();
+		const instance = new ast.BlockEnd();
+		const source = new stakr.Source('test', [start, instance]);
 
 		_.throws(() => {
 			instance.assemble({
 				source,
 				blockStack: [],
-				data: new Stakr.AssembleData(),
+				data: new stakr.AssembleData(),
 				offset: 1,
 			});
 		}, 'expected to throw if extraneous');

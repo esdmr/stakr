@@ -1,21 +1,21 @@
 import { DepGraph } from 'dependency-graph';
 import commandMap from './commands.js';
-import * as Types from './types.d';
+import * as types from './types.d';
 import SafeArray from './util/safe-array.js';
 
 export class AssembleData {
-	readonly identifiers = new Map<string, Types.Definition>();
+	readonly identifiers = new Map<string, types.Definition>();
 	readonly imports = new Set<string>();
 	readonly namespaces = new Set<string>();
 }
 
 export class LinkData {
-	readonly identifiers = new Map<string, Types.Definition>();
+	readonly identifiers = new Map<string, types.Definition>();
 }
 
 export class ExecuteData {
-	readonly stack = new SafeArray<Types.StackItem>();
-	readonly aux = new SafeArray<Types.StackItem>();
+	readonly stack = new SafeArray<types.StackItem>();
+	readonly aux = new SafeArray<types.StackItem>();
 	readonly commandMap = new Map(commandMap);
 	nextSource?: string = undefined;
 	nextOffset?: number = undefined;
@@ -101,7 +101,7 @@ export class ExecutionContext {
 
 		source.assemble();
 
-		const arg: Types.Writable<Types.LinkArg> = {
+		const arg: types.Writable<types.LinkArg> = {
 			context: this,
 			source,
 			data: new LinkData(),
@@ -122,7 +122,7 @@ export class ExecutionContext {
 		data: ExecuteData,
 		offset: number,
 	) {
-		const arg: Types.ExecuteArg = {
+		const arg: types.ExecuteArg = {
 			context: this,
 			source,
 			data,
@@ -154,14 +154,14 @@ export class Source {
 	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
 	private assembleData?: AssembleData = undefined;
 
-	constructor (readonly name: string, readonly ast: Types.ASTTree) {}
+	constructor (readonly name: string, readonly ast: types.ASTTree) {}
 
 	assemble () {
 		if (this.assembleData) {
 			return this.assembleData;
 		}
 
-		const arg: Types.Writable<Types.AssembleArg> = {
+		const arg: types.Writable<types.AssembleArg> = {
 			source: this,
 			blockStack: [] as number[],
 			data: new AssembleData(),

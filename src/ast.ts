@@ -1,18 +1,18 @@
 import * as commands from './commands.js';
-import * as Types from './types.d';
+import * as types from './types.d';
 
-export class Literal implements Types.ASTNode {
-	constructor (readonly value: Types.StackItem) {}
+export class Literal implements types.ASTNode {
+	constructor (readonly value: types.StackItem) {}
 
-	execute ({ data }: Types.ExecuteArg) {
+	execute ({ data }: types.ExecuteArg) {
 		data.stack.push(this.value);
 	}
 }
 
-export class Label implements Types.ASTNode {
+export class Label implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, data, offset }: Types.AssembleArg) {
+	assemble ({ source, data, offset }: types.AssembleArg) {
 		if (data.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' already defined.`);
 		}
@@ -26,10 +26,10 @@ export class Label implements Types.ASTNode {
 	}
 }
 
-export class Operator implements Types.ASTNode {
+export class Operator implements types.ASTNode {
 	constructor (readonly name: string) {}
 
-	execute (arg: Types.ExecuteArg) {
+	execute (arg: types.ExecuteArg) {
 		const operator = arg.data.commandMap.get(this.name);
 
 		if (operator === undefined) {
@@ -40,10 +40,10 @@ export class Operator implements Types.ASTNode {
 	}
 }
 
-export class Refer implements Types.ASTNode {
+export class Refer implements types.ASTNode {
 	constructor (readonly name: string) {}
 
-	execute (arg: Types.ExecuteArg) {
+	execute (arg: types.ExecuteArg) {
 		const definition = arg.source.assemble().identifiers.get(this.name) ??
 			arg.source.linkData.get(arg.context)?.identifiers.get(this.name);
 
@@ -63,7 +63,7 @@ export class Refer implements Types.ASTNode {
 	}
 }
 
-export class BlockStart implements Types.ASTNode {
+export class BlockStart implements types.ASTNode {
 	endOffset?: number;
 
 	get offset () {
@@ -74,16 +74,16 @@ export class BlockStart implements Types.ASTNode {
 		return this.endOffset;
 	}
 
-	assemble ({ blockStack, offset }: Types.AssembleArg) {
+	assemble ({ blockStack, offset }: types.AssembleArg) {
 		blockStack.push(offset);
 	}
 
-	execute ({ data }: Types.ExecuteArg) {
+	execute ({ data }: types.ExecuteArg) {
 		data.stack.push(this.offset);
 	}
 }
 
-export class BlockEnd implements Types.ASTNode {
+export class BlockEnd implements types.ASTNode {
 	startOffset?: number;
 
 	get offset () {
@@ -94,7 +94,7 @@ export class BlockEnd implements Types.ASTNode {
 		return this.startOffset;
 	}
 
-	assemble ({ source, blockStack, offset }: Types.AssembleArg) {
+	assemble ({ source, blockStack, offset }: types.AssembleArg) {
 		const startOffset = blockStack.pop();
 
 		if (startOffset === undefined) {
@@ -106,22 +106,22 @@ export class BlockEnd implements Types.ASTNode {
 	}
 }
 
-export class WhileEnd extends BlockEnd implements Types.ASTNode {
-	execute (arg: Types.ExecuteArg) {
+export class WhileEnd extends BlockEnd implements types.ASTNode {
+	execute (arg: types.ExecuteArg) {
 		arg.offset = this.offset;
 	}
 }
 
-export class FunctionEnd extends BlockEnd implements Types.ASTNode {
-	execute (arg: Types.ExecuteArg) {
+export class FunctionEnd extends BlockEnd implements types.ASTNode {
+	execute (arg: types.ExecuteArg) {
 		commands.return_(arg);
 	}
 }
 
-export class FunctionStatement implements Types.ASTNode {
+export class FunctionStatement implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, data, offset }: Types.AssembleArg) {
+	assemble ({ source, data, offset }: types.AssembleArg) {
 		if (data.identifiers.has(this.name)) {
 			throw new Error(`Identifier '${this.name}' is already defined`);
 		}
@@ -134,15 +134,15 @@ export class FunctionStatement implements Types.ASTNode {
 		});
 	}
 
-	execute (arg: Types.ExecuteArg) {
+	execute (arg: types.ExecuteArg) {
 		commands.goto_(arg);
 	}
 }
 
-export class ImportStatement implements Types.ASTNode {
+export class ImportStatement implements types.ASTNode {
 	constructor (readonly namespace: string, readonly source: string) {}
 
-	assemble ({ data }: Types.AssembleArg) {
+	assemble ({ data }: types.AssembleArg) {
 		if (data.imports.has(this.source)) {
 			throw new Error(`Source '${this.source}' already imported`);
 		}
@@ -155,7 +155,7 @@ export class ImportStatement implements Types.ASTNode {
 		data.namespaces.add(this.namespace);
 	}
 
-	link ({ context, data }: Types.LinkArg) {
+	link ({ context, data }: types.LinkArg) {
 		const other = context.sourceMap.get(this.source);
 
 		if (other === undefined) {

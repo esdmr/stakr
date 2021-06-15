@@ -1,11 +1,11 @@
 import * as _ from 'tap';
-import * as Stakr from 'src/stakr.js';
+import * as stakr from 'src/stakr.js';
 import { call_ } from 'src/commands.js';
 import { ExecuteArg } from 'src/types.d';
 
-const context = new Stakr.ExecutionContext();
-const source = new Stakr.Source('test', []);
-const data = new Stakr.ExecuteData();
+const context = new stakr.ExecutionContext();
+const source = new stakr.Source('test', []);
+const data = new stakr.ExecuteData();
 const arg: ExecuteArg = {
 	context,
 	source,

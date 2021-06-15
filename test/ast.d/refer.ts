@@ -1,28 +1,28 @@
 import * as _ from 'tap';
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import * as ast from 'src/ast.js';
+import * as stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
 
 await _.test('Refer', async (_) => {
 	await _.test('name', async (_) => {
-		_.equal(new AST.Refer('test').name, 'test', 'expected to preserve name');
+		_.equal(new ast.Refer('test').name, 'test', 'expected to preserve name');
 		_.end();
 	});
 
 	await _.test('execute', async (_) => {
 		await _.test('label', async (_) => {
-			const instance = new AST.Refer('test-label');
-			const context = new Stakr.ExecutionContext();
+			const instance = new ast.Refer('test-label');
+			const context = new stakr.ExecutionContext();
 
-			const source = new Stakr.Source('test', [
-				new AST.Label('test-label', false),
+			const source = new stakr.Source('test', [
+				new ast.Label('test-label', false),
 				instance,
 			]);
 
 			const arg: ExecuteArg = {
 				context,
 				source,
-				data: new Stakr.ExecuteData(),
+				data: new stakr.ExecuteData(),
 				offset: 2,
 			};
 
@@ -35,20 +35,20 @@ await _.test('Refer', async (_) => {
 		});
 
 		await _.test('function', async (_) => {
-			const instance = new AST.Refer('test-function');
-			const context = new Stakr.ExecutionContext();
+			const instance = new ast.Refer('test-function');
+			const context = new stakr.ExecutionContext();
 
-			const source = new Stakr.Source('test', [
-				new AST.BlockStart(),
-				new AST.FunctionStatement('test-function', false),
-				new AST.FunctionEnd(),
+			const source = new stakr.Source('test', [
+				new ast.BlockStart(),
+				new ast.FunctionStatement('test-function', false),
+				new ast.FunctionEnd(),
 				instance,
 			]);
 
 			const arg: ExecuteArg = {
 				context,
 				source,
-				data: new Stakr.ExecuteData(),
+				data: new stakr.ExecuteData(),
 				offset: 4,
 			};
 
@@ -62,28 +62,28 @@ await _.test('Refer', async (_) => {
 		});
 
 		await _.test('import', async (_) => {
-			const context = new Stakr.ExecutionContext();
-			const instance = new AST.Refer('lib:test-function');
+			const context = new stakr.ExecutionContext();
+			const instance = new ast.Refer('lib:test-function');
 
-			const source = new Stakr.Source('test', [
-				new AST.ImportStatement('lib', 'test-lib'),
+			const source = new stakr.Source('test', [
+				new ast.ImportStatement('lib', 'test-lib'),
 				instance,
 			]);
 
-			context.addSource(new Stakr.Source('test-lib', [
-				new AST.BlockStart(),
-				new AST.FunctionStatement('test-function', true),
-				new AST.FunctionEnd(),
+			context.addSource(new stakr.Source('test-lib', [
+				new ast.BlockStart(),
+				new ast.FunctionStatement('test-function', true),
+				new ast.FunctionEnd(),
 			]));
 
 			context.addSource(source);
 
 			_.throws(() => {
-				context.execute(['test'], new Stakr.ExecuteData());
+				context.execute(['test'], new stakr.ExecuteData());
 			}, 'expected to throw if function is not found');
 
 			context.link(new Set(['test']));
-			const data = new Stakr.ExecuteData();
+			const data = new stakr.ExecuteData();
 
 			const arg: ExecuteArg = {
 				context,

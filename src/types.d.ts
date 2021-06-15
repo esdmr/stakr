@@ -1,4 +1,4 @@
-import * as Stakr from './stakr.js';
+import * as stakr from './stakr.js';
 
 export type StackItem = string | number | boolean | null;
 
@@ -10,23 +10,23 @@ export interface Definition {
 }
 
 export interface AssembleArg {
-	readonly source: Stakr.Source;
+	readonly source: stakr.Source;
 	readonly blockStack: number[];
-	readonly data: Stakr.AssembleData;
+	readonly data: stakr.AssembleData;
 	offset: number;
 }
 
 export interface LinkArg {
-	readonly context: Stakr.ExecutionContext;
-	readonly source: Stakr.Source;
-	readonly data: Stakr.LinkData;
+	readonly context: stakr.ExecutionContext;
+	readonly source: stakr.Source;
+	readonly data: stakr.LinkData;
 	readonly offset: number;
 }
 
 export interface ExecuteArg {
-	readonly context: Stakr.ExecutionContext;
-	readonly source: Stakr.Source;
-	readonly data: Stakr.ExecuteData;
+	readonly context: stakr.ExecutionContext;
+	readonly source: stakr.Source;
+	readonly data: stakr.ExecuteData;
 	offset: number;
 }
 
