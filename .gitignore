@@ -16,7 +16,7 @@
 .nyc_output
 .serverless
 .Trash-*
-.vscode/*
+.vscode
 .vuepress/dist
 .yarn-integrity
 *.bmf
