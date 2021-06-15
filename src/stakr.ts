@@ -3,6 +3,8 @@ import commandMap from './commands.js';
 import * as types from './types.d';
 import SafeArray from './util/safe-array.js';
 
+const AUX_MAX_LENGTH = 1024;
+
 export class AssembleData {
 	readonly identifiers = new Map<string, types.Definition>();
 	readonly imports = new Set<string>();
@@ -15,7 +17,7 @@ export class LinkData {
 
 export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
-	readonly aux = new SafeArray<types.StackItem>();
+	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
 	readonly commandMap = new Map(commandMap);
 	nextSource?: string = undefined;
 	nextOffset?: number = undefined;
