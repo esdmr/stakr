@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
+/** @internal */
 const enum Message {
 	INDEX_IS_NEGATIVE = 'Index is negative',
 	INDEX_IS_NOT_INT = 'Index is not a safe (positive) integer',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
-	LARGER_THAN_MAX = 'Input array is larger than maximum length allowed',
+	LARGER_THAN_MAX = 'Input is larger than maximum length allowed',
 	MAX_IS_NEGATIVE = 'Maximum length is negative',
 	MAX_IS_NOT_INT = 'Maximum length is not a safe (positive) integer',
-	STACK_IS_EMPTY = 'Stack is empty',
-	STACK_IS_FULL = 'Stack is full',
+	ARRAY_IS_EMPTY = 'SafeArray is empty',
+	ARRAY_IS_FULL = 'SafeArray is full',
 }
+
+/** @internal */
+export { Message as ErrorMessage };
 
 /**
  * A dense array with bound checks.
@@ -21,12 +25,15 @@ export default class SafeArray<T> {
 	/**
 	 * The length of a safe-array. This is a number one higher than the highest
 	 * index in the safe-array.
-	*/
+	 *
+	 * @nosideeffects
+	 */
 	get length (): number {
 		return this._length;
 	}
 
 	/**
+	 * @nosideeffects
 	 * @throws {RangeError}
 	 * @param maxLength Maximum number of elements allowed in the safe-array.
 	 * Must be a positive safe integer. (`+Infinity` for no limitation)
@@ -46,6 +53,7 @@ export default class SafeArray<T> {
 	/**
 	 * Creates a new instance of safe-array and copies a safe-array into it.
 	 *
+	 * @nosideeffects
 	 * @throws {RangeError}
 	 * @param array The array to copy into the safe-array. It should not have
 	 * more elements than the provided maximum length.
@@ -54,19 +62,20 @@ export default class SafeArray<T> {
 	 * @returns The new instance of safe-array.
 	 */
 	static from<T> (array: readonly T[], maxLength?: number): SafeArray<T> {
-		if (typeof maxLength === 'number' && array.length > maxLength) {
+		const safeArray = new SafeArray<T>(maxLength);
+
+		if (array.length > safeArray._maxLength) {
 			throw new RangeError(Message.LARGER_THAN_MAX);
 		}
 
-		const safeArray = new SafeArray<T>(maxLength);
 		safeArray.push(...array);
-
 		return safeArray;
 	}
 
 	/**
 	 * Copies the content of a safe-array into a new array.
 	 *
+	 * @nosideeffects
 	 * @returns The new array.
 	 */
 	toNewArray (): T[] {
@@ -80,8 +89,16 @@ export default class SafeArray<T> {
 	 * @param items New elements to add to the safe-array.
 	 */
 	push (...items: readonly T[]): void {
-		if (this._length + items.length > this._maxLength) {
-			throw new RangeError(Message.STACK_IS_FULL);
+		if (items.length === 0) {
+			return;
+		}
+
+		if (this.length === this._maxLength) {
+			throw new RangeError(Message.ARRAY_IS_FULL);
+		}
+
+		if (this.length + items.length > this._maxLength) {
+			throw new RangeError(Message.LARGER_THAN_MAX);
 		}
 
 		this._length = this._array.push(...items);
@@ -95,15 +112,17 @@ export default class SafeArray<T> {
 	 */
 	pop (): T {
 		if (this._array.length === 0) {
-			throw new RangeError(Message.STACK_IS_EMPTY);
+			throw new RangeError(Message.ARRAY_IS_EMPTY);
 		}
 
+		this._length--;
 		return this._array.pop() as T;
 	}
 
 	/**
 	 * Reads an element from a safe-array and returns it.
 	 *
+	 * @nosideeffects
 	 * @throws {RangeError}
 	 * @param index Index of element to return.
 	 * @returns Value of element.
@@ -136,6 +155,7 @@ export default class SafeArray<T> {
 	/**
 	 * Returns a string representation of a safe-array.
 	 *
+	 * @nosideeffects Depending on every elements' `toString` method.
 	 * @returns The string.
 	 */
 	toString (): string {
@@ -144,16 +164,18 @@ export default class SafeArray<T> {
 
 	/**
 	 * Returns a string representation of a safe-array. The elements are
-	 * converted to string using their toLocalString methods.
+	 * converted to string using their `toLocalString` methods.
 	 *
+	 * @nosideeffects Depending on every elements' `toLocaleString` method.
 	 * @returns The string.
 	 */
 	toLocaleString (): string {
 		return this._array.toLocaleString();
 	}
 
-	get [Symbol.iterator] (): () => IterableIterator<T> {
-		return this._array[Symbol.iterator];
+	/** @nosideeffects */
+	[Symbol.iterator] (): IterableIterator<T> {
+		return this._array[Symbol.iterator]();
 	}
 
 	private _assertIndex (index: number): void {
