@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@istanbuljs/esm-loader-hook': 0.1.2
-  '@types/node': 15.12.2
+  '@types/node': 15.0.1
   '@types/tap': 15.0.3
   dependency-graph: 0.11.0
   rimraf: 3.0.2
@@ -15,7 +15,7 @@ dependencies:
 
 devDependencies:
   '@istanbuljs/esm-loader-hook': 0.1.2
-  '@types/node': 15.12.2
+  '@types/node': 15.0.1
   '@types/tap': 15.0.3
   rimraf: 3.0.2
   tap: 15.0.9_typescript@4.3.3
@@ -414,6 +414,10 @@ packages:
 
   /@types/minimist/1.2.1:
     resolution: {integrity: sha512-fZQQafSREFyuZcdWFAExYjBiCL7AUCdgsk80iO0q4yihYYdcIiH28CcuPTGFgLOCC8RlW49GSQxdHwZP+I7CNg==}
+    dev: true
+
+  /@types/node/15.0.1:
+    resolution: {integrity: sha512-TMkXt0Ck1y0KKsGr9gJtWGjttxlZnnvDtphxUOSd0bfaR6Q1jle+sPvrzNR1urqYTWMinoKvjKfXUGsumaO1PA==}
     dev: true
 
   /@types/node/15.12.2:

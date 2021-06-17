@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "0.1.2",
-    "@types/node": "15.12.2",
+    "@types/node": "15.0.1",
     "@types/tap": "15.0.3",
     "rimraf": "3.0.2",
     "tap": "15.0.9",
