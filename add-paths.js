@@ -15,7 +15,11 @@ async function main () {
 	const dir = path.join('build', 'test', 'node_modules');
 
 	process.chdir(__dirname);
-	await fs.mkdir(dir, { recursive: true });
+
+	await fs.mkdir(dir, {
+		recursive: true,
+	});
+
 	process.chdir(dir);
 
 	try {
