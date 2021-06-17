@@ -56,11 +56,11 @@ export const return_ = (arg: ExecuteArg) => {
 	}
 };
 
-export const if_ = (name = 'if') => (arg: ExecuteArg) => {
+export const if_ = (arg: ExecuteArg) => {
 	const condition = arg.data.stack.pop();
 
 	if (typeof condition !== 'boolean') {
-		throw new TypeError(`${name} statement on non-boolean, got ${typeof condition}`);
+		throw new TypeError(`Condition is not a boolean, got ${typeof condition}`);
 	}
 
 	if (condition) {
@@ -77,8 +77,8 @@ const commandMap = new Map<string, Executable>([
 	['goto', goto_],
 	['call', call_],
 	['return', return_],
-	['if', if_()],
-	['while', if_('while')],
+	['if', if_],
+	['while', if_],
 ]);
 
 export default commandMap;
