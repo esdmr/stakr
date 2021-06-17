@@ -39,4 +39,8 @@ jobs:
         restore-keys: |
           ${{ runner.OS }}-pnpm-
     - run: pnpm install
-    - run: pnpm run test --if-present
+    - run: pnpm run test
+    - run: pnpm run tap:coverage -- --coverage-report=lcovonly
+    - uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage/lcov.info
