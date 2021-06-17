@@ -1,7 +1,7 @@
-import * as _ from 'tap';
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
 import * as types from 'src/types.d';
+import * as _ from 'tap';
 
 await _.test('name', async (_) => {
 	_.equal(new stakr.Source('test', []).name, 'test', 'expected to preserve name');

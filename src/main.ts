@@ -1,4 +1,4 @@
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import * as ast from './ast.js';
 import * as stakr from './stakr.js';
 

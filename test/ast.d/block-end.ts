@@ -1,6 +1,6 @@
-import * as _ from 'tap';
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
+import * as _ from 'tap';
 
 await _.test('BlockEnd', async (_) => {
 	await _.test('offset', async (_) => {

@@ -1,7 +1,7 @@
-import * as _ from 'tap';
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
+import * as _ from 'tap';
 
 await _.test('link', async (_) => {
 	const context = new stakr.ExecutionContext();

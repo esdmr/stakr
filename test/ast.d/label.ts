@@ -1,7 +1,7 @@
-import * as _ from 'tap';
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
 import { AssembleArg } from 'src/types.d';
+import * as _ from 'tap';
 
 await _.test('Label', async (_) => {
 	await _.test('name', async (_) => {

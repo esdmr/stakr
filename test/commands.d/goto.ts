@@ -1,8 +1,8 @@
-import * as _ from 'tap';
-import * as stakr from 'src/stakr.js';
-import url from 'url';
+import url from 'node:url';
 import { goto_ } from 'src/commands.js';
+import * as stakr from 'src/stakr.js';
 import { ExecuteArg } from 'src/types.d';
+import * as _ from 'tap';
 import { testGoto } from '../test-util/goto.js';
 
 if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
