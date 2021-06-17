@@ -26,7 +26,7 @@
     "rimraf": "3.0.2",
     "tap": "15.0.9",
     "typescript": "4.3.3",
-    "xo": "0.39.1"
+    "xo": "0.40.2"
   },
   "dependencies": {
     "dependency-graph": "0.11.0"
