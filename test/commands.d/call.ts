@@ -1,6 +1,6 @@
-import * as _ from 'tap';
-import * as Stakr from 'src/stakr.js';
 import { call_ } from 'src/commands.js';
+import * as Stakr from 'src/stakr.js';
+import * as _ from 'tap';
 
 const context = new Stakr.ExecutionContext();
 const source = new Stakr.Source('test', []);

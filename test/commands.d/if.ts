@@ -1,6 +1,6 @@
-import * as _ from 'tap';
-import * as Stakr from 'src/stakr.js';
 import { if_ } from 'src/commands.js';
+import * as Stakr from 'src/stakr.js';
+import * as _ from 'tap';
 import { testGoto } from './goto.js';
 
 const command = if_();

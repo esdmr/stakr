@@ -1,7 +1,7 @@
-export {};
+export { };
 
 type StackItem = string | number | undefined | boolean;
-	type AssemblyItem = StackItem | (() => void) | Declare | Label | Refer;
+type AssemblyItem = StackItem | (() => void) | Declare | Label | Refer;
 
 const stack: StackItem[] = [];
 const aux: StackItem[] = [];
@@ -53,7 +53,7 @@ const set = $decor(() => {
 const mul = $binop((a, b) => a * b);
 
 class AssemblerData {
-	decls: Map<Declare['name'], number> = new Map();
+	decls = new Map<Declare['name'], number>();
 
 	constructor (public list: AssemblyItem[]) {}
 }
