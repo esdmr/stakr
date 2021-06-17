@@ -26,9 +26,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - uses: pnpm/action-setup@v2.0.0
+    - uses: pnpm/action-setup@v2.0.1
       with:
-        version: 6.2.5
+        version: 6.7.6
     - name: Set PNPM StoreDir
       run: pnpm config set store-dir ~/.pnpm-store
     - name: Cache PNPM modules
