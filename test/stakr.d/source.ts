@@ -1,6 +1,6 @@
-import * as _ from 'tap';
 import * as AST from 'src/ast.js';
 import * as Stakr from 'src/stakr.js';
+import * as _ from 'tap';
 
 void _.test('name', (_) => {
 	_.equal(new Stakr.Source('test', []).name, 'test', 'expected to preserve name');

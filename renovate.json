@@ -8,5 +8,12 @@
   },
   "lockFileMaintenance": {
     "enabled": true
-  }
+  },
+  "packageRules": [
+    {
+      "description": "node: prefixes are no longer working due to https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52595",
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "<=15.0.1"
+    }
+  ]
 }

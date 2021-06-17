@@ -1,7 +1,7 @@
-import * as _ from 'tap';
-import * as Stakr from 'src/stakr.js';
-import url from 'url';
+import url from 'node:url';
 import { goto_ } from 'src/commands.js';
+import * as Stakr from 'src/stakr.js';
+import * as _ from 'tap';
 
 export function testGoto (
 	_: Tap.Test,

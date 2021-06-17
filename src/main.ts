@@ -1,8 +1,8 @@
-import * as S from './stakr.js';
+import { inspect } from 'node:util';
 import * as A from './ast.js';
-import { inspect } from 'util';
+import * as S from './stakr.js';
 
-export {};
+export { };
 
 const context = new S.ExecutionContext();
 context.addSource(new S.Source('a', [
