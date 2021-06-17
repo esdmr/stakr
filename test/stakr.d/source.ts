@@ -1,6 +1,6 @@
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
-import * as types from 'src/types.d';
+import * as types from 'src/types.js';
 import * as _ from 'tap';
 
 await _.test('name', async (_) => {

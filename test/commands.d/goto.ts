@@ -1,7 +1,7 @@
 import url from 'node:url';
 import { goto_ } from 'src/commands.js';
 import * as stakr from 'src/stakr.js';
-import { ExecuteArg } from 'src/types.d';
+import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { testGoto } from '../test-util/goto.js';
 

@@ -1,4 +1,4 @@
-import { Executable, ExecuteArg } from './types.d';
+import { Executable, ExecuteArg } from './types.js';
 
 function newTypeErrorForJumpTarget (offset: string) {
 	return new TypeError(`Jump target not a number, got ${offset}`);

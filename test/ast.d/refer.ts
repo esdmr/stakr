@@ -1,6 +1,6 @@
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
-import { ExecuteArg } from 'src/types.d';
+import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 
 await _.test('Refer', async (_) => {

@@ -4,7 +4,7 @@ import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { testGoto } from '../test-util/goto.js';
 
-const command = if_();
+const command = if_;
 const context = new stakr.ExecutionContext();
 const source = new stakr.Source('test', []);
 const data = new stakr.ExecuteData();

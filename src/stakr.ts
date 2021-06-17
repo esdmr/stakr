@@ -1,6 +1,6 @@
 import { DepGraph } from 'dependency-graph';
 import commandMap from './commands.js';
-import * as types from './types.d';
+import * as types from './types.js';
 import SafeArray from './util/safe-array.js';
 
 const AUX_MAX_LENGTH = 1024;

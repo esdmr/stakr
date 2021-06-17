@@ -1,5 +1,5 @@
 import * as commands from './commands.js';
-import * as types from './types.d';
+import * as types from './types.js';
 
 export class Literal implements types.ASTNode {
 	constructor (readonly value: types.StackItem) {}
