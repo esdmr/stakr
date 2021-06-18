@@ -5,42 +5,46 @@ name: Test
 
 on:
   push:
-    branches:
-      - master
-      - release/*
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  test:
     strategy:
       matrix:
-        node-version: [16.x]
+        os: [ubuntu-latest]
+        node: [16.x]
+        pnpm: ["6.7.6"]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-    - uses: pnpm/action-setup@v2.0.1
-      with:
-        version: 6.7.6
-    - name: Set PNPM StoreDir
-      run: pnpm config set store-dir ~/.pnpm-store
-    - name: Cache PNPM modules
-      uses: actions/cache@v2
-      with:
-        path: ~/.pnpm-store
-        key: ${{ runner.OS }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.OS }}-pnpm-
-    - run: pnpm install
-    - run: pnpm run test
-    - run: pnpm run tap:coverage -- --coverage-report=lcovonly
-    - uses: codecov/codecov-action@v1
-      with:
-        files: ./coverage/lcov.info
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Use PNPM ${{ matrix.pnpm }}
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: ${{ matrix.pnpm }}
+      - name: Set PNPM StoreDir
+        run: pnpm config set store-dir ~/.pnpm-store
+      - name: Cache PNPM modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.OS }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.OS }}-pnpm-
+      - name: Install packages
+        run: pnpm install
+      - name: Run linter and tests
+        run: pnpm run test
+      - name: Export coverage report
+        run: pnpm run tap:coverage -- --coverage-report=lcovonly
+      - name: Upload report to CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage/lcov.info
