@@ -1,5 +1,5 @@
-import * as _ from 'tap';
 import assert, { AssertionError } from 'src/util/assert.js';
+import * as _ from 'tap';
 
 const error = (message: string) => new AssertionError(message);
 
@@ -26,5 +26,3 @@ _.throws(() => {
 _.throws(() => {
 	assert(false, '1{}3{}5 (arity 2)', '(2)', '(4)');
 }, error('1(2)3(4)5 (arity 2)'));
-
-_.end();

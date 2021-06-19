@@ -45,5 +45,3 @@ await _.test('assemble', async (_) => {
 
 	_.end();
 });
-
-_.end();

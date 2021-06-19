@@ -4,7 +4,6 @@ import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { testGoto } from '../test-util/goto.js';
 
-const command = if_;
 const context = new stakr.ExecutionContext();
 const source = new stakr.Source('test', []);
 const data = new stakr.ExecuteData();
@@ -15,22 +14,20 @@ const arg: ExecuteArg = {
 	offset: 0,
 };
 
-_.throws(command.bind(null, arg), 'expected to throw if stack is empty');
+_.throws(if_.bind(null, arg), 'expected to throw if stack is empty');
 data.stack.push('abc');
-_.throws(command.bind(null, arg), 'expected to throw if poped value is not a boolean');
+_.throws(if_.bind(null, arg), 'expected to throw if poped value is not a boolean');
 data.stack.clear();
 data.stack.push(123, true);
-command(arg);
+if_(arg);
 _.equal(arg.offset, 0, 'expected to not jump if poped value is true');
 _.strictSame(data.stack.toNewArray(), [], 'expected to pop twice from the stack even if the condition is true');
 
 await _.test('goto', async (_) => {
 	testGoto(_, () => {
 		data.stack.push(false);
-		command(arg);
+		if_(arg);
 	}, arg);
 
 	_.end();
 });
-
-_.end();

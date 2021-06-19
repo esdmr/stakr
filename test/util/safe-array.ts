@@ -1,5 +1,5 @@
-import * as _ from 'tap';
 import SafeArray, { ErrorMessage as Message } from 'src/util/safe-array.js';
+import * as _ from 'tap';
 
 const error = (message: string) => new RangeError(message);
 
@@ -325,5 +325,3 @@ await _.test('@@iterator', async (_) => {
 
 	_.end();
 });
-
-_.end();

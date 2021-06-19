@@ -132,5 +132,3 @@ await _.test('resolveSource', async (_) => {
 	_.equal(context.resolveSource('test'), source, 'expected to return the source');
 	_.end();
 });
-
-_.end();

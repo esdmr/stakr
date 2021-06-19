@@ -41,5 +41,3 @@ await _.test('external', async (_) => {
 	_.equal(data.halted, false, 'expected to clear halted flag');
 	_.end();
 });
-
-_.end();
