@@ -64,10 +64,7 @@ export const if_ = (arg: ExecuteArg) => {
 	}
 
 	if (condition) {
-		// Check if offset is valid.
-		const { offset } = arg;
-		goto_(arg);
-		arg.offset = offset;
+		arg.data.stack.pop();
 	} else {
 		goto_(arg);
 	}

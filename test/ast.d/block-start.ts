@@ -1,40 +1,57 @@
 import * as ast from 'src/ast.js';
-import * as stakr from 'src/stakr.js';
-import { AssembleArg } from 'src/types.js';
+import * as types from 'src/types.js';
 import * as _ from 'tap';
+import { createAssets, SourceState } from '../test-util/stakr.js';
 
 await _.test('offset', async (_) => {
 	const instance = new ast.BlockStart();
 
-	_.throws(() => instance.offset, 'expected to throw if not initialized');
+	_.throws(() => instance.offset,
+		'expected to throw if not initialized');
+
 	instance.endOffset = 123;
-	_.equal(instance.offset, instance.endOffset, 'expected to preserve offset');
+
+	_.equal(instance.offset, instance.endOffset,
+		'expected to preserve offset');
+
 	_.end();
 });
 
 await _.test('assemble', async (_) => {
 	const instance = new ast.BlockStart();
-	const source = new stakr.Source('test', [instance]);
-	const arg: AssembleArg = {
+
+	const { source, assembleData } = createAssets({
+		source: [instance],
+		state: SourceState.RAW,
+	});
+
+	const arg: types.AssembleArg = {
 		source,
 		blockStack: [],
-		data: new stakr.AssembleData(),
+		data: assembleData,
 		offset: 0,
 	};
 
 	instance.assemble(arg);
-	_.strictSame(arg.blockStack, [0], 'expected to push offset');
+
+	_.strictSame(arg.blockStack, [0],
+		'expected to push offset');
+
 	_.end();
 });
 
 await _.test('execute', async (_) => {
 	const instance = new ast.BlockStart();
-	const context = new stakr.ExecutionContext();
-	const data = new stakr.ExecuteData();
-	context.addSource(new stakr.Source('test', [instance, new ast.BlockEnd()]));
+
+	const { context, source, data } = createAssets({
+		source: [instance, new ast.BlockEnd()],
+	});
 
 	instance.endOffset = 123;
-	context.execute(['test'], data);
-	_.strictSame(data.stack.toNewArray(), [123], 'expected to push offset');
+	context.execute([source.name], data);
+
+	_.strictSame(data.stack.toNewArray(), [123],
+		'expected to push offset');
+
 	_.end();
 });

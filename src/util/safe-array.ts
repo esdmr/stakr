@@ -106,7 +106,7 @@ export default class SafeArray<T> {
 
 	/**
 	 * Removes the last element from a safe-array and returns it. If the
-     * safe-array is empty, a RangeError is thrown.
+	 * safe-array is empty, a RangeError is thrown.
 	 *
 	 * @throws {RangeError}
 	 */

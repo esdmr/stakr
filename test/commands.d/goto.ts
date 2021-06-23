@@ -1,18 +1,25 @@
 import { goto_ } from 'src/commands.js';
-import * as stakr from 'src/stakr.js';
-import { ExecuteArg } from 'src/types.js';
+import * as types from 'src/types.js';
 import * as _ from 'tap';
-import { testGoto } from '../test-util/goto.js';
+import testGoto from '../test-util/goto.js';
+import { createAssets } from '../test-util/stakr.js';
 
-const context = new stakr.ExecutionContext();
-const source = new stakr.Source('test', []);
-const arg: ExecuteArg = {
+const { context, source, data } = createAssets();
+
+const arg: types.ExecuteArg = {
 	context,
 	source,
-	data: new stakr.ExecuteData(),
+	data,
 	offset: 0,
 };
 
-testGoto(_, () => {
+testGoto(_, (value) => {
+	data.stack.clear();
+
+	if (value !== undefined) {
+		data.stack.push(value);
+	}
+
 	goto_(arg);
-}, arg);
+	return arg;
+});
