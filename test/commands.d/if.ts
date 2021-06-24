@@ -1,12 +1,11 @@
 import { if_ } from 'src/commands.js';
-import * as stakr from 'src/stakr.js';
 import * as types from 'src/types.js';
 import * as _ from 'tap';
 import testGoto from '../test-util/goto.js';
+import { createAssets } from '../test-util/stakr.js';
 
-const context = new stakr.ExecutionContext();
-const source = new stakr.Source('test', []);
-const data = new stakr.ExecuteData();
+const { context, source, data } = createAssets();
+
 const arg: types.ExecuteArg = {
 	context,
 	source,
