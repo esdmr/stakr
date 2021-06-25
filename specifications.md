@@ -4,13 +4,17 @@
 <!-- omit in toc -->
 ## Table of contents
 - [Internal API](#internal-api)
-  - [Definitions](#definitions)
-  - [Commands](#commands)
-    - [`call`](#call)
-    - [`goto`](#goto)
-    - [`if`](#if)
-    - [`return`](#return)
-    - [`while`](#while)
+	- [Definitions](#definitions)
+	- [Naming convention](#naming-convention)
+	- [Calling convention](#calling-convention)
+		- [Caller](#caller)
+		- [Callee](#callee)
+	- [Commands](#commands)
+		- [`call`](#call)
+		- [`goto`](#goto)
+		- [`if`](#if)
+		- [`return`](#return)
+		- [`while`](#while)
 
 ## Internal API
 
@@ -59,6 +63,39 @@
         </ul>
     </dd>
 </dl>
+
+### Naming convention
+
++ Operator: `get`, `getThing`. Lower camel case.
++ Subroutine: `Get`, `GetThing`. Pascal case.
++ Constant: `E_`, `PI`, `EMPTY_STRING`. Upper snake case. Single letter
+  constants must be postfixed with an underline to differentiate them with a
+  single letter subroutine.
++ Label: `loop_`, `end_loop`. Lower snake case. Single-word labels must be
+  postfixed with an underline to differentiate them with a single word operator.
++ Type: `Array_`, `Array_Iterator`. Title snake case. It can not be a single
+  letter or series of single letters seperated by underline. Single-word types must
+  be postfixed with an underline to differentiate them with a single word
+  subroutine.
+
+### Calling convention
+
+#### Caller
+
++ If not constant, push arguments to the stack.
++ Call function
++ Use and then optionally pop the return value. Return type may be provided
+  through `:Return_`.
++ If subroutine, pop the parameters. Parameter type may be provided through
+  `:Parameter_`.
+
+#### Callee
+
++ Optionally `enter`.
++ ...
++ If operator, replace parameters with the return value, poping any locals.
++ `leave` if necessary.
++ Return.
 
 ### Commands
 
