@@ -1,12 +1,12 @@
 # Stakr
 
-[![Github workflow](https://github.com/esdmr/stakr/actions/workflows/test.yml/badge.svg?branch=master)][workflow]
+[![Github workflow](https://github.com/esdmr/stakr/actions/workflows/ci.yml/badge.svg?branch=master)][workflow]
 [![Codecov coverage](https://img.shields.io/codecov/c/gh/esdmr/stakr/master?logo=CodeCov)][codecov]
 [![NodeJS version](https://img.shields.io/badge/node-≥16.0.0-brightgreen?logo=node.js)][node]
 [![PNPM version](https://img.shields.io/badge/pnpm-≥6.9.0-brightgreen?logo=pnpm)][pnpm]
 [![License](https://img.shields.io/github/license/esdmr/stakr)][license]
 
-[workflow]: https://github.com/esdmr/stakr/actions/workflows/test.yml
+[workflow]: https://github.com/esdmr/stakr/actions/workflows/ci.yml
 [codecov]: https://codecov.io/gh/esdmr/stakr
 [node]: https://nodejs.org/en/download/current
 [pnpm]: https://pnpm.io
