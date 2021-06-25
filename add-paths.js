@@ -24,7 +24,11 @@ async function main () {
 
 	try {
 		await fs.unlink('src');
-	} catch {}
+	} catch (error) {
+		if (error.code !== 'ENOENT') {
+			throw error;
+		}
+	}
 
 	await fs.symlink(path.join('..', '..'), 'src');
 }
