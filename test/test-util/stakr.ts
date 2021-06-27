@@ -10,27 +10,27 @@ export const enum SourceState {
 
 export interface Parameters {
 	context?: stakr.ExecutionContext;
+	source?: string | types.ASTTree | stakr.Source;
+	lib?: string | types.ASTTree | stakr.Source;
+	state?: SourceState;
 	executeData?: stakr.ExecuteData;
 	assembleData?: stakr.AssembleData;
 	linkData?: stakr.LinkData;
-	lib?: string | types.ASTTree | stakr.Source;
-	source?: string | types.ASTTree | stakr.Source;
-	state?: SourceState;
 	offset?: number;
 	halted?: boolean;
 }
 
 export interface Returns {
 	context: stakr.ExecutionContext;
+	source: stakr.Source;
+	lib: stakr.Source;
+	executeOrder: string[];
+	arg: types.ExecuteArg;
+	linkArg: types.LinkArg;
+	assembleArg: types.AssembleArg;
 	data: stakr.ExecuteData;
 	assembleData: stakr.AssembleData;
 	linkData: stakr.LinkData;
-	arg: types.ExecuteArg;
-	assembleArg: types.AssembleArg;
-	linkArg: types.LinkArg;
-	lib: stakr.Source;
-	source: stakr.Source;
-	executeOrder: string[];
 }
 
 function isReadonlyArray (arg: unknown): arg is readonly unknown[] {
@@ -38,24 +38,68 @@ function isReadonlyArray (arg: unknown): arg is readonly unknown[] {
 }
 
 export function createAssets (arg: Parameters = {}): Returns {
-	const out: Partial<Returns> = {};
+	const context = arg.context ?? new stakr.ExecutionContext();
+	const { executeData, assembleData, linkData } = createData(arg);
+	const { source, lib, executeOrder } = createSources(arg, context);
 
-	out.context = arg.context ?? new stakr.ExecutionContext();
-	out.data = arg.executeData ?? new stakr.ExecuteData();
-	out.assembleData = arg.assembleData ?? new stakr.AssembleData();
-	out.linkData = arg.linkData ?? new stakr.LinkData();
+	const executeArg = {
+		context,
+		source,
+		data: executeData,
+	};
 
-	out.data.sourceName = 'test-source';
-	out.data.offset = arg.offset ?? 0;
-	out.data.halted = arg.halted ?? false;
+	const assembleArg = {
+		source,
+		data: assembleData,
+		blockStack: [],
+		offset: arg.offset ?? 0,
+	};
 
-	out.lib = typeof arg.lib === 'string' ?
+	const linkArg = {
+		context,
+		source,
+		data: linkData,
+		offset: arg.offset ?? 0,
+	};
+
+	return {
+		context,
+		source,
+		lib,
+		executeOrder,
+		arg: executeArg,
+		assembleArg,
+		linkArg,
+		data: executeData,
+		assembleData,
+		linkData,
+	};
+}
+
+function createData (arg: Parameters) {
+	const executeData = arg.executeData ?? new stakr.ExecuteData();
+	const assembleData = arg.assembleData ?? new stakr.AssembleData();
+	const linkData = arg.linkData ?? new stakr.LinkData();
+
+	executeData.sourceName = 'test-source';
+	executeData.offset = arg.offset ?? 0;
+	executeData.halted = arg.halted ?? false;
+
+	return {
+		executeData,
+		assembleData,
+		linkData,
+	};
+}
+
+function createSources (arg: Parameters, context: stakr.ExecutionContext) {
+	const lib = typeof arg.lib === 'string' ?
 		new stakr.Source(arg.lib, []) :
 		(isReadonlyArray(arg.lib) ?
 			new stakr.Source('test-lib', arg.lib) :
 			arg.lib ?? new stakr.Source('test-lib', []));
 
-	out.source = typeof arg.source === 'string' ?
+	const source = typeof arg.source === 'string' ?
 		new stakr.Source(arg.source, []) :
 		(isReadonlyArray(arg.source) ?
 			new stakr.Source('test-source', arg.source) :
@@ -65,43 +109,27 @@ export function createAssets (arg: Parameters = {}): Returns {
 
 	if (state >= SourceState.ASSEMBLED) {
 		if (arg.lib !== undefined) {
-			out.lib.assemble();
+			lib.assemble();
 		}
 
-		out.source.assemble();
+		source.assemble();
 	}
 
 	if (state >= SourceState.ADDED) {
 		if (arg.lib !== undefined) {
-			out.context.addSource(out.lib);
+			context.addSource(lib);
 		}
 
-		out.context.addSource(out.source);
+		context.addSource(source);
 	}
 
-	out.executeOrder = state >= SourceState.LINKED ?
-		out.context.link(new Set([out.source.name])) :
+	const executeOrder = state >= SourceState.LINKED ?
+		context.link(new Set([source.name])) :
 		[];
 
-	out.arg = {
-		context: out.context,
-		source: out.source,
-		data: out.data,
+	return {
+		source,
+		lib,
+		executeOrder,
 	};
-
-	out.assembleArg = {
-		source: out.source,
-		data: out.assembleData,
-		blockStack: [],
-		offset: arg.offset ?? 0,
-	};
-
-	out.linkArg = {
-		context: out.context,
-		source: out.source,
-		data: out.linkData,
-		offset: arg.offset ?? 0,
-	};
-
-	return out as Returns;
 }
