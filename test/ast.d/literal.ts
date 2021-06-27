@@ -22,7 +22,6 @@ await _.test('execute', async (_) => {
 		context,
 		source,
 		data,
-		offset: 0,
 	});
 
 	_.strictSame(data.stack.toNewArray(), [instance.value],

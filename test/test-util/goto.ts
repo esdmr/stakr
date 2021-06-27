@@ -15,7 +15,7 @@ export default function testGoto (
 
 	const arg = command(123);
 
-	_.equal(arg.offset, 123,
+	_.equal(arg.data.offset, 123,
 		'expected to jump to given offset');
 
 	_.strictSame(arg.data.stack.toNewArray(), [],

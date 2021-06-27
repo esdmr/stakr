@@ -21,13 +21,13 @@ await _.test('execute', async (_) => {
 				new ast.Label('test-label', false),
 				instance,
 			],
+			offset: 2,
 		});
 
 		const arg: ExecuteArg = {
 			context,
 			source,
 			data,
-			offset: 2,
 		};
 
 		instance.execute(arg);
@@ -48,18 +48,18 @@ await _.test('execute', async (_) => {
 				new ast.FunctionEnd(),
 				instance,
 			],
+			offset: 4,
 		});
 
 		const arg: ExecuteArg = {
 			context,
 			source,
 			data,
-			offset: 4,
 		};
 
 		instance.execute(arg);
 
-		_.equal(arg.offset, 2,
+		_.equal(data.offset, 2,
 			'expected to jump to function');
 
 		_.strictSame(data.aux.toNewArray(), [4],
@@ -82,6 +82,7 @@ await _.test('execute', async (_) => {
 				instance,
 			],
 			state: SourceState.ADDED,
+			offset: 2,
 		});
 
 		_.throws(
@@ -97,7 +98,6 @@ await _.test('execute', async (_) => {
 			context,
 			source,
 			data,
-			offset: 2,
 		};
 
 		instance.execute(arg);
@@ -105,10 +105,10 @@ await _.test('execute', async (_) => {
 		_.equal(data.halted, false,
 			'expected to clear halted flag');
 
-		_.equal(data.nextSource, 'test-lib',
+		_.equal(data.sourceName, 'test-lib',
 			'expected to jump to source');
 
-		_.equal(data.nextOffset, 2,
+		_.equal(data.offset, 2,
 			'expected to jump to function');
 
 		_.strictSame(data.aux.toNewArray(), [2, source.name],

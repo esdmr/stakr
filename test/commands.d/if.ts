@@ -10,7 +10,6 @@ const arg: types.ExecuteArg = {
 	context,
 	source,
 	data,
-	offset: 0,
 };
 
 _.throws(
@@ -33,7 +32,7 @@ data.stack.clear();
 data.stack.push(123, true);
 if_(arg);
 
-_.equal(arg.offset, 0,
+_.equal(data.offset, 0,
 	'expected to not jump if poped value is true');
 
 _.strictSame(data.stack.toNewArray(), [],

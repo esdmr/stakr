@@ -27,7 +27,6 @@ export interface ExecuteArg {
 	readonly context: stakr.ExecutionContext;
 	readonly source: stakr.Source;
 	readonly data: stakr.ExecuteData;
-	offset: number;
 }
 
 export type Writable<T> = { -readonly [K in keyof T]: T[K] };

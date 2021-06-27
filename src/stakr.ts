@@ -19,9 +19,21 @@ export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
 	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
 	readonly commandMap = new Map(commandMap);
-	nextSource?: string = undefined;
-	nextOffset?: number = undefined;
+	sourceName = '';
 	halted = true;
+	private _offset = 0;
+
+	get offset () {
+		return this._offset;
+	}
+
+	set offset (value) {
+		if (!Number.isSafeInteger(value) || value < 0) {
+			throw new RangeError(`'${value}' is not a valid offset.`);
+		}
+
+		this._offset = value;
+	}
 }
 
 export class ExecutionContext {
@@ -45,7 +57,7 @@ export class ExecutionContext {
 
 		for (const sourceName of sources) {
 			const source = deps.getNodeData(sourceName);
-			this.linkSource(source);
+			source.link(this);
 
 			for (const target of source.assemble().imports) {
 				deps.addDependency(sourceName, target);
@@ -61,15 +73,13 @@ export class ExecutionContext {
 		}
 
 		for (const sourceName of sourceList) {
-			data.nextSource = sourceName;
-			data.nextOffset = 0;
+			data.sourceName = sourceName;
+			data.offset = 0;
 			data.halted = false;
 
 			while (!data.halted) {
-				const source = this.resolveSource(data.nextSource);
-
-				data.halted = true;
-				this.executeSource(source, data, data.nextOffset);
+				const source = this.resolveSource(data.sourceName);
+				source.execute(this, data);
 			}
 		}
 	}
@@ -92,63 +102,6 @@ export class ExecutionContext {
 		}
 
 		return source;
-	}
-
-	private linkSource (
-		source: Source,
-	) {
-		if (source.linkData.has(this)) {
-			return source.linkData.get(this);
-		}
-
-		source.assemble();
-
-		const arg: types.Writable<types.LinkArg> = {
-			context: this,
-			source,
-			data: new LinkData(),
-			offset: 0,
-		};
-
-		for (const [offset, item] of source.ast.entries()) {
-			arg.offset = offset;
-			item.link?.(arg);
-		}
-
-		source.linkData.set(this, arg.data);
-		return arg.data;
-	}
-
-	private executeSource (
-		source: Source,
-		data: ExecuteData,
-		offset: number,
-	) {
-		const arg: types.ExecuteArg = {
-			context: this,
-			source,
-			data,
-			get offset () {
-				return offset;
-			},
-			set offset (value) {
-				if (!Number.isSafeInteger(value) || value < 0) {
-					throw new RangeError(`'${value}' is not a valid offset.`);
-				}
-
-				offset = value;
-			},
-		};
-
-		while (arg.data.halted) {
-			const item = source.ast[offset++];
-
-			if (item === undefined) {
-				break;
-			}
-
-			item.execute?.(arg);
-		}
 	}
 }
 
@@ -183,5 +136,50 @@ export class Source {
 
 		this.assembleData = arg.data;
 		return this.assembleData;
+	}
+
+	link (context: ExecutionContext) {
+		if (this.linkData.has(context)) {
+			return this.linkData.get(context);
+		}
+
+		this.assemble();
+
+		const arg: types.Writable<types.LinkArg> = {
+			context,
+			source: this,
+			data: new LinkData(),
+			offset: 0,
+		};
+
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.link?.(arg);
+		}
+
+		this.linkData.set(context, arg.data);
+		return arg.data;
+	}
+
+	execute (
+		context: ExecutionContext,
+		data: ExecuteData,
+	) {
+		const arg: types.ExecuteArg = {
+			context,
+			source: this,
+			data,
+		};
+
+		while (!data.halted && data.sourceName === this.name) {
+			const item = this.ast[data.offset++];
+
+			if (item === undefined) {
+				data.halted = true;
+				break;
+			}
+
+			item.execute?.(arg);
+		}
 	}
 }

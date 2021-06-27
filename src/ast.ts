@@ -108,7 +108,7 @@ export class BlockEnd implements types.ASTNode {
 
 export class WhileEnd extends BlockEnd implements types.ASTNode {
 	execute (arg: types.ExecuteArg) {
-		arg.offset = this.offset;
+		arg.data.offset = this.offset;
 	}
 }
 

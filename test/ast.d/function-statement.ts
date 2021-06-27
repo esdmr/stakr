@@ -52,19 +52,19 @@ await _.test('execute', async (_) => {
 
 	const { context, source, data } = createAssets({
 		source: [instance],
+		offset: 1,
 	});
 
 	const arg: ExecuteArg = {
 		context,
 		source,
 		data,
-		offset: 1,
 	};
 
 	data.stack.push(123);
 	instance.execute(arg);
 
-	_.equal(arg.offset, 123,
+	_.equal(data.offset, 123,
 		'expected to jump');
 
 	_.end();

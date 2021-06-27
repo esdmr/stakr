@@ -16,6 +16,8 @@ export interface Parameters {
 	lib?: string | types.ASTTree | stakr.Source;
 	source?: string | types.ASTTree | stakr.Source;
 	state?: SourceState;
+	offset?: number;
+	halted?: boolean;
 }
 
 export interface Returns {
@@ -39,6 +41,10 @@ export function createAssets (arg: Parameters = {}): Returns {
 	out.data = arg.executeData ?? new stakr.ExecuteData();
 	out.assembleData = arg.assembleData ?? new stakr.AssembleData();
 	out.linkData = arg.linkData ?? new stakr.LinkData();
+
+	out.data.sourceName = 'test-source';
+	out.data.offset = arg.offset ?? 0;
+	out.data.halted = arg.halted ?? false;
 
 	out.lib = typeof arg.lib === 'string' ?
 		new stakr.Source(arg.lib, []) :

@@ -10,7 +10,6 @@ const arg: types.ExecuteArg = {
 	context,
 	source,
 	data,
-	offset: 0,
 };
 
 testGoto(_, (value) => {

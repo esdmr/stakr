@@ -17,13 +17,13 @@ await _.test('execute', async (_) => {
 
 	const { context, source, data } = createAssets({
 		source: [instance],
+		offset: 1,
 	});
 
 	const arg: ExecuteArg = {
 		context,
 		source,
 		data,
-		offset: 1,
 	};
 
 	let operatorCalled = false;

@@ -54,14 +54,13 @@ void _.test('execute', (_) => {
 							context,
 							source,
 							data,
-							offset: 1,
 						},
 						'expected to provide an execute argument',
 					);
 
-					arg.offset = 2;
+					data.offset = 2;
 
-					_.equal(arg.offset, 2,
+					_.equal(data.offset, 2,
 						'expected to preserve offset');
 				},
 			},
@@ -71,41 +70,41 @@ void _.test('execute', (_) => {
 				},
 			},
 			{
-				execute (arg: types.ExecuteArg) {
+				execute ({ data }: types.ExecuteArg) {
 					_.ok(jumped,
 						'expected to jump on set offset');
 
 					_.throws(
 						() => {
-							arg.offset = -1;
+							data.offset = -1;
 						},
 						'expected to throw if offset is set to a negative value',
 					);
 
 					_.throws(
 						() => {
-							arg.offset = 1.1;
+							data.offset = 1.1;
 						},
 						'expected to throw if offset is set to a fractional value',
 					);
 
 					_.throws(
 						() => {
-							arg.offset = Number.NaN;
+							data.offset = Number.NaN;
 						},
 						'expected to throw if offset is set to NaN',
 					);
 
 					_.throws(
 						() => {
-							arg.offset = Number.POSITIVE_INFINITY;
+							data.offset = Number.POSITIVE_INFINITY;
 						},
 						'expected to throw if offset is set to Infinity',
 					);
 
 					_.throws(
 						() => {
-							arg.offset = Number.MAX_SAFE_INTEGER + 1;
+							data.offset = Number.MAX_SAFE_INTEGER + 1;
 						},
 						'expected to throw if offset is set to a non-safe integer',
 					);

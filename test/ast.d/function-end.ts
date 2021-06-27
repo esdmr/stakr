@@ -11,19 +11,19 @@ await _.test('execute', async (_) => {
 			new ast.BlockStart(),
 			instance,
 		],
+		offset: 2,
 	});
 
 	const arg: ExecuteArg = {
 		context,
 		source,
 		data,
-		offset: 2,
 	};
 
 	data.aux.push(123);
 	instance.execute(arg);
 
-	_.equal(arg.offset, 123,
+	_.equal(data.offset, 123,
 		'expected to return');
 
 	_.strictSame(data.aux.toNewArray(), [],

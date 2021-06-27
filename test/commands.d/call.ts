@@ -9,7 +9,6 @@ const arg: types.ExecuteArg = {
 	context,
 	source,
 	data,
-	offset: 0,
 };
 
 _.throws(
@@ -33,7 +32,7 @@ await _.test('internal', async (_) => {
 	data.stack.push(123);
 	call_(arg);
 
-	_.equal(arg.offset, 123,
+	_.equal(data.offset, 123,
 		'expected to jump to given offset');
 
 	_.strictSame(data.stack.toNewArray(), [],
@@ -57,17 +56,17 @@ await _.test('external', async (_) => {
 
 	data.stack.clear();
 	data.aux.clear();
-	arg.offset = 0;
+	data.offset = 0;
 	data.stack.push(123, 'test-lib');
 	call_(arg);
 
 	_.strictSame(data.aux.toNewArray(), [0, source.name],
 		'expected to push offset onto aux');
 
-	_.equal(data.nextSource, 'test-lib',
+	_.equal(data.sourceName, 'test-lib',
 		'expected to set next source');
 
-	_.equal(data.nextOffset, 123,
+	_.equal(data.offset, 123,
 		'expected to set next offset');
 
 	_.equal(data.halted, false,

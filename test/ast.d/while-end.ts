@@ -11,18 +11,18 @@ await _.test('execute', async (_) => {
 			new ast.BlockStart(),
 			instance,
 		],
+		offset: 2,
 	});
 
 	const arg: ExecuteArg = {
 		context,
 		source,
 		data,
-		offset: 2,
 	};
 
 	instance.execute(arg);
 
-	_.equal(arg.offset, 0,
+	_.equal(data.offset, 0,
 		'expected to jump to start');
 
 	_.end();
