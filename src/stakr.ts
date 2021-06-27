@@ -29,7 +29,7 @@ export class ExecuteData {
 
 	set offset (value) {
 		if (!Number.isSafeInteger(value) || value < 0) {
-			throw new RangeError(`'${value}' is not a valid offset.`);
+			throw new RangeError(`'${value}' is not a valid offset`);
 		}
 
 		this._offset = value;

@@ -14,7 +14,7 @@ export class Label implements types.ASTNode {
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
 		if (data.identifiers.has(this.name)) {
-			throw new Error(`Identifier '${this.name}' already defined.`);
+			throw new Error(`Identifier '${this.name}' already defined`);
 		}
 
 		data.identifiers.set(this.name, {
