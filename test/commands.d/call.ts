@@ -1,15 +1,8 @@
 import { call_ } from 'src/commands.js';
-import * as types from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets } from '../test-util/stakr.js';
 
-const { context, source, data } = createAssets();
-
-const arg: types.ExecuteArg = {
-	context,
-	source,
-	data,
-};
+const { source, data, arg } = createAssets();
 
 _.throws(
 	() => {

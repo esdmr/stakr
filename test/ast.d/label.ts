@@ -1,5 +1,4 @@
 import * as ast from 'src/ast.js';
-import { AssembleArg } from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets } from '../test-util/stakr.js';
 
@@ -15,16 +14,9 @@ await _.test('name', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.Label('test-label', false);
 
-	const { source, assembleData } = createAssets({
+	const { source, assembleArg: arg } = createAssets({
 		source: [instance],
 	});
-
-	const arg: AssembleArg = {
-		source,
-		data: assembleData,
-		blockStack: [],
-		offset: 0,
-	};
 
 	instance.assemble(arg);
 

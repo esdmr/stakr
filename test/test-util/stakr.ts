@@ -25,6 +25,9 @@ export interface Returns {
 	data: stakr.ExecuteData;
 	assembleData: stakr.AssembleData;
 	linkData: stakr.LinkData;
+	arg: types.ExecuteArg;
+	assembleArg: types.AssembleArg;
+	linkArg: types.LinkArg;
 	lib: stakr.Source;
 	source: stakr.Source;
 	executeOrder: string[];
@@ -79,6 +82,26 @@ export function createAssets (arg: Parameters = {}): Returns {
 	out.executeOrder = state >= SourceState.LINKED ?
 		out.context.link(new Set([out.source.name])) :
 		[];
+
+	out.arg = {
+		context: out.context,
+		source: out.source,
+		data: out.data,
+	};
+
+	out.assembleArg = {
+		source: out.source,
+		data: out.assembleData,
+		blockStack: [],
+		offset: arg.offset ?? 0,
+	};
+
+	out.linkArg = {
+		context: out.context,
+		source: out.source,
+		data: out.linkData,
+		offset: arg.offset ?? 0,
+	};
 
 	return out as Returns;
 }

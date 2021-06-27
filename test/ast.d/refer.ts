@@ -1,5 +1,4 @@
 import * as ast from 'src/ast.js';
-import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets, SourceState } from '../test-util/stakr.js';
 
@@ -16,19 +15,13 @@ await _.test('execute', async (_) => {
 	await _.test('label', async (_) => {
 		const instance = new ast.Refer('test-label');
 
-		const { context, source, data } = createAssets({
+		const { data, arg } = createAssets({
 			source: [
 				new ast.Label('test-label', false),
 				instance,
 			],
 			offset: 2,
 		});
-
-		const arg: ExecuteArg = {
-			context,
-			source,
-			data,
-		};
 
 		instance.execute(arg);
 
@@ -41,7 +34,7 @@ await _.test('execute', async (_) => {
 	await _.test('function', async (_) => {
 		const instance = new ast.Refer('test-function');
 
-		const { context, source, data } = createAssets({
+		const { data, arg } = createAssets({
 			source: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', false),
@@ -50,12 +43,6 @@ await _.test('execute', async (_) => {
 			],
 			offset: 4,
 		});
-
-		const arg: ExecuteArg = {
-			context,
-			source,
-			data,
-		};
 
 		instance.execute(arg);
 
@@ -71,7 +58,7 @@ await _.test('execute', async (_) => {
 	await _.test('import', async (_) => {
 		const instance = new ast.Refer('lib:test-function');
 
-		const { context, source, data } = createAssets({
+		const { context, source, data, arg } = createAssets({
 			lib: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', true),
@@ -93,12 +80,6 @@ await _.test('execute', async (_) => {
 		);
 
 		context.link(new Set([source.name]));
-
-		const arg: ExecuteArg = {
-			context,
-			source,
-			data,
-		};
 
 		instance.execute(arg);
 

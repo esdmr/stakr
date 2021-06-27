@@ -1,5 +1,4 @@
 import * as ast from 'src/ast.js';
-import { AssembleArg, LinkArg } from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets, SourceState } from '../test-util/stakr.js';
 
@@ -24,17 +23,10 @@ await _.test('source', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	const { source, assembleData } = createAssets({
+	const { assembleData, assembleArg: arg } = createAssets({
 		source: [instance],
 		state: SourceState.RAW,
 	});
-
-	const arg: AssembleArg = {
-		source,
-		blockStack: [],
-		data: assembleData,
-		offset: 0,
-	};
 
 	instance.assemble(arg);
 
@@ -66,7 +58,7 @@ await _.test('assemble', async (_) => {
 await _.test('link', async (_) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	const { context, source, lib, linkData } = createAssets({
+	const { context, source, lib, linkArg: arg } = createAssets({
 		lib: [
 			new ast.BlockStart(),
 			new ast.FunctionStatement('test-internal', false),
@@ -78,13 +70,6 @@ await _.test('link', async (_) => {
 		source: [instance],
 		state: SourceState.ADDED,
 	});
-
-	const arg: LinkArg = {
-		context,
-		source,
-		data: linkData,
-		offset: 0,
-	};
 
 	const { identifiers: libExports } = lib.assemble();
 	context.sourceMap.delete('test-lib');

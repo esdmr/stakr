@@ -1,15 +1,8 @@
 import { return_ } from 'src/commands.js';
-import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets } from '../test-util/stakr.js';
 
-const { context, source, data } = createAssets();
-
-const arg: ExecuteArg = {
-	context,
-	source,
-	data,
-};
+const { data, arg } = createAssets();
 
 _.throws(
 	() => {

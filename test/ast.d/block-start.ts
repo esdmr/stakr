@@ -1,5 +1,4 @@
 import * as ast from 'src/ast.js';
-import * as types from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets, SourceState } from '../test-util/stakr.js';
 
@@ -20,17 +19,10 @@ await _.test('offset', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.BlockStart();
 
-	const { source, assembleData } = createAssets({
+	const { assembleArg: arg } = createAssets({
 		source: [instance],
 		state: SourceState.RAW,
 	});
-
-	const arg: types.AssembleArg = {
-		source,
-		blockStack: [],
-		data: assembleData,
-		offset: 0,
-	};
 
 	instance.assemble(arg);
 

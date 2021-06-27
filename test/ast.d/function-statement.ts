@@ -1,6 +1,5 @@
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
-import { ExecuteArg } from 'src/types.js';
 import * as _ from 'tap';
 import { createAssets } from '../test-util/stakr.js';
 
@@ -50,16 +49,10 @@ await _.test('assemble', async (_) => {
 await _.test('execute', async (_) => {
 	const instance = new ast.FunctionStatement('test-function', false);
 
-	const { context, source, data } = createAssets({
+	const { data, arg } = createAssets({
 		source: [instance],
 		offset: 1,
 	});
-
-	const arg: ExecuteArg = {
-		context,
-		source,
-		data,
-	};
 
 	data.stack.push(123);
 	instance.execute(arg);
