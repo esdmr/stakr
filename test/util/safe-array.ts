@@ -1,4 +1,4 @@
-import SafeArray, { ErrorMessage as Message } from 'src/util/safe-array.js';
+import SafeArray, { Message } from 'src/util/safe-array.js';
 import * as _ from 'tap';
 
 const error = (message: string) => new RangeError(message);

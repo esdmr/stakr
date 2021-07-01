@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 /** @internal */
-const enum Message {
+export const enum Message {
 	INDEX_IS_NEGATIVE = 'Index is negative',
 	INDEX_IS_NOT_INT = 'Index is not a safe (positive) integer',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
@@ -10,9 +10,6 @@ const enum Message {
 	ARRAY_IS_EMPTY = 'SafeArray is empty',
 	ARRAY_IS_FULL = 'SafeArray is full',
 }
-
-/** @internal */
-export { Message as ErrorMessage };
 
 /**
  * A dense array with bound checks.
