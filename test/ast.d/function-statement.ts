@@ -1,6 +1,7 @@
 import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import testGoto from '../test-util/goto.js';
 import { createAssets } from '../test-util/stakr.js';
 
 await _.test('name', async (_) => {
@@ -54,11 +55,13 @@ await _.test('execute', async (_) => {
 		offset: 1,
 	});
 
-	data.stack.push(123);
-	instance.execute(arg);
+	testGoto(_, (...items) => {
+		data.stack.clear();
+		data.stack.push(...items);
+		instance.execute(arg);
 
-	_.equal(data.offset, 123,
-		'expected to jump');
+		return data;
+	});
 
 	_.end();
 });

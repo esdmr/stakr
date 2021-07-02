@@ -3,7 +3,7 @@ import * as _ from 'tap';
 import testGoto from '../test-util/goto.js';
 import { createAssets } from '../test-util/stakr.js';
 
-const { data, arg } = createAssets();
+const { source, lib, data, arg } = createAssets();
 
 _.throws(
 	() => {
@@ -22,26 +22,25 @@ _.throws(
 );
 
 data.stack.clear();
-data.stack.push(123, true);
+data.stack.push(123, lib.name, true);
 if_(arg);
 
 _.equal(data.offset, 0,
-	'expected to not jump if poped value is true');
+	'expected to not jump to offset if poped value is true');
+
+_.equal(data.sourceName, source.name,
+	'expected to not jump to source if poped value is true');
 
 _.strictSame(data.stack.toNewArray(), [],
 	'expected to pop twice from the stack even if the condition is true');
 
 await _.test('goto', async (_) => {
-	testGoto(_, (value) => {
+	testGoto(_, (...items) => {
 		data.stack.clear();
-
-		if (value !== undefined) {
-			data.stack.push(value);
-		}
-
-		data.stack.push(false);
+		data.stack.push(...items, false);
 		if_(arg);
-		return arg;
+
+		return data;
 	});
 
 	_.end();

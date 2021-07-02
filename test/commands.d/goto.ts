@@ -5,13 +5,10 @@ import { createAssets } from '../test-util/stakr.js';
 
 const { data, arg } = createAssets();
 
-testGoto(_, (value) => {
+testGoto(_, (...items) => {
 	data.stack.clear();
-
-	if (value !== undefined) {
-		data.stack.push(value);
-	}
-
+	data.stack.push(...items);
 	goto_(arg);
-	return arg;
+
+	return data;
 });

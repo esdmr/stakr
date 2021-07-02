@@ -15,7 +15,7 @@ await _.test('execute', async (_) => {
 	await _.test('label', async (_) => {
 		const instance = new ast.Refer('test-label');
 
-		const { data, arg } = createAssets({
+		const { source, data, arg } = createAssets({
 			source: [
 				new ast.Label('test-label', false),
 				instance,
@@ -25,8 +25,14 @@ await _.test('execute', async (_) => {
 
 		instance.execute(arg);
 
-		_.strictSame(data.stack.toNewArray(), [0],
+		_.strictSame(data.stack.toNewArray(), [0, source.name],
 			'expected to push onto the stack');
+
+		_.strictSame(data.offset, 2,
+			'expected to not jump');
+
+		_.strictSame(data.sourceName, source.name,
+			'expected to not change source');
 
 		_.end();
 	});
@@ -34,7 +40,7 @@ await _.test('execute', async (_) => {
 	await _.test('function', async (_) => {
 		const instance = new ast.Refer('test-function');
 
-		const { data, arg } = createAssets({
+		const { source, data, arg } = createAssets({
 			source: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', false),
@@ -49,16 +55,58 @@ await _.test('execute', async (_) => {
 		_.equal(data.offset, 2,
 			'expected to jump to function');
 
-		_.strictSame(data.aux.toNewArray(), [4],
+		_.equal(data.sourceName, source.name,
+			'expected to not change the source');
+
+		_.strictSame(data.stack.toNewArray(), [],
+			'expected to not push anything onto the stack');
+
+		_.strictSame(data.aux.toNewArray(), [4, source.name],
 			'expected to push onto the aux stack');
 
 		_.end();
 	});
 
-	await _.test('import', async (_) => {
+	await _.test('import label', async (_) => {
+		const instance = new ast.Refer('lib:test-label');
+
+		const { context, source, lib, data, arg } = createAssets({
+			lib: [new ast.Label('test-label', true)],
+			source: [
+				new ast.ImportStatement('lib', 'test-lib'),
+				instance,
+			],
+			state: SourceState.ADDED,
+			offset: 2,
+		});
+
+		_.throws(
+			() => {
+				context.execute([source.name], data);
+			},
+			'expected to throw if function is not found',
+		);
+
+		context.link(new Set([source.name]));
+
+		instance.execute(arg);
+
+		_.strictSame(data.stack.toNewArray(), [0, lib.name],
+			'expected to push onto the stack');
+
+		_.strictSame(data.offset, 2,
+			'expected to not jump');
+
+		_.strictSame(data.sourceName, source.name,
+			'expected to not change source');
+
+		_.end();
+	});
+
+	await _.test('import function', async (_) => {
 		const instance = new ast.Refer('lib:test-function');
 
-		const { context, source, data, arg } = createAssets({
+		const { context, source, lib, data, arg } = createAssets({
 			lib: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', true),
@@ -83,14 +131,14 @@ await _.test('execute', async (_) => {
 
 		instance.execute(arg);
 
-		_.equal(data.halted, false,
-			'expected to clear halted flag');
-
-		_.equal(data.sourceName, 'test-lib',
+		_.equal(data.sourceName, lib.name,
 			'expected to jump to source');
 
 		_.equal(data.offset, 2,
 			'expected to jump to function');
+
+		_.strictSame(data.stack.toNewArray(), [],
+			'expected to not push anything onto the stack');
 
 		_.strictSame(data.aux.toNewArray(), [2, source.name],
 			'expected to push onto the aux stack');

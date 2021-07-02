@@ -51,11 +51,7 @@ export class Refer implements types.ASTNode {
 			throw new Error(`Undefined identifier '${this.name}'`);
 		}
 
-		arg.data.stack.push(definition.offset);
-
-		if (definition.sourceName !== arg.source.name) {
-			arg.data.stack.push(definition.sourceName);
-		}
+		arg.data.stack.push(definition.offset, definition.sourceName);
 
 		if (definition.implicitlyCalled) {
 			commands.call_(arg);
@@ -64,14 +60,15 @@ export class Refer implements types.ASTNode {
 }
 
 export class BlockStart implements types.ASTNode {
-	endOffset?: number;
+	/** @internal */
+	_endOffset?: number;
 
-	get offset () {
-		if (this.endOffset === undefined) {
+	get endOffset () {
+		if (this._endOffset === undefined) {
 			throw new Error('Block does not have a end offset');
 		}
 
-		return this.endOffset;
+		return this._endOffset;
 	}
 
 	assemble ({ blockStack, offset }: types.AssembleArg) {
@@ -79,19 +76,20 @@ export class BlockStart implements types.ASTNode {
 	}
 
 	execute ({ data }: types.ExecuteArg) {
-		data.stack.push(this.offset);
+		data.stack.push(this.endOffset, data.sourceName);
 	}
 }
 
 export class BlockEnd implements types.ASTNode {
-	startOffset?: number;
+	/** @internal */
+	_startOffset?: number;
 
-	get offset () {
-		if (this.startOffset === undefined) {
+	get startOffset () {
+		if (this._startOffset === undefined) {
 			throw new Error('Block does not have a start offset');
 		}
 
-		return this.startOffset;
+		return this._startOffset;
 	}
 
 	assemble ({ source, blockStack, offset }: types.AssembleArg) {
@@ -101,14 +99,21 @@ export class BlockEnd implements types.ASTNode {
 			throw new Error(`Extraneous end of block at ${offset}`);
 		}
 
-		this.startOffset = startOffset;
-		(source.ast[startOffset] as BlockStart).endOffset = offset + 1;
+		this._startOffset = startOffset;
+		const start = source.ast[startOffset];
+
+		if (!(start instanceof BlockStart)) {
+			throw new TypeError('Start of block is not a BlockStart.');
+		}
+
+		// Skip BlockEnd itself
+		start._endOffset = offset + 1;
 	}
 }
 
 export class WhileEnd extends BlockEnd implements types.ASTNode {
 	execute (arg: types.ExecuteArg) {
-		arg.data.offset = this.offset;
+		arg.data.offset = this.startOffset;
 	}
 }
 
@@ -128,6 +133,7 @@ export class FunctionStatement implements types.ASTNode {
 
 		data.identifiers.set(this.name, {
 			sourceName: source.name,
+			// Skip FunctionStatement itself.
 			offset: offset + 1,
 			exported: this.exported,
 			implicitlyCalled: true,

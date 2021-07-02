@@ -1,5 +1,6 @@
 import * as ast from 'src/ast.js';
 import * as _ from 'tap';
+import testGoto from '../test-util/goto.js';
 import { createAssets } from '../test-util/stakr.js';
 
 await _.test('execute', async (_) => {
@@ -13,14 +14,17 @@ await _.test('execute', async (_) => {
 		offset: 2,
 	});
 
-	data.aux.push(123);
-	instance.execute(arg);
+	testGoto(_, (...items) => {
+		data.aux.clear();
+		data.aux.push(...items);
+		instance.execute(arg);
 
-	_.equal(data.offset, 123,
-		'expected to return');
-
-	_.strictSame(data.aux.toNewArray(), [],
-		'expected to pop value from aux');
+		return {
+			stack: data.aux,
+			offset: data.offset,
+			sourceName: data.sourceName,
+		};
+	});
 
 	_.end();
 });
