@@ -67,12 +67,12 @@ await _.test('execute', async (_) => {
 
 			_.throws(
 				() => {
-					context.execute([source.name], data);
+					context.execute(source.name, data);
 				},
 				'expected to throw if function is not found',
 			);
 
-			context.link(new Set([source.name]));
+			context.link(source.name);
 
 			instance.execute(arg);
 
@@ -141,12 +141,12 @@ await _.test('execute', async (_) => {
 
 		_.throws(
 			() => {
-				context.execute([source.name], data);
+				context.execute(source.name, data);
 			},
 			'expected to throw if function is not found',
 		);
 
-		context.link(new Set([source.name]));
+		context.link(source.name);
 
 		instance.execute(arg);
 
@@ -211,12 +211,12 @@ await _.test('execute', async (_) => {
 
 		_.throws(
 			() => {
-				context.execute([source.name], data);
+				context.execute(source.name, data);
 			},
 			'expected to throw if function is not found',
 		);
 
-		context.link(new Set([source.name]));
+		context.link(source.name);
 
 		instance.execute(arg);
 

@@ -124,7 +124,7 @@ function createSources (arg: Parameters, context: stakr.ExecutionContext) {
 	}
 
 	const executeOrder = state >= SourceState.LINKED ?
-		context.link(new Set([source.name])) :
+		context.link(source.name) :
 		[];
 
 	return {

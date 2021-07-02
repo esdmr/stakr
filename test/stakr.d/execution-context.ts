@@ -11,13 +11,13 @@ await _.test('link', async (_) => {
 		state: SourceState.ADDED,
 	});
 
-	_.throws(() => context.link(new Set()),
+	_.throws(() => context.link(),
 		'expected to throw if given no source');
 
-	_.strictSame(context.link(new Set([source.name])), [lib.name, source.name],
+	_.strictSame(context.link(source.name), [lib.name, source.name],
 		'expected to return dependency graph');
 
-	_.doesNotThrow(() => context.link(new Set([source.name])),
+	_.doesNotThrow(() => context.link(source.name),
 		'expected to not throw if linked twice');
 
 	// @ts-expect-error Accessing private property
@@ -37,7 +37,7 @@ await _.test('link', async (_) => {
 	_.end();
 });
 
-void _.test('execute', (_) => {
+void _.test('executeAll', (_) => {
 	let called = false;
 	let jumped = true;
 
@@ -116,20 +116,20 @@ void _.test('execute', (_) => {
 
 	_.throws(
 		() => {
-			context.execute([], data);
+			context.executeAll([], data);
 		},
 		'expected to throw if given no source',
 	);
 
 	_.throws(
 		() => {
-			context.execute([source.name], data);
+			context.executeAll([source.name], data);
 		},
 		'expected to throw if given source is not added',
 	);
 
 	context.addSource(source);
-	context.execute([source.name], data);
+	context.executeAll([source.name], data);
 
 	_.ok(called,
 		'expected to execute sources');

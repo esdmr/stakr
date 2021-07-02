@@ -39,23 +39,24 @@ export class ExecuteData {
 export class ExecutionContext {
 	readonly sourceMap = new Map<string, Source>();
 
-	link (sources: Set<string>) {
+	link (...sources: readonly string[]) {
 		const deps = new DepGraph<Source>();
+		const sourceSet = new Set(sources);
 
-		if (sources.size === 0) {
+		if (sourceSet.size === 0) {
 			throw new Error('Empty source list');
 		}
 
-		for (const sourceName of sources) {
+		for (const sourceName of sourceSet) {
 			const source = this.resolveSource(sourceName);
 			deps.addNode(sourceName, source);
 
 			for (const target of source.assemble().imports) {
-				sources.add(target);
+				sourceSet.add(target);
 			}
 		}
 
-		for (const sourceName of sources) {
+		for (const sourceName of sourceSet) {
 			const source = deps.getNodeData(sourceName);
 			source.link(this);
 
@@ -67,20 +68,24 @@ export class ExecutionContext {
 		return deps.overallOrder();
 	}
 
-	execute (sourceList: string[], data: ExecuteData) {
+	executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
 			throw new Error('Empty source list');
 		}
 
 		for (const sourceName of sourceList) {
-			data.sourceName = sourceName;
-			data.offset = 0;
-			data.halted = false;
+			this.execute(sourceName, data);
+		}
+	}
 
-			while (!data.halted) {
-				const source = this.resolveSource(data.sourceName);
-				source.execute(this, data);
-			}
+	execute (sourceName: string, data: ExecuteData) {
+		data.sourceName = sourceName;
+		data.offset = 0;
+		data.halted = false;
+
+		while (!data.halted) {
+			const source = this.resolveSource(data.sourceName);
+			source.execute(this, data);
 		}
 	}
 

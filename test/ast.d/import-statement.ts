@@ -82,7 +82,7 @@ await _.test('link', async (_) => {
 	);
 
 	context.addSource(lib);
-	context.link(new Set([source.name]));
+	context.link(source.name);
 
 	_.strictSame(
 		source.linkData.get(context)?.identifiers.get('lib:test-function'),
