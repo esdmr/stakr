@@ -18,7 +18,7 @@ context.addSource(new stakr.Source('b', [
 	new ast.Literal('Before Import'),
 	new ast.ImportStatement('a', 'a'),
 	new ast.Literal('After Import'),
-	new ast.Refer('a:abc'),
+	new ast.Refer('a:abc', false),
 	new ast.Literal('After Call'),
 ]));
 

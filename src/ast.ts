@@ -41,7 +41,7 @@ export class Operator implements types.ASTNode {
 }
 
 export class Refer implements types.ASTNode {
-	constructor (readonly name: string) {}
+	constructor (readonly name: string, readonly referOnly: boolean) {}
 
 	execute (arg: types.ExecuteArg) {
 		const definition = arg.source.assemble().identifiers.get(this.name) ??
@@ -53,7 +53,7 @@ export class Refer implements types.ASTNode {
 
 		arg.data.stack.push(definition.offset, definition.sourceName);
 
-		if (definition.implicitlyCalled) {
+		if (!this.referOnly && definition.implicitlyCalled) {
 			commands.call_(arg);
 		}
 	}
