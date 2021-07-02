@@ -19,6 +19,7 @@ export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
 	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
 	readonly commandMap = new Map(commandMap);
+	framePointer = -1;
 	sourceName = '';
 	halted = true;
 	private _offset = 0;

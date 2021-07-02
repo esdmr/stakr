@@ -47,12 +47,67 @@ export function if_ ({ data }: types.ExecuteArg) {
 	}
 }
 
+export function enter_ ({ data }: types.ExecuteArg) {
+	data.aux.push(data.framePointer);
+	data.framePointer = data.stack.length;
+}
+
+export function leave_ ({ data }: types.ExecuteArg) {
+	const framePointer = data.aux.pop();
+
+	if (typeof framePointer !== 'number') {
+		throw new TypeError('New frame pointer is not a number');
+	}
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError('New frame pointer is not valid');
+	}
+
+	data.framePointer = framePointer;
+}
+
+export function frame_ ({ data }: types.ExecuteArg) {
+	const { framePointer } = data;
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError('Frame pointer is not valid');
+	}
+
+	if (framePointer === 0) {
+		throw new RangeError('Frame pointer points to the start of stack');
+	}
+
+	if (framePointer > data.stack.length) {
+		throw new RangeError('Frame pointer is past the end of stack');
+	}
+
+	data.stack.push(1 - framePointer);
+}
+
+export function local_ ({ data }: types.ExecuteArg) {
+	const { framePointer } = data;
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError('Frame pointer is not valid');
+	}
+
+	if (framePointer > data.stack.length) {
+		throw new RangeError('Frame pointer is past the end of stack');
+	}
+
+	data.stack.push(framePointer);
+}
+
 const commandMap = new Map<string, types.Executable>([
 	['goto', goto_],
 	['call', call_],
 	['return', return_],
 	['if', if_],
 	['while', if_],
+	['enter', enter_],
+	['leave', leave_],
+	['frame', frame_],
+	['local', local_],
 ]);
 
 export default commandMap;
