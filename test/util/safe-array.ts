@@ -117,7 +117,7 @@ await _.test('constructor', async (_) => {
 	_.doesNotThrow(() => new SafeArray(),
 		'expected to not throw if maximum length is not set');
 
-	_.same(new SafeArray().toNewArray(), [],
+	_.strictSame(new SafeArray().toNewArray(), [],
 		'expected to return an empty safe-array');
 
 	_.end();
@@ -155,7 +155,7 @@ await _.test('static from', async (_) => {
 	_.ok(new SafeArray() instanceof SafeArray,
 		'expected to return a safe-array');
 
-	_.same(SafeArray.from([1, 2]).toNewArray(), [1, 2],
+	_.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
 		'expected to copy array onto safe-array');
 
 	_.end();
@@ -165,17 +165,17 @@ await _.test('toNewArray', async (_) => {
 	_.ok(Array.isArray(new SafeArray().toNewArray()),
 		'expected to return an array');
 
-	_.same(new SafeArray(), [],
+	_.strictSame(new SafeArray().toNewArray(), [],
 		'expected to return an empty array if empty');
 
 	const instance = new SafeArray();
 	_.not(instance.toNewArray(), instance.toNewArray(),
 		'expected to return a new array on every call');
 
-	_.same(SafeArray.from([1, 2]).toNewArray(), [1, 2],
+	_.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
 		'expected to copy items');
 
-	_.same(SafeArray.from([undefined]), [undefined],
+	_.strictSame(SafeArray.from([undefined]).toNewArray(), [undefined],
 		'expected to copy undefined as an item');
 
 	const old = instance.toNewArray();
@@ -183,7 +183,7 @@ await _.test('toNewArray', async (_) => {
 	_.not(old, instance.toNewArray(),
 		'expected to return a new array after modification');
 
-	_.same(instance.toNewArray(), [1, 2, 3],
+	_.strictSame(instance.toNewArray(), [1, 2, 3],
 		'expected to return up-to-date array');
 
 	_.end();
@@ -224,14 +224,14 @@ await _.test('push', async (_) => {
 	const instance = new SafeArray();
 	instance.push();
 
-	_.same(instance.toNewArray(), [],
+	_.strictSame(instance.toNewArray(), [],
 		'expected to not change safe-array with no inputs');
 
 	_.equal(instance.length, 0,
 		'expected to not update length with no inputs');
 
 	instance.push(1);
-	_.same(instance.toNewArray(), [1],
+	_.strictSame(instance.toNewArray(), [1],
 		'expected to push inputs');
 
 	_.equal(instance.length, 1,
@@ -299,7 +299,7 @@ await _.test('clear', async (_) => {
 	const instance = SafeArray.from([1, 2]);
 	instance.clear();
 
-	_.same(instance.toNewArray(), [], 'expected to clear the array');
+	_.strictSame(instance.toNewArray(), [], 'expected to clear the array');
 	_.equal(instance.length, 0, 'expected to update the length');
 
 	_.end();
@@ -320,7 +320,7 @@ await _.test('toLocaleString', async (_) => {
 });
 
 await _.test('@@iterator', async (_) => {
-	_.same([...SafeArray.from([1, 2])], [1, 2],
+	_.strictSame([...SafeArray.from([1, 2])], [1, 2],
 		'expected to match the array');
 
 	_.end();
