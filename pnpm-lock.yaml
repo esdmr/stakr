@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@istanbuljs/esm-loader-hook': 0.1.2
   '@types/node': 15.0.1
-  '@types/tap': 15.0.4
+  '@types/tap': 15.0.5
   dependency-graph: 0.11.0
   rimraf: 3.0.2
   tap: 15.0.9
@@ -16,7 +16,7 @@ dependencies:
 devDependencies:
   '@istanbuljs/esm-loader-hook': 0.1.2
   '@types/node': 15.0.1
-  '@types/tap': 15.0.4
+  '@types/tap': 15.0.5
   rimraf: 3.0.2
   tap: 15.0.9_typescript@4.3.5
   typescript: 4.3.5
@@ -462,8 +462,8 @@ packages:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: true
 
-  /@types/tap/15.0.4:
-    resolution: {integrity: sha512-oOZWq0ySiTxhm9BrHTmYSF5Xh3HbzDv6i4dT/pY55Jm8dAabInT9Nbwtm7Y/G9mArtJqZaukcEq1TlFGG23weA==}
+  /@types/tap/15.0.5:
+    resolution: {integrity: sha512-MaP+EgZNFAGRvVjHWv8ldrLvYBn4PnmAlzY7IL3/RPAPkOXdggTSTgLFONbnTpdQTe8+ixYGAySKAm9ESlZm1A==}
     dependencies:
       '@types/node': 15.0.1
     dev: true
