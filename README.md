@@ -1,9 +1,9 @@
 # Stakr
-[![Github workflow](https://img.shields.io/github/workflow/status/esdmr/stakr/CI/master?label=test&logo=github)][workflow]
-[![Codecov coverage](https://img.shields.io/codecov/c/gh/esdmr/stakr/master?logo=CodeCov)][codecov]
-[![NodeJS version](https://img.shields.io/badge/node-≥16.0.0-brightgreen?logo=node.js)][node]
-[![PNPM version](https://img.shields.io/badge/pnpm-≥6.9.0-brightgreen?logo=pnpm)][pnpm]
-[![License](https://img.shields.io/github/license/esdmr/stakr)][license]
+[![Github workflow](https://img.shields.io/github/workflow/status/esdmr/stakr/CI/master?label=test&labelColor=0F0F0F&logo=github)][workflow]
+[![Codecov coverage](https://img.shields.io/codecov/c/gh/esdmr/stakr/master?labelColor=0F0F0F&logo=CodeCov&logoColor=FF66B0)][codecov]
+[![NodeJS version](https://img.shields.io/badge/node-≥16.0.0-brightgreen?labelColor=0F0F0F&logo=node.js&logoColor=00B834)][node]
+[![PNPM version](https://img.shields.io/badge/pnpm-≥6.9.0-brightgreen?labelColor=0F0F0F&logo=pnpm)][pnpm]
+[![License](https://img.shields.io/github/license/esdmr/stakr?labelColor=0F0F0F)][license]
 
 [workflow]: https://github.com/esdmr/stakr/actions/workflows/ci.yml
 [codecov]: https://codecov.io/gh/esdmr/stakr
