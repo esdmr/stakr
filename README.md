@@ -1,6 +1,5 @@
 # Stakr
-
-[![Github workflow](https://github.com/esdmr/stakr/actions/workflows/ci.yml/badge.svg?branch=master)][workflow]
+[![Github workflow](https://img.shields.io/github/workflow/status/esdmr/stakr/CI/master?label=test&logo=github)][workflow]
 [![Codecov coverage](https://img.shields.io/codecov/c/gh/esdmr/stakr/master?logo=CodeCov)][codecov]
 [![NodeJS version](https://img.shields.io/badge/node-≥16.0.0-brightgreen?logo=node.js)][node]
 [![PNPM version](https://img.shields.io/badge/pnpm-≥6.9.0-brightgreen?logo=pnpm)][pnpm]
