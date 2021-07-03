@@ -1,6 +1,6 @@
 import { DepGraph } from 'dependency-graph';
-import commandMap from './commands.js';
-import * as types from './types.js';
+import commandList from './commands.js';
+import type * as types from './types.js';
 import SafeArray from './util/safe-array.js';
 
 const AUX_MAX_LENGTH = 1024;
@@ -9,16 +9,31 @@ export class AssembleData {
 	readonly identifiers = new Map<string, types.Definition>();
 	readonly imports = new Set<string>();
 	readonly namespaces = new Set<string>();
+
+	addIdentifier (name: string, definition: types.Definition) {
+		if (this.identifiers.has(name)) {
+			throw new Error(`Identifier '${name}' is already defined`);
+		}
+
+		this.identifiers.set(name, definition);
+	}
 }
 
 export class LinkData {
 	readonly identifiers = new Map<string, types.Definition>();
+
+	importSource (otherSource: Source, prefix: string) {
+		for (const [key, value] of otherSource.assemble().identifiers) {
+			if (value.exported) {
+				this.identifiers.set(`${prefix}${key}`, value);
+			}
+		}
+	}
 }
 
 export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
 	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
-	readonly commandMap = new Map(commandMap);
 	framePointer = -1;
 	sourceName = '';
 	halted = true;
@@ -37,8 +52,108 @@ export class ExecuteData {
 	}
 }
 
+export class Source {
+	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
+	private assembleData?: AssembleData = undefined;
+
+	constructor (readonly name: string, readonly ast: types.ASTTree) {}
+
+	assemble () {
+		if (this.assembleData) {
+			return this.assembleData;
+		}
+
+		const arg: types.Writable<types.AssembleArg> = {
+			source: this,
+			blockStack: [] as number[],
+			data: new AssembleData(),
+			offset: 0,
+		};
+
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.assemble?.(arg);
+		}
+
+		const lastBlock = arg.blockStack.pop();
+
+		if (lastBlock !== undefined) {
+			throw new Error(`Extraneous start of block at ${lastBlock}`);
+		}
+
+		this.assembleData = arg.data;
+		return this.assembleData;
+	}
+
+	/** @internal */
+	link (context: ExecutionContext) {
+		if (this.linkData.has(context)) {
+			return this.linkData.get(context);
+		}
+
+		this.assemble();
+
+		const data = new LinkData();
+
+		const arg: types.Writable<types.LinkArg> = {
+			context,
+			source: this,
+			data,
+			offset: 0,
+		};
+
+		for (const sourceName of context.persistentSources) {
+			const otherSource = context.resolveSource(sourceName);
+
+			data.importSource(otherSource, '');
+		}
+
+		for (const [offset, item] of this.ast.entries()) {
+			arg.offset = offset;
+			item.link?.(arg);
+		}
+
+		this.linkData.set(context, arg.data);
+		return arg.data;
+	}
+
+	/** @internal */
+	execute (
+		context: ExecutionContext,
+		data: ExecuteData,
+	) {
+		const arg: types.ExecuteArg = {
+			context,
+			source: this,
+			data,
+		};
+
+		while (!data.halted && data.sourceName === this.name) {
+			const item = this.ast[data.offset++];
+
+			if (item === undefined) {
+				data.halted = true;
+				break;
+			}
+
+			item.execute?.(arg);
+		}
+	}
+}
+
+const commands = new Source('stdlib:commands', commandList);
+commands.assemble();
+
 export class ExecutionContext {
 	readonly sourceMap = new Map<string, Source>();
+	readonly persistentSources: string[] = [];
+
+	constructor (addStandardLibrary = true) {
+		if (addStandardLibrary) {
+			this.addSource(commands);
+			this.persistentSources.push(commands.name);
+		}
+	}
 
 	link (...sources: readonly string[]) {
 		const deps = new DepGraph<Source>();
@@ -108,84 +223,5 @@ export class ExecutionContext {
 		}
 
 		return source;
-	}
-}
-
-export class Source {
-	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
-	private assembleData?: AssembleData = undefined;
-
-	constructor (readonly name: string, readonly ast: types.ASTTree) {}
-
-	assemble () {
-		if (this.assembleData) {
-			return this.assembleData;
-		}
-
-		const arg: types.Writable<types.AssembleArg> = {
-			source: this,
-			blockStack: [] as number[],
-			data: new AssembleData(),
-			offset: 0,
-		};
-
-		for (const [offset, item] of this.ast.entries()) {
-			arg.offset = offset;
-			item.assemble?.(arg);
-		}
-
-		const lastBlock = arg.blockStack.pop();
-
-		if (lastBlock !== undefined) {
-			throw new Error(`Extraneous start of block at ${lastBlock}`);
-		}
-
-		this.assembleData = arg.data;
-		return this.assembleData;
-	}
-
-	link (context: ExecutionContext) {
-		if (this.linkData.has(context)) {
-			return this.linkData.get(context);
-		}
-
-		this.assemble();
-
-		const arg: types.Writable<types.LinkArg> = {
-			context,
-			source: this,
-			data: new LinkData(),
-			offset: 0,
-		};
-
-		for (const [offset, item] of this.ast.entries()) {
-			arg.offset = offset;
-			item.link?.(arg);
-		}
-
-		this.linkData.set(context, arg.data);
-		return arg.data;
-	}
-
-	execute (
-		context: ExecutionContext,
-		data: ExecuteData,
-	) {
-		const arg: types.ExecuteArg = {
-			context,
-			source: this,
-			data,
-		};
-
-		while (!data.halted && data.sourceName === this.name) {
-			const item = this.ast[data.offset++];
-
-			if (item === undefined) {
-				data.halted = true;
-				break;
-			}
-
-			item.execute?.(arg);
-		}
 	}
 }

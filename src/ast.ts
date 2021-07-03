@@ -1,5 +1,7 @@
 import * as commands from './commands.js';
-import * as types from './types.js';
+import type * as types from './types.js';
+
+export { NativeFunction } from './commands.js';
 
 export class Literal implements types.ASTNode {
 	constructor (readonly value: types.StackItem) {}
@@ -13,30 +15,12 @@ export class Label implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
-		if (data.identifiers.has(this.name)) {
-			throw new Error(`Identifier '${this.name}' already defined`);
-		}
-
-		data.identifiers.set(this.name, {
+		data.addIdentifier(this.name, {
 			offset,
 			sourceName: source.name,
 			exported: this.exported,
 			implicitlyCalled: false,
 		});
-	}
-}
-
-export class Operator implements types.ASTNode {
-	constructor (readonly name: string) {}
-
-	execute (arg: types.ExecuteArg) {
-		const operator = arg.data.commandMap.get(this.name);
-
-		if (operator === undefined) {
-			throw new Error(`Undefined operator '${this.name}'`);
-		}
-
-		operator(arg);
 	}
 }
 
@@ -127,11 +111,7 @@ export class FunctionStatement implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
-		if (data.identifiers.has(this.name)) {
-			throw new Error(`Identifier '${this.name}' is already defined`);
-		}
-
-		data.identifiers.set(this.name, {
+		data.addIdentifier(this.name, {
 			sourceName: source.name,
 			// Skip FunctionStatement itself.
 			offset: offset + 1,
@@ -162,16 +142,8 @@ export class ImportStatement implements types.ASTNode {
 	}
 
 	link ({ context, data }: types.LinkArg) {
-		const other = context.sourceMap.get(this.source);
+		const otherSource = context.resolveSource(this.source);
 
-		if (other === undefined) {
-			throw new Error(`Undefined source '${this.source}'`);
-		}
-
-		for (const [key, value] of other.assemble().identifiers) {
-			if (value.exported) {
-				data.identifiers.set(`${this.namespace}:${key}`, value);
-			}
-		}
+		data.importSource(otherSource, `${this.namespace}:`);
 	}
 }

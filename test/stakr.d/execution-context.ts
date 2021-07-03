@@ -138,7 +138,10 @@ void _.test('executeAll', (_) => {
 });
 
 await _.test('addSource', async (_) => {
-	const { source, context } = createAssets();
+	const { source, context } = createAssets({
+		context: false,
+	});
+
 	const source2 = new stakr.Source(source.name, []);
 
 	_.strictSame(context.sourceMap, new Map([[source.name, source]]),

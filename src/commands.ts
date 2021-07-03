@@ -1,5 +1,36 @@
-import * as stakr from './stakr.js';
-import * as types from './types.js';
+import type * as stakr from './stakr.js';
+import type * as types from './types.js';
+
+export class NativeFunction implements types.ASTNode {
+	constructor (
+		readonly name: string,
+		readonly executable: types.Executable,
+		readonly exported: boolean,
+	) {}
+
+	static createArray (
+		map: ReadonlyArray<[string, types.Executable]>,
+		exported: boolean,
+	): NativeFunction[] {
+		return map.map(([name, executable]) => {
+			return new NativeFunction(name, executable, exported);
+		});
+	}
+
+	assemble ({ source, data, offset }: types.AssembleArg) {
+		data.addIdentifier(this.name, {
+			sourceName: source.name,
+			offset,
+			exported: this.exported,
+			implicitlyCalled: true,
+		});
+	}
+
+	execute (arg: types.ExecuteArg) {
+		this.executable(arg);
+		return_(arg);
+	}
+}
 
 function jump (
 	data: stakr.ExecuteData,
@@ -98,7 +129,7 @@ export function local_ ({ data }: types.ExecuteArg) {
 	data.stack.push(framePointer);
 }
 
-const commandMap = new Map<string, types.Executable>([
+const commandList = NativeFunction.createArray([
 	['goto', goto_],
 	['call', call_],
 	['return', return_],
@@ -108,6 +139,6 @@ const commandMap = new Map<string, types.Executable>([
 	['leave', leave_],
 	['frame', frame_],
 	['local', local_],
-]);
+], true);
 
-export default commandMap;
+export default commandList;

@@ -9,7 +9,7 @@ export const enum SourceState {
 }
 
 export interface Parameters {
-	context?: stakr.ExecutionContext;
+	context?: boolean | stakr.ExecutionContext;
 	source?: string | types.ASTTree | stakr.Source;
 	lib?: string | types.ASTTree | stakr.Source;
 	state?: SourceState;
@@ -38,9 +38,8 @@ function isReadonlyArray (arg: unknown): arg is readonly unknown[] {
 }
 
 export function createAssets (arg: Parameters = {}): Returns {
-	const context = arg.context ?? new stakr.ExecutionContext();
 	const { executeData, assembleData, linkData } = createData(arg);
-	const { source, lib, executeOrder } = createSources(arg, context);
+	const { source, lib, executeOrder, context } = createSources(arg);
 
 	const executeArg = {
 		context,
@@ -92,7 +91,11 @@ function createData (arg: Parameters) {
 	};
 }
 
-function createSources (arg: Parameters, context: stakr.ExecutionContext) {
+function createSources (arg: Parameters) {
+	const context = typeof arg.context === 'boolean' ?
+		new stakr.ExecutionContext(arg.context) :
+		arg.context ?? new stakr.ExecutionContext();
+
 	const lib = typeof arg.lib === 'string' ?
 		new stakr.Source(arg.lib, []) :
 		(isReadonlyArray(arg.lib) ?
@@ -131,5 +134,6 @@ function createSources (arg: Parameters, context: stakr.ExecutionContext) {
 		source,
 		lib,
 		executeOrder,
+		context,
 	};
 }

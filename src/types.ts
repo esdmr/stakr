@@ -1,4 +1,4 @@
-import * as stakr from './stakr.js';
+import type * as stakr from './stakr.js';
 
 export type StackItem = string | number | boolean | null;
 
