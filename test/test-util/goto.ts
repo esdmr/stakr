@@ -1,6 +1,7 @@
 import { ExecuteData } from 'src/stakr';
 import { StackItem } from 'src/types.js';
 import SafeArray from 'src/util/safe-array.js';
+import { CommandsMessage, SafeArrayMessage } from './message.js';
 
 type Command = (...items: StackItem[]) => {
 	stack: SafeArray<StackItem>;
@@ -12,20 +13,35 @@ export default function testGoto (
 	_: Tap.Test,
 	command: Command,
 ): void {
-	_.throws(() => command(),
-		'expected to throw if stack is empty');
+	_.throws(
+		() => command(),
+		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		'expected to throw if stack is empty',
+	);
 
-	_.throws(() => command('abc'),
-		'expected to throw if there is not enough parameters');
+	_.throws(
+		() => command('abc'),
+		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		'expected to throw if there is not enough parameters'
+	);
 
-	_.throws(() => command(123),
-		'expected to throw if only given a number');
+	_.throws(
+		() => command(123),
+		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		'expected to throw if only given a number'
+	);
 
-	_.throws(() => command(true, false),
-		'expected to throw if poped value is not string');
+	_.throws(
+		() => command(true, false),
+		new TypeError(CommandsMessage.SOURCE_NAME_IS_NOT_STRING),
+		'expected to throw if poped value is not string'
+	);
 
-	_.throws(() => command(true, 'abc'),
-		'expected to throw if poped value is not number');
+	_.throws(
+		() => command(true, 'abc'),
+		new TypeError(CommandsMessage.OFFSET_IS_NOT_NUMBER),
+		'expected to throw if poped value is not number',
+	);
 
 	const { stack, offset, sourceName } = command(123, 'test-source');
 

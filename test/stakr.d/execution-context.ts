@@ -2,6 +2,7 @@ import * as ast from 'src/ast.js';
 import * as stakr from 'src/stakr.js';
 import * as types from 'src/types.js';
 import * as _ from 'tap';
+import { StakrMessage } from '../test-util/message.js';
 import { createAssets, SourceState } from '../test-util/stakr.js';
 
 await _.test('link', async (_) => {
@@ -11,8 +12,11 @@ await _.test('link', async (_) => {
 		state: SourceState.ADDED,
 	});
 
-	_.throws(() => context.link(),
-		'expected to throw if given no source');
+	_.throws(
+		() => context.link(),
+		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		'expected to throw if given no source'
+	);
 
 	_.strictSame(context.link(source.name), [lib.name, source.name],
 		'expected to return dependency graph');
@@ -118,6 +122,7 @@ void _.test('executeAll', (_) => {
 		() => {
 			context.executeAll([], data);
 		},
+		new Error(StakrMessage.EMPTY_SOURCE_LIST),
 		'expected to throw if given no source',
 	);
 

@@ -1,6 +1,13 @@
 import * as commands from './commands.js';
 import type * as types from './types.js';
 
+/** @internal */
+export const enum Message {
+	BLOCK_START_NOT_INIT = 'Block does not have a end offset',
+	BLOCK_END_NOT_INIT = 'Block does not have a start offset',
+	START_IS_NOT_BLOCK_START = 'Start of block is not a BlockStart',
+}
+
 export { NativeFunction } from './commands.js';
 
 export class Literal implements types.ASTNode {
@@ -49,7 +56,7 @@ export class BlockStart implements types.ASTNode {
 
 	get endOffset () {
 		if (this._endOffset === undefined) {
-			throw new Error('Block does not have a end offset');
+			throw new Error(Message.BLOCK_START_NOT_INIT);
 		}
 
 		return this._endOffset;
@@ -70,7 +77,7 @@ export class BlockEnd implements types.ASTNode {
 
 	get startOffset () {
 		if (this._startOffset === undefined) {
-			throw new Error('Block does not have a start offset');
+			throw new Error(Message.BLOCK_END_NOT_INIT);
 		}
 
 		return this._startOffset;
@@ -87,7 +94,7 @@ export class BlockEnd implements types.ASTNode {
 		const start = source.ast[startOffset];
 
 		if (!(start instanceof BlockStart)) {
-			throw new TypeError('Start of block is not a BlockStart.');
+			throw new TypeError(Message.START_IS_NOT_BLOCK_START);
 		}
 
 		// Skip BlockEnd itself

@@ -1,12 +1,16 @@
 import * as ast from 'src/ast.js';
 import * as _ from 'tap';
+import { ASTMessage } from '../test-util/message.js';
 import { createAssets, SourceState } from '../test-util/stakr.js';
 
 await _.test('offset', async (_) => {
 	const instance = new ast.BlockEnd();
 
-	_.throws(() => instance.startOffset,
-		'expected to throw if not initialized');
+	_.throws(
+		() => instance.startOffset,
+		new Error(ASTMessage.BLOCK_END_NOT_INIT),
+		'expected to throw if not initialized',
+	);
 
 	instance._startOffset = 123;
 
@@ -47,6 +51,7 @@ await _.test('assemble', async (_) => {
 				offset: 1,
 			});
 		},
+		new TypeError(ASTMessage.START_IS_NOT_BLOCK_START),
 		'expected to throw if start of block is not a BlockStart',
 	);
 

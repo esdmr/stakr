@@ -3,6 +3,11 @@ import commandList from './commands.js';
 import type * as types from './types.js';
 import SafeArray from './util/safe-array.js';
 
+/** @internal */
+export const enum Message {
+	EMPTY_SOURCE_LIST = 'Empty source list',
+}
+
 const AUX_MAX_LENGTH = 1024;
 
 export class AssembleData {
@@ -160,7 +165,7 @@ export class ExecutionContext {
 		const sourceSet = new Set(sources);
 
 		if (sourceSet.size === 0) {
-			throw new Error('Empty source list');
+			throw new Error(Message.EMPTY_SOURCE_LIST);
 		}
 
 		for (const sourceName of sourceSet) {
@@ -186,7 +191,7 @@ export class ExecutionContext {
 
 	executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
-			throw new Error('Empty source list');
+			throw new Error(Message.EMPTY_SOURCE_LIST);
 		}
 
 		for (const sourceName of sourceList) {

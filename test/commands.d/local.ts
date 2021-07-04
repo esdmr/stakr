@@ -1,5 +1,6 @@
 import { local_ } from 'src/commands.js';
 import * as _ from 'tap';
+import { CommandsMessage } from '../test-util/message.js';
 import { createAssets } from '../test-util/stakr.js';
 
 const { data, arg } = createAssets();
@@ -26,6 +27,7 @@ _.throws(
 	() => {
 		local_(arg);
 	},
+	new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
 	'expected to throw if frame pointer is not an integer',
 );
 
@@ -35,6 +37,7 @@ _.throws(
 	() => {
 		local_(arg);
 	},
+	new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
 	'expected to throw if frame pointer is not a safe integer',
 );
 
@@ -44,6 +47,7 @@ _.throws(
 	() => {
 		local_(arg);
 	},
+	new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
 	'expected to throw if frame pointer is negative',
 );
 
@@ -53,5 +57,6 @@ _.throws(
 	() => {
 		local_(arg);
 	},
+	new RangeError(CommandsMessage.FRAME_POINTER_IS_PAST_END),
 	'expected to throw if frame pointer is more than stack length',
 );
