@@ -1,6 +1,6 @@
-import * as ast from 'src/ast.js';
 import * as _ from 'tap';
-import { createAssets, SourceState } from '../test-util/stakr.js';
+import * as ast from '#src/ast.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
 await _.test('prefix', async (_) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');

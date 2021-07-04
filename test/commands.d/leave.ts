@@ -1,7 +1,7 @@
-import { leave_ } from 'src/commands.js';
 import * as _ from 'tap';
-import { CommandsMessage } from '../test-util/message.js';
-import { createAssets } from '../test-util/stakr.js';
+import { leave_ } from '#src/commands.js';
+import { CommandsMessage } from '#test-util/message.js';
+import { createAssets } from '#test-util/stakr.js';
 
 const { data, arg } = createAssets();
 const array = [1, 2, 3];

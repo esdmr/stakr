@@ -1,7 +1,7 @@
-import * as ast from 'src/ast.js';
 import * as _ from 'tap';
-import { ASTMessage } from '../test-util/message.js';
-import { createAssets, SourceState } from '../test-util/stakr.js';
+import * as ast from '#src/ast.js';
+import { ASTMessage } from '#test-util/message.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
 await _.test('offset', async (_) => {
 	const instance = new ast.BlockEnd();

@@ -1,7 +1,7 @@
-import { ExecuteData } from 'src/stakr';
-import { StackItem } from 'src/types.js';
-import SafeArray from 'src/util/safe-array.js';
 import { CommandsMessage, SafeArrayMessage } from './message.js';
+import { ExecuteData } from '#src/stakr.js';
+import { StackItem } from '#src/types.js';
+import SafeArray from '#src/util/safe-array.js';
 
 type Command = (...items: StackItem[]) => {
 	stack: SafeArray<StackItem>;
@@ -22,19 +22,19 @@ export default function testGoto (
 	_.throws(
 		() => command('abc'),
 		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
-		'expected to throw if there is not enough parameters'
+		'expected to throw if there is not enough parameters',
 	);
 
 	_.throws(
 		() => command(123),
 		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
-		'expected to throw if only given a number'
+		'expected to throw if only given a number',
 	);
 
 	_.throws(
 		() => command(true, false),
 		new TypeError(CommandsMessage.SOURCE_NAME_IS_NOT_STRING),
-		'expected to throw if poped value is not string'
+		'expected to throw if poped value is not string',
 	);
 
 	_.throws(

@@ -1,7 +1,7 @@
-import { Label } from 'src/ast.js';
-import * as types from 'src/types.js';
 import * as _ from 'tap';
-import { createAssets } from '../test-util/stakr.js';
+import { Label } from '#src/ast.js';
+import * as types from '#src/types.js';
+import { createAssets } from '#test-util/stakr.js';
 
 await _.test('importSource', async (_) => {
 	const { source, linkData } = createAssets({

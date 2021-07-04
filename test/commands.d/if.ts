@@ -1,8 +1,8 @@
-import { if_ } from 'src/commands.js';
 import * as _ from 'tap';
-import testGoto from '../test-util/goto.js';
-import { CommandsMessage, SafeArrayMessage } from '../test-util/message.js';
-import { createAssets } from '../test-util/stakr.js';
+import { if_ } from '#src/commands.js';
+import testGoto from '#test-util/goto.js';
+import { CommandsMessage, SafeArrayMessage } from '#test-util/message.js';
+import { createAssets } from '#test-util/stakr.js';
 
 const { source, lib, data, arg } = createAssets();
 

@@ -1,6 +1,6 @@
-import * as ast from 'src/ast.js';
 import * as _ from 'tap';
-import { createAssets } from '../test-util/stakr.js';
+import * as ast from '#src/ast.js';
+import { createAssets } from '#test-util/stakr.js';
 
 await _.test('execute', async (_) => {
 	const instance = new ast.WhileEnd();

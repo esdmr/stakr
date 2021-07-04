@@ -1,12 +1,16 @@
 {
   "private": true,
   "type": "module",
+  "imports": {
+    "#src/*": "./build/*",
+    "#test-util/*": "./build/test/test-util/*"
+  },
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
     "tspm": "node add-paths.js",
-    "clean": "rimraf build .nyc_output coverage && npm run tspm",
-    "build": "npm run tspm && tsc -b",
-    "watch": "npm run tspm && tsc -b -w",
+    "clean": "rimraf build .nyc_output coverage",
+    "build": "tsc -b",
+    "watch": "tsc -b -w",
     "prepare": "npm run clean && npm run build",
     "lint": "xo",
     "lint:fix": "npm run lint -- --fix",

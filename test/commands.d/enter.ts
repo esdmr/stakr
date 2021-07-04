@@ -1,6 +1,6 @@
-import { enter_ } from 'src/commands.js';
 import * as _ from 'tap';
-import { createAssets } from '../test-util/stakr.js';
+import { enter_ } from '#src/commands.js';
+import { createAssets } from '#test-util/stakr.js';
 
 const { data, arg } = createAssets();
 const array = [1, 2, 3];

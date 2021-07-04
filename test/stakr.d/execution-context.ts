@@ -1,9 +1,9 @@
-import * as ast from 'src/ast.js';
-import * as stakr from 'src/stakr.js';
-import * as types from 'src/types.js';
 import * as _ from 'tap';
-import { StakrMessage } from '../test-util/message.js';
-import { createAssets, SourceState } from '../test-util/stakr.js';
+import * as ast from '#src/ast.js';
+import * as stakr from '#src/stakr.js';
+import * as types from '#src/types.js';
+import { StakrMessage } from '#test-util/message.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
 await _.test('link', async (_) => {
 	const { context, lib, source } = createAssets({
@@ -15,7 +15,7 @@ await _.test('link', async (_) => {
 	_.throws(
 		() => context.link(),
 		new Error(StakrMessage.EMPTY_SOURCE_LIST),
-		'expected to throw if given no source'
+		'expected to throw if given no source',
 	);
 
 	_.strictSame(context.link(source.name), [lib.name, source.name],

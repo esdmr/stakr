@@ -1,5 +1,5 @@
-import * as stakr from 'src/stakr.js';
-import * as types from 'src/types.js';
+import * as stakr from '#src/stakr.js';
+import * as types from '#src/types.js';
 
 export const enum SourceState {
 	RAW,

@@ -1,5 +1,5 @@
-import assert, { AssertionError } from 'src/util/assert.js';
 import * as _ from 'tap';
+import assert, { AssertionError } from '#src/util/assert.js';
 
 const error = (message: string) => new AssertionError(message);
 

@@ -1,7 +1,7 @@
-import { return_ } from 'src/commands.js';
 import * as _ from 'tap';
-import testGoto from '../test-util/goto.js';
-import { createAssets } from '../test-util/stakr.js';
+import { return_ } from '#src/commands.js';
+import testGoto from '#test-util/goto.js';
+import { createAssets } from '#test-util/stakr.js';
 
 const { data, arg } = createAssets();
 

@@ -1,7 +1,7 @@
-import { NativeFunction } from 'src/commands.js';
 import * as _ from 'tap';
-import testGoto from '../test-util/goto.js';
-import { createAssets } from '../test-util/stakr.js';
+import { NativeFunction } from '#src/commands.js';
+import testGoto from '#test-util/goto.js';
+import { createAssets } from '#test-util/stakr.js';
 
 await _.test('name', async (_) => {
 	const instance = new NativeFunction('test', () => undefined, true);

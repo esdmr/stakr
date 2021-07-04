@@ -1,8 +1,8 @@
-import * as ast from 'src/ast.js';
-import * as stakr from 'src/stakr.js';
 import * as _ from 'tap';
-import testGoto from '../test-util/goto.js';
-import { createAssets } from '../test-util/stakr.js';
+import * as ast from '#src/ast.js';
+import * as stakr from '#src/stakr.js';
+import testGoto from '#test-util/goto.js';
+import { createAssets } from '#test-util/stakr.js';
 
 await _.test('name', async (_) => {
 	const instance = new ast.FunctionStatement('test', false);
