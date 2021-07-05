@@ -55,7 +55,7 @@ await _.test('execute', async (_) => {
 		offset: 1,
 	});
 
-	testGoto(_, (...items) => {
+	await testGoto(_, async (...items) => {
 		data.stack.clear();
 		data.stack.push(...items);
 		instance.execute(arg);

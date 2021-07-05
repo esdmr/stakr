@@ -1,9 +1,12 @@
+import { promisify } from 'node:util';
 import * as _ from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
 import * as types from '#src/types.js';
 import { StakrMessage } from '#test-util/message.js';
 import { createAssets, SourceState } from '#test-util/stakr.js';
+
+const nextTick: () => Promise<void> = promisify(process.nextTick);
 
 await _.test('link', async (_) => {
 	const { context, lib, source } = createAssets({
@@ -41,7 +44,7 @@ await _.test('link', async (_) => {
 	_.end();
 });
 
-void _.test('executeAll', (_) => {
+void _.test('executeAll', async (_) => {
 	let called = false;
 	let jumped = true;
 
@@ -118,26 +121,42 @@ void _.test('executeAll', (_) => {
 		],
 	});
 
-	_.throws(
-		() => {
-			context.executeAll([], data);
-		},
+	await _.rejects(
+		async () => context.executeAll([], data),
 		new Error(StakrMessage.EMPTY_SOURCE_LIST),
 		'expected to throw if given no source',
 	);
 
-	_.throws(
-		() => {
-			context.executeAll([source.name], data);
-		},
+	await _.rejects(
+		async () => context.executeAll([source.name], data),
 		'expected to throw if given source is not added',
 	);
 
 	context.addSource(source);
-	context.executeAll([source.name], data);
+	await context.executeAll([source.name], data);
 
 	_.ok(called,
 		'expected to execute sources');
+
+	await _.test('async', async (_) => {
+		let called = false;
+
+		const { context, source, data } = createAssets({
+			source: [{
+				async execute () {
+					await nextTick();
+					called = true;
+				},
+			}],
+		});
+
+		await context.execute(source.name, data);
+
+		_.ok(called,
+			'expected to await all ast items when executing them');
+
+		_.end();
+	});
 
 	_.end();
 });

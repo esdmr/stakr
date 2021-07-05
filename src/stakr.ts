@@ -123,7 +123,7 @@ export class Source {
 	}
 
 	/** @internal */
-	execute (
+	async execute (
 		context: ExecutionContext,
 		data: ExecuteData,
 	) {
@@ -141,7 +141,11 @@ export class Source {
 				break;
 			}
 
-			item.execute?.(arg);
+			const value = item.execute?.(arg);
+
+			if (value !== undefined) {
+				await value;
+			}
 		}
 	}
 }
@@ -189,24 +193,24 @@ export class ExecutionContext {
 		return deps.overallOrder();
 	}
 
-	executeAll (sourceList: readonly string[], data: ExecuteData) {
+	async executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
 			throw new Error(Message.EMPTY_SOURCE_LIST);
 		}
 
 		for (const sourceName of sourceList) {
-			this.execute(sourceName, data);
+			await this.execute(sourceName, data);
 		}
 	}
 
-	execute (sourceName: string, data: ExecuteData) {
+	async execute (sourceName: string, data: ExecuteData) {
 		data.sourceName = sourceName;
 		data.offset = 0;
 		data.halted = false;
 
 		while (!data.halted) {
 			const source = this.resolveSource(data.sourceName);
-			source.execute(this, data);
+			await source.execute(this, data);
 		}
 	}
 

@@ -1,7 +1,10 @@
+import { promisify } from 'node:util';
 import * as _ from 'tap';
 import { NativeFunction } from '#src/commands.js';
 import testGoto from '#test-util/goto.js';
 import { createAssets } from '#test-util/stakr.js';
+
+const nextTick: () => Promise<void> = promisify(process.nextTick);
 
 await _.test('name', async (_) => {
 	const instance = new NativeFunction('test', () => undefined, true);
@@ -73,7 +76,7 @@ await _.test('execute', async (_) => {
 	const { data, arg } = createAssets();
 
 	data.aux.push(123, 'test-lib');
-	instance.execute(arg);
+	await instance.execute(arg);
 
 	_.ok(called,
 		'expected to call the given function');
@@ -88,10 +91,10 @@ await _.test('execute', async (_) => {
 		'expected to pop from aux');
 
 	await _.test('return', async (_) => {
-		testGoto(_, (...items) => {
+		await testGoto(_, async (...items) => {
 			data.aux.clear();
 			data.aux.push(...items);
-			instance.execute(arg);
+			await instance.execute(arg);
 
 			return {
 				stack: data.aux,
@@ -99,6 +102,34 @@ await _.test('execute', async (_) => {
 				sourceName: data.sourceName,
 			};
 		});
+
+		_.end();
+	});
+
+	await _.test('async', async (_) => {
+		let called = false;
+
+		const instance = new NativeFunction('test-function', async () => {
+			await nextTick();
+			called = true;
+		}, false);
+
+		const { data, arg } = createAssets();
+
+		data.aux.push(123, 'test-lib');
+		await instance.execute(arg);
+
+		_.ok(called,
+			'expected to call the given function');
+
+		_.equal(data.sourceName, 'test-lib',
+			'expected to return to source');
+
+		_.equal(data.offset, 123,
+			'expected to return to offset');
+
+		_.strictSame(data.aux.toNewArray(), [],
+			'expected to pop from aux');
 
 		_.end();
 	});

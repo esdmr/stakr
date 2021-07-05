@@ -37,8 +37,13 @@ export class NativeFunction implements types.ASTNode {
 		});
 	}
 
-	execute (arg: types.ExecuteArg) {
-		this.executable(arg);
+	async execute (arg: types.ExecuteArg) {
+		const value = this.executable(arg);
+
+		if (value !== undefined) {
+			await value;
+		}
+
 		return_(arg);
 	}
 }

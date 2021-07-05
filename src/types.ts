@@ -30,7 +30,7 @@ export interface ExecuteArg {
 }
 
 export type Writable<T> = { -readonly [K in keyof T]: T[K] };
-export type Executable = (arg: ExecuteArg) => void;
+export type Executable = (arg: ExecuteArg) => void | Promise<void>;
 export type ASTTree = readonly ASTNode[];
 
 export interface ASTNode {

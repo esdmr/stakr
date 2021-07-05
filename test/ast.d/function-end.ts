@@ -14,7 +14,7 @@ await _.test('execute', async (_) => {
 		offset: 2,
 	});
 
-	testGoto(_, (...items) => {
+	await testGoto(_, async (...items) => {
 		data.aux.clear();
 		data.aux.push(...items);
 		instance.execute(arg);

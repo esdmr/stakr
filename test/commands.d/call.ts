@@ -5,6 +5,6 @@ import { createAssets } from '#test-util/stakr.js';
 
 const { data, arg } = createAssets();
 
-testCall(_, data, () => {
+await testCall(_, data, async () => {
 	call_(arg);
 });

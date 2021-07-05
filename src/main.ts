@@ -24,7 +24,7 @@ context.addSource(new stakr.Source('b', [
 
 const sourceList = context.link('b');
 const data = new stakr.ExecuteData();
-context.executeAll(sourceList, data);
+await context.executeAll(sourceList, data);
 
 console.log(inspect({
 	sourceList,

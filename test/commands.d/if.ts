@@ -38,7 +38,7 @@ _.strictSame(data.stack.toNewArray(), [],
 	'expected to pop twice from the stack even if the condition is true');
 
 await _.test('goto', async (_) => {
-	testGoto(_, (...items) => {
+	await testGoto(_, async (...items) => {
 		data.stack.clear();
 		data.stack.push(...items, false);
 		if_(arg);
