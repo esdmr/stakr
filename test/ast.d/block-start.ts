@@ -44,7 +44,7 @@ await _.test('execute', async (_) => {
 	});
 
 	instance._endOffset = 123;
-	context.execute(source.name, data);
+	await context.execute(source.name, data);
 
 	_.strictSame(data.stack.toNewArray(), [123, source.name],
 		'expected to push offset');
