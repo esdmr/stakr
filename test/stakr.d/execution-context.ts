@@ -24,7 +24,7 @@ await _.test('link', async (_) => {
 	_.strictSame(await context.link(source.name), [lib.name, source.name],
 		'expected to return dependency graph');
 
-	_.resolves(async () => context.link(source.name),
+	await _.resolves(async () => context.link(source.name),
 		'expected to not throw if linked twice');
 
 	// @ts-expect-error Accessing private property
