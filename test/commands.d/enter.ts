@@ -2,7 +2,7 @@ import * as _ from 'tap';
 import { enter_ } from '#src/commands.js';
 import { createAssets } from '#test-util/stakr.js';
 
-const { data, arg } = createAssets();
+const { data, arg } = await createAssets();
 const array = [1, 2, 3];
 
 data.stack.push(...array);

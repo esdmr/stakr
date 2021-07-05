@@ -50,7 +50,7 @@ await _.test('assemble', async (_) => {
 await _.test('execute', async (_) => {
 	const instance = new ast.FunctionStatement('test-function', false);
 
-	const { data, arg } = createAssets({
+	const { data, arg } = await createAssets({
 		source: [instance],
 		offset: 1,
 	});

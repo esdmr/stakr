@@ -9,22 +9,22 @@ import { createAssets, SourceState } from '#test-util/stakr.js';
 const nextTick: () => Promise<void> = promisify(process.nextTick);
 
 await _.test('link', async (_) => {
-	const { context, lib, source } = createAssets({
+	const { context, lib, source } = await createAssets({
 		lib: [new ast.FunctionStatement('test-function', true)],
 		source: [new ast.ImportStatement('lib', 'test-lib')],
 		state: SourceState.ADDED,
 	});
 
-	_.throws(
-		() => context.link(),
+	await _.rejects(
+		async () => context.link(),
 		new Error(StakrMessage.EMPTY_SOURCE_LIST),
 		'expected to throw if given no source',
 	);
 
-	_.strictSame(context.link(source.name), [lib.name, source.name],
+	_.strictSame(await context.link(source.name), [lib.name, source.name],
 		'expected to return dependency graph');
 
-	_.doesNotThrow(() => context.link(source.name),
+	_.resolves(async () => context.link(source.name),
 		'expected to not throw if linked twice');
 
 	// @ts-expect-error Accessing private property
@@ -48,7 +48,7 @@ void _.test('executeAll', async (_) => {
 	let called = false;
 	let jumped = true;
 
-	const { context, data, source } = createAssets({
+	const { context, data, source } = await createAssets({
 		state: SourceState.ASSEMBLED,
 		source: [
 			{
@@ -141,7 +141,7 @@ void _.test('executeAll', async (_) => {
 	await _.test('async', async (_) => {
 		let called = false;
 
-		const { context, source, data } = createAssets({
+		const { context, source, data } = await createAssets({
 			source: [{
 				async execute () {
 					await nextTick();
@@ -162,8 +162,10 @@ void _.test('executeAll', async (_) => {
 });
 
 await _.test('addSource', async (_) => {
-	const { source, context } = createAssets({
-		context: false,
+	const { source, context } = await createAssets({
+		context: {
+			addStandardLibrary: false,
+		},
 	});
 
 	const source2 = new stakr.Source(source.name, []);
@@ -181,17 +183,17 @@ await _.test('addSource', async (_) => {
 	_.end();
 });
 
-await _.test('resolveSource', async (_) => {
-	const { context, source } = createAssets({
+await _.test('getSource', async (_) => {
+	const { context, source } = await createAssets({
 		state: SourceState.ASSEMBLED,
 	});
 
-	_.throws(() => context.resolveSource(source.name),
+	_.throws(() => context.getSource(source.name),
 		'expected to throw if source is not found');
 
 	context.addSource(source);
 
-	_.equal(context.resolveSource(source.name), source,
+	_.equal(context.getSource(source.name), source,
 		'expected to return the source');
 
 	_.end();

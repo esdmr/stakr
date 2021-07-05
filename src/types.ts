@@ -38,3 +38,15 @@ export interface ASTNode {
 	readonly link?: (arg: LinkArg) => void;
 	readonly execute?: Executable;
 }
+
+export interface Loader {
+	readonly resolve: (
+		specifier: string,
+		parentName: string,
+	) => string;
+
+	readonly getSource: (
+		url: string,
+		context: stakr.ExecutionContext,
+	) => Promise<stakr.Source>;
+}

@@ -3,7 +3,7 @@ import { leave_ } from '#src/commands.js';
 import { CommandsMessage } from '#test-util/message.js';
 import { createAssets } from '#test-util/stakr.js';
 
-const { data, arg } = createAssets();
+const { data, arg } = await createAssets();
 const array = [1, 2, 3];
 
 data.stack.push(...array);

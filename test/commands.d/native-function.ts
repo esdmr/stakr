@@ -37,7 +37,7 @@ await _.test('exported', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new NativeFunction('test-function', () => undefined, false);
 
-	const { source, assembleArg: arg } = createAssets({
+	const { source, assembleArg: arg } = await createAssets({
 		source: [instance],
 	});
 
@@ -73,7 +73,7 @@ await _.test('execute', async (_) => {
 		called = true;
 	}, false);
 
-	const { data, arg } = createAssets();
+	const { data, arg } = await createAssets();
 
 	data.aux.push(123, 'test-lib');
 	await instance.execute(arg);
@@ -114,7 +114,7 @@ await _.test('execute', async (_) => {
 			called = true;
 		}, false);
 
-		const { data, arg } = createAssets();
+		const { data, arg } = await createAssets();
 
 		data.aux.push(123, 'test-lib');
 		await instance.execute(arg);

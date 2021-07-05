@@ -4,7 +4,7 @@ import * as types from '#src/types.js';
 import { createAssets } from '#test-util/stakr.js';
 
 await _.test('importSource', async (_) => {
-	const { source, linkData } = createAssets({
+	const { source, linkData } = await createAssets({
 		source: [
 			new Label('test-label', false),
 			new Label('test-label2', true),

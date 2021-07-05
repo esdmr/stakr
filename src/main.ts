@@ -22,7 +22,7 @@ context.addSource(new stakr.Source('b', [
 	new ast.Literal('After Call'),
 ]));
 
-const sourceList = context.link('b');
+const sourceList = await context.link('b');
 const data = new stakr.ExecuteData();
 await context.executeAll(sourceList, data);
 

@@ -9,13 +9,14 @@ export const enum SourceState {
 }
 
 export interface Parameters {
-	context?: boolean | stakr.ExecutionContext;
-	source?: string | types.ASTTree | stakr.Source;
-	lib?: string | types.ASTTree | stakr.Source;
+	context?: ConstructorParameters<typeof stakr.ExecutionContext>[0];
+	source?: types.ASTTree;
+	lib?: types.ASTTree;
 	state?: SourceState;
 	executeData?: stakr.ExecuteData;
 	assembleData?: stakr.AssembleData;
 	linkData?: stakr.LinkData;
+	loader?: stakr.DefaultLoader;
 	offset?: number;
 	halted?: boolean;
 }
@@ -31,15 +32,12 @@ export interface Returns {
 	data: stakr.ExecuteData;
 	assembleData: stakr.AssembleData;
 	linkData: stakr.LinkData;
+	loader: stakr.DefaultLoader;
 }
 
-function isReadonlyArray (arg: unknown): arg is readonly unknown[] {
-	return Array.isArray(arg);
-}
-
-export function createAssets (arg: Parameters = {}): Returns {
+export async function createAssets (arg: Parameters = {}): Promise<Returns> {
 	const { executeData, assembleData, linkData } = createData(arg);
-	const { source, lib, executeOrder, context } = createSources(arg);
+	const { source, lib, executeOrder, context } = await createSources(arg);
 
 	const executeArg = {
 		context,
@@ -61,6 +59,8 @@ export function createAssets (arg: Parameters = {}): Returns {
 		offset: arg.offset ?? 0,
 	};
 
+	const loader = new stakr.DefaultLoader();
+
 	return {
 		context,
 		source,
@@ -72,6 +72,7 @@ export function createAssets (arg: Parameters = {}): Returns {
 		data: executeData,
 		assembleData,
 		linkData,
+		loader,
 	};
 }
 
@@ -91,23 +92,10 @@ function createData (arg: Parameters) {
 	};
 }
 
-function createSources (arg: Parameters) {
-	const context = typeof arg.context === 'boolean' ?
-		new stakr.ExecutionContext(arg.context) :
-		arg.context ?? new stakr.ExecutionContext();
-
-	const lib = typeof arg.lib === 'string' ?
-		new stakr.Source(arg.lib, []) :
-		(isReadonlyArray(arg.lib) ?
-			new stakr.Source('test-lib', arg.lib) :
-			arg.lib ?? new stakr.Source('test-lib', []));
-
-	const source = typeof arg.source === 'string' ?
-		new stakr.Source(arg.source, []) :
-		(isReadonlyArray(arg.source) ?
-			new stakr.Source('test-source', arg.source) :
-			arg.source ?? new stakr.Source('test-source', []));
-
+async function createSources (arg: Parameters) {
+	const context = new stakr.ExecutionContext(arg.context);
+	const lib = new stakr.Source('test-lib', arg.lib ?? []);
+	const source = new stakr.Source('test-source', arg.source ?? []);
 	const state = arg.state ?? SourceState.LINKED;
 
 	if (state >= SourceState.ASSEMBLED) {
@@ -127,7 +115,7 @@ function createSources (arg: Parameters) {
 	}
 
 	const executeOrder = state >= SourceState.LINKED ?
-		context.link(source.name) :
+		await context.link(source.name) :
 		[];
 
 	return {

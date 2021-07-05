@@ -6,6 +6,8 @@ import SafeArray from './util/safe-array.js';
 /** @internal */
 export const enum Message {
 	EMPTY_SOURCE_LIST = 'Empty source list',
+	LOADER_NO_RELATIVE = 'Source with a non-absolute name can not resolve a relative path',
+	LOADER_INVALID = 'Invalid source specifier',
 }
 
 const AUX_MAX_LENGTH = 1024;
@@ -108,7 +110,7 @@ export class Source {
 		};
 
 		for (const sourceName of context.persistentSources) {
-			const otherSource = context.resolveSource(sourceName);
+			const otherSource = context.getSource(sourceName);
 
 			data.importSource(otherSource, '');
 		}
@@ -150,21 +152,68 @@ export class Source {
 	}
 }
 
+export class ResolutionError extends Error {
+	name = ResolutionError.name;
+}
+
+export class DefaultLoader implements types.Loader {
+	resolve (specifier: string, parentName: string) {
+		let resolved;
+
+		if (specifier.startsWith('./') || specifier.startsWith('../')) {
+			if (!parentName.startsWith('/')) {
+				throw new ResolutionError(Message.LOADER_NO_RELATIVE);
+			}
+
+			resolved = this.resolvePath(parentName, specifier);
+		} else if (specifier.startsWith('/')) {
+			resolved = this.resolvePath('/', specifier);
+		} else {
+			// `specifier` is now a bare specifier.
+			resolved = specifier;
+		}
+
+		if (/%2f|%5c/ui.test(resolved)) {
+			throw new ResolutionError(Message.LOADER_INVALID);
+		}
+
+		return resolved;
+	}
+
+	async getSource (url: string, context: ExecutionContext) {
+		return context.getSource(url);
+	}
+
+	private resolvePath (from: string, to: string) {
+		return new URL(to, new URL(from, 'resolve://')).pathname;
+	}
+}
+
+const defaultLoader = new DefaultLoader();
 const commands = new Source('stdlib:commands', commandList);
 commands.assemble();
 
 export class ExecutionContext {
 	readonly sourceMap = new Map<string, Source>();
 	readonly persistentSources: string[] = [];
+	readonly loader: types.Loader;
 
-	constructor (addStandardLibrary = true) {
+	constructor ({
+		loader = defaultLoader,
+		addStandardLibrary = true,
+	}: {
+		loader?: types.Loader;
+		addStandardLibrary?: boolean;
+	} = {}) {
+		this.loader = loader;
+
 		if (addStandardLibrary) {
 			this.addSource(commands);
 			this.persistentSources.push(commands.name);
 		}
 	}
 
-	link (...sources: readonly string[]) {
+	async link (...sources: readonly string[]) {
 		const deps = new DepGraph<Source>();
 		const sourceSet = new Set(sources);
 
@@ -173,7 +222,7 @@ export class ExecutionContext {
 		}
 
 		for (const sourceName of sourceSet) {
-			const source = this.resolveSource(sourceName);
+			const source = await this.loader.getSource(sourceName, this);
 			deps.addNode(sourceName, source);
 
 			for (const target of source.assemble().imports) {
@@ -209,7 +258,7 @@ export class ExecutionContext {
 		data.halted = false;
 
 		while (!data.halted) {
-			const source = this.resolveSource(data.sourceName);
+			const source = this.getSource(data.sourceName);
 			await source.execute(this, data);
 		}
 	}
@@ -224,7 +273,7 @@ export class ExecutionContext {
 		this.sourceMap.set(source.name, source);
 	}
 
-	resolveSource (sourceName: string) {
+	getSource (sourceName: string) {
 		const source = this.sourceMap.get(sourceName);
 
 		if (source === undefined) {

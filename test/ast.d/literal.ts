@@ -14,7 +14,7 @@ await _.test('value', async (_) => {
 await _.test('execute', async (_) => {
 	const instance = new ast.Literal(123);
 
-	const { context, source, data } = createAssets({
+	const { context, source, data } = await createAssets({
 		source: [instance],
 	});
 

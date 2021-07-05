@@ -4,7 +4,7 @@ import testGoto from '#test-util/goto.js';
 import { CommandsMessage, SafeArrayMessage } from '#test-util/message.js';
 import { createAssets } from '#test-util/stakr.js';
 
-const { source, lib, data, arg } = createAssets();
+const { source, lib, data, arg } = await createAssets();
 
 _.throws(
 	() => {

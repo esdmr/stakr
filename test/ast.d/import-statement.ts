@@ -23,7 +23,7 @@ await _.test('source', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	const { assembleData, assembleArg: arg } = createAssets({
+	const { assembleData, assembleArg: arg } = await createAssets({
 		source: [instance],
 		state: SourceState.RAW,
 	});
@@ -58,7 +58,7 @@ await _.test('assemble', async (_) => {
 await _.test('link', async (_) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	const { context, source, lib, linkArg: arg } = createAssets({
+	const { context, source, lib, linkArg: arg } = await createAssets({
 		lib: [
 			new ast.BlockStart(),
 			new ast.FunctionStatement('test-internal', false),
@@ -82,7 +82,7 @@ await _.test('link', async (_) => {
 	);
 
 	context.addSource(lib);
-	context.link(source.name);
+	await context.link(source.name);
 
 	_.strictSame(
 		source.linkData.get(context)?.identifiers.get('lib:test-function'),

@@ -14,7 +14,7 @@ await _.test('name', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.Label('test-label', false);
 
-	const { source, assembleArg: arg } = createAssets({
+	const { source, assembleArg: arg } = await createAssets({
 		source: [instance],
 	});
 

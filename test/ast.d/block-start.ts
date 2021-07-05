@@ -23,7 +23,7 @@ await _.test('offset', async (_) => {
 await _.test('assemble', async (_) => {
 	const instance = new ast.BlockStart();
 
-	const { assembleArg: arg } = createAssets({
+	const { assembleArg: arg } = await createAssets({
 		source: [instance],
 		state: SourceState.RAW,
 	});
@@ -39,7 +39,7 @@ await _.test('assemble', async (_) => {
 await _.test('execute', async (_) => {
 	const instance = new ast.BlockStart();
 
-	const { context, source, data } = createAssets({
+	const { context, source, data } = await createAssets({
 		source: [instance, new ast.BlockEnd()],
 	});
 

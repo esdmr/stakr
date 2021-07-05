@@ -24,7 +24,7 @@ await _.test('assemble', async (_) => {
 	const start = new ast.BlockStart();
 	const instance = new ast.BlockEnd();
 
-	const { source, lib, assembleData } = createAssets({
+	const { source, lib, assembleData } = await createAssets({
 		source: [start, instance],
 		lib: [{}, instance],
 		state: SourceState.RAW,

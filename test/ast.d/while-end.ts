@@ -5,7 +5,7 @@ import { createAssets } from '#test-util/stakr.js';
 await _.test('execute', async (_) => {
 	const instance = new ast.WhileEnd();
 
-	const { data, arg } = createAssets({
+	const { data, arg } = await createAssets({
 		source: [
 			new ast.BlockStart(),
 			instance,

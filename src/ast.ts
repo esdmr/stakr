@@ -148,8 +148,9 @@ export class ImportStatement implements types.ASTNode {
 		data.namespaces.add(this.namespace);
 	}
 
-	link ({ context, data }: types.LinkArg) {
-		const otherSource = context.resolveSource(this.source);
+	link ({ context, source, data }: types.LinkArg) {
+		const resolved = context.loader.resolve(this.source, source.name);
+		const otherSource = context.getSource(resolved);
 
 		data.importSource(otherSource, `${this.namespace}:`);
 	}

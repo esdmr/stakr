@@ -27,7 +27,7 @@ await _.test('execute', async (_) => {
 		await _.test(`label${referOnlyState}`, async (_) => {
 			const instance = new ast.Refer('test-label', referOnly);
 
-			const { source, data, arg } = createAssets({
+			const { source, data, arg } = await createAssets({
 				source: [
 					new ast.Label('test-label', false),
 					instance,
@@ -55,7 +55,7 @@ await _.test('execute', async (_) => {
 		await _.test(`import label${referOnlyState}`, async (_) => {
 			const instance = new ast.Refer('lib:test-label', referOnly);
 
-			const { context, source, lib, data, arg } = createAssets({
+			const { context, source, lib, data, arg } = await createAssets({
 				lib: [new ast.Label('test-label', true)],
 				source: [
 					new ast.ImportStatement('lib', 'test-lib'),
@@ -70,7 +70,7 @@ await _.test('execute', async (_) => {
 				'expected to throw if function is not found',
 			);
 
-			context.link(source.name);
+			await context.link(source.name);
 
 			instance.execute(arg);
 
@@ -93,7 +93,7 @@ await _.test('execute', async (_) => {
 	await _.test('function', async (_) => {
 		const instance = new ast.Refer('test-function', false);
 
-		const { source, data, arg } = createAssets({
+		const { source, data, arg } = await createAssets({
 			source: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', false),
@@ -123,7 +123,7 @@ await _.test('execute', async (_) => {
 	await _.test('import function', async (_) => {
 		const instance = new ast.Refer('lib:test-function', false);
 
-		const { context, source, lib, data, arg } = createAssets({
+		const { context, source, lib, data, arg } = await createAssets({
 			lib: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', true),
@@ -142,7 +142,7 @@ await _.test('execute', async (_) => {
 			'expected to throw if function is not found',
 		);
 
-		context.link(source.name);
+		await context.link(source.name);
 
 		instance.execute(arg);
 
@@ -164,7 +164,7 @@ await _.test('execute', async (_) => {
 	await _.test('function referOnly', async (_) => {
 		const instance = new ast.Refer('test-function', true);
 
-		const { source, data, arg } = createAssets({
+		const { source, data, arg } = await createAssets({
 			source: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', false),
@@ -191,7 +191,7 @@ await _.test('execute', async (_) => {
 	await _.test('import function referOnly', async (_) => {
 		const instance = new ast.Refer('lib:test-function', true);
 
-		const { context, source, lib, data, arg } = createAssets({
+		const { context, source, lib, data, arg } = await createAssets({
 			lib: [
 				new ast.BlockStart(),
 				new ast.FunctionStatement('test-function', true),
@@ -210,7 +210,7 @@ await _.test('execute', async (_) => {
 			'expected to throw if function is not found',
 		);
 
-		context.link(source.name);
+		await context.link(source.name);
 
 		instance.execute(arg);
 
