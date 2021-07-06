@@ -264,8 +264,8 @@ export class ExecutionContext {
 	}
 
 	addSource (source: Source) {
-		if (this.sourceMap.has(source.name) &&
-			this.sourceMap.get(source.name) !== source) {
+		if (this.sourceMap.has(source.name)
+			&& this.sourceMap.get(source.name) !== source) {
 			throw new Error(`The same name '${source.name}' was registered with a different source`);
 		}
 

@@ -114,9 +114,9 @@ async function createSources (arg: Parameters) {
 		context.addSource(source);
 	}
 
-	const executeOrder = state >= SourceState.LINKED ?
-		await context.link(source.name) :
-		[];
+	const executeOrder = state >= SourceState.LINKED
+		? await context.link(source.name)
+		: [];
 
 	return {
 		source,
