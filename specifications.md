@@ -11,8 +11,12 @@
 		- [Callee](#callee)
 	- [Commands](#commands)
 		- [`call`](#call)
+		- [`enter`](#enter)
+		- [`frame`](#frame)
 		- [`goto`](#goto)
 		- [`if`](#if)
+		- [`leave`](#leave)
+		- [`local`](#local)
 		- [`return`](#return)
 		- [`while`](#while)
 
@@ -32,9 +36,10 @@
     <dd>
         The <dfn>auxiliary stack</dfn> (<abbr>aux</abbr> for short) is a
         secondary LIFO stack array. It is used to store function return offsets,
-        and internal function variables. It is limited to a maximum of 1024
+        and previous frame pointers. It is limited to a maximum of 1024
         (2\^10) elements by default. This limit may be changed or withdrawn in
-        later versions of the specification.
+        later versions of the specification. It can not be accessed through the
+		standard commands.
     </dd>
     <dt>Source Address</dt>
     <dd>
@@ -46,15 +51,21 @@
     <dt>Stack Address</dt>
     <dd>
         The <dfn>stack address</dfn> (<abbr>address</abbr> for short) is a
-        signed integer representing an index within a stack. The stack is
-        implied through operators. If a negative value is provided, the length
-        of that stack will be added. If the address is out of bounds, it will
-        abort.
+        signed integer representing an index within a stack. If a negative value
+		is provided, its absolute value is used for referencing.
+    </dd>
+    <dt>Frame Pointer</dt>
+    <dd>
+        The <dfn>frame pointer</dfn> is an address representing an index within
+        a stack. It is useful for accessing function parameters and locals using
+		two seperate commands <code>frame</code> and <code>local</code>. New
+		frame pointers can be created using the <code>enter</code> and
+		<code>leave</code> commands.
     </dd>
     <dt>Literal</dt>
     <dd>
         A <dfn>literal</dfn> is a fixed constant value. A literal can have any
-		of the following types:
+        of the following types:
         <ul>
             <li>String (Array of unicode characters)</li>
             <li>Number (64-bit binary floating-point)</li>
@@ -100,58 +111,61 @@
 ### Commands
 
 #### `call`
-- Let <var>SO</var> be pop().
-- If <var>SO</var> is a String, then
-  - Let <var>S</var> be <var>SO</var>.
-  - Let <var>O</var> be pop().
-  - Assert: <var>O</var> is a valid offset.
-  - xmove(nextOffset).
-  - xmove(sourceName).
-  - Jump to <var>O</var> at source <var>S</var>.
-- Else,
-  - Let <var>O</var> be <var>SO</var>.
-  - Assert: <var>O</var> is valid offset.
-  - xmove(nextOffset).
-  - Jump to <var>O</var>.
+- Let <var>S</var> be pop().
+- Let <var>O</var> be pop().
+- Assert: <var>O</var> is a valid offset.
+- auxPush(offset, sourceName).
+- Jump to <var>O</var> at source <var>S</var>.
+
+#### `enter`
+- auxPush(framePointer).
+- Set framePointer to length(stack).
+
+#### `frame`
+- Assert: framePointer is a valid safe integer.
+- Assert: framePointer is not less than or equal to zero.
+- Assert: framePointer is not more than length(stack).
+- push(1 - framePointer).
+- Note: The expression (framePointer - 1) is inverted to correctly specify the
+  growth direction of the function parameter array.
 
 #### `goto`
-- Let <var>SO</var> be pop().
-- If <var>SO</var> is a String, then
-  - Let <var>S</var> be <var>SO</var>.
-  - Assert: <var>S</var> is a valid source name.
-  - Let <var>O</var> be pop().
-  - Assert: <var>O</var> is a valid offset.
-  - Jump to <var>O</var> at source <var>S</var>.
-- Else,
-  - Let <var>O</var> be <var>SO</var>.
-  - Assert: <var>O</var> is valid offset.
-  - Jump to <var>O</var>.
+- Let <var>S</var> be pop().
+- Assert: <var>S</var> is a valid source name.
+- Let <var>O</var> be pop().
+- Assert: <var>O</var> is a valid offset.
+- Jump to <var>O</var> at source <var>S</var>.
 
 #### `if`
 - Let <var>C</var> be pop().
 - Assert: <var>C</var> is a Boolean.
 - If <var>C</var>, then
-  - Let <var>SO</var> be pop().
-  - If <var>SO</var> is a String, then
-    - Assert: <var>SO</var> is a valid source name.
-    - Assert: pop() is a valid offset.
-  - Else,
-    - Assert: <var>SO</var> is valid offset.
+  - Let <var>S</var> be pop().
+  - Assert: <var>S</var> is a valid source name.
+  - Let <var>O</var> be pop().
+  - Assert: <var>O</var> is a valid offset.
 - Else,
-  - Forward to [`goto`](#goto)
+  - Forward to [`goto`](#goto).
+
+#### `leave`
+- Let <var>F</var> be auxPop().
+- Assert: framePointer is a valid safe integer.
+- Assert: framePointer is not less than or equal to zero.
+- Set framePointer to <var>F</var>.
+
+#### `local`
+- Assert: framePointer is a valid safe integer.
+- Assert: framePointer is not more than length(stack).
+- push(framePointer).
+- Note: the expression (framePointer) is positive, which correctly specifies the
+  growth direction of the function locals array.
 
 #### `return`
-- Let <var>SO</var> be xpop().
-- If <var>SO</var> is a String, then
-  - Let <var>S</var> be <var>SO</var>.
-  - Assert: <var>S</var> is a valid source name.
-  - Let <var>O</var> be xpop().
-  - Assert: <var>O</var> is a valid offset.
-  - Jump to <var>O</var> at source <var>S</var>.
-- Else,
-  - Let <var>O</var> be <var>SO</var>.
-  - Assert: <var>O</var> is valid offset.
-  - Jump to <var>O</var>.
+- Let <var>S</var> be auxPop().
+- Assert: <var>S</var> is a valid source name.
+- Let <var>O</var> be auxPop().
+- Assert: <var>O</var> is a valid offset.
+- Jump to <var>O</var> at source <var>S</var>.
 
 #### `while`
-- Forward to [`If`](#if)
+- Forward to [`If`](#if).
