@@ -23,9 +23,7 @@ export class NativeFunction implements types.ASTNode {
 		map: ReadonlyArray<[string, types.Executable]>,
 		exported: boolean,
 	): NativeFunction[] {
-		return map.map(([name, executable]) => {
-			return new NativeFunction(name, executable, exported);
-		});
+		return map.map(([name, executable]) => new NativeFunction(name, executable, exported));
 	}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {

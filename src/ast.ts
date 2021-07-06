@@ -35,8 +35,8 @@ export class Refer implements types.ASTNode {
 	constructor (readonly name: string, readonly referOnly: boolean) {}
 
 	execute (arg: types.ExecuteArg) {
-		const definition = arg.source.assemble().identifiers.get(this.name) ??
-			arg.source.linkData.get(arg.context)?.identifiers.get(this.name);
+		const definition = arg.source.assemble().identifiers.get(this.name)
+			?? arg.source.linkData.get(arg.context)?.identifiers.get(this.name);
 
 		if (definition === undefined) {
 			throw new Error(`Undefined identifier '${this.name}'`);
