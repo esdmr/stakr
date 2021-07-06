@@ -1,84 +1,160 @@
-import { Executable, ExecuteArg } from './stakr.js';
+import type * as stakr from './stakr.js';
+import type * as types from './types.js';
 
-function newTypeErrorForJumpTarget (offset: string) {
-	return new TypeError(`Jump target not a number, got ${offset}`);
+/** @internal */
+export const enum Message {
+	SOURCE_NAME_IS_NOT_STRING = 'Source name is not a string',
+	OFFSET_IS_NOT_NUMBER = 'Offset is not a number',
+	CONDITION_IS_NOT_BOOLEAN = 'Condition is not a boolean',
+	FRAME_POINTER_IS_NOT_NUMBER = 'Frame pointer is not a number',
+	FRAME_POINTER_IS_NOT_VALID = 'Frame pointer is not valid',
+	FRAME_POINTER_IS_AT_START = 'Frame pointer points to the start of stack',
+	FRAME_POINTER_IS_PAST_END = 'Frame pointer is past the end of stack',
 }
 
-export const goto_ = (arg: ExecuteArg) => {
-	const offset = arg.context.pop();
+export class NativeFunction implements types.ASTNode {
+	constructor (
+		readonly name: string,
+		readonly executable: types.Executable,
+		readonly exported: boolean,
+	) {}
+
+	static createArray (
+		map: ReadonlyArray<[string, types.Executable]>,
+		exported: boolean,
+	): NativeFunction[] {
+		return map.map(([name, executable]) => {
+			return new NativeFunction(name, executable, exported);
+		});
+	}
+
+	assemble ({ source, data, offset }: types.AssembleArg) {
+		data.addIdentifier(this.name, {
+			sourceName: source.name,
+			offset,
+			exported: this.exported,
+			implicitlyCalled: true,
+		});
+	}
+
+	async execute (arg: types.ExecuteArg) {
+		const value = this.executable(arg);
+
+		if (value !== undefined) {
+			await value;
+		}
+
+		return_(arg);
+	}
+}
+
+function jump (
+	data: stakr.ExecuteData,
+	sourceName: types.StackItem,
+	offset: types.StackItem,
+) {
+	if (typeof sourceName !== 'string') {
+		throw new TypeError(Message.SOURCE_NAME_IS_NOT_STRING);
+	}
 
 	if (typeof offset !== 'number') {
-		throw newTypeErrorForJumpTarget(typeof offset);
+		throw new TypeError(Message.OFFSET_IS_NOT_NUMBER);
 	}
 
-	arg.offset = offset;
-};
+	data.sourceName = sourceName;
+	data.offset = offset;
+}
 
-export const call_ = (arg: ExecuteArg) => {
-	const offsetOrSource = arg.context.pop();
+export function goto_ ({ data }: types.ExecuteArg) {
+	jump(data, data.stack.pop(), data.stack.pop());
+}
 
-	if (typeof offsetOrSource === 'string') {
-		const offset = arg.context.pop();
+export function call_ ({ data }: types.ExecuteArg) {
+	data.aux.push(data.offset, data.sourceName);
+	jump(data, data.stack.pop(), data.stack.pop());
+}
 
-		if (typeof offset !== 'number') {
-			throw newTypeErrorForJumpTarget(typeof offset);
-		}
+export function return_ ({ data }: types.ExecuteArg) {
+	jump(data, data.aux.pop(), data.aux.pop());
+}
 
-		arg.context.aux.push(arg.offset, arg.source.name);
-		arg.context.nextSource = offsetOrSource;
-		arg.context.nextOffset = offset;
-		arg.context.halted = false;
-	} else if (typeof offsetOrSource === 'number') {
-		arg.context.aux.push(arg.offset);
-		arg.offset = offsetOrSource;
-	} else {
-		throw newTypeErrorForJumpTarget(typeof offsetOrSource);
-	}
-};
-
-export const return_ = (arg: ExecuteArg) => {
-	const offsetOrSource = arg.context.aux.pop();
-
-	if (typeof offsetOrSource === 'string') {
-		const offset = arg.context.aux.pop();
-
-		if (typeof offset !== 'number') {
-			throw newTypeErrorForJumpTarget(typeof offset);
-		}
-
-		arg.context.nextSource = offsetOrSource;
-		arg.context.nextOffset = offset;
-		arg.context.halted = false;
-	} else if (typeof offsetOrSource === 'number') {
-		arg.offset = offsetOrSource;
-	} else {
-		throw newTypeErrorForJumpTarget(typeof offsetOrSource);
-	}
-};
-
-export const if_ = (name = 'if') => (arg: ExecuteArg) => {
-	const condition = arg.context.pop();
+export function if_ ({ data }: types.ExecuteArg) {
+	const { sourceName, offset } = data;
+	const condition = data.stack.pop();
 
 	if (typeof condition !== 'boolean') {
-		throw new TypeError(`${name} statement on non-boolean, got ${typeof condition}`);
+		throw new TypeError(Message.CONDITION_IS_NOT_BOOLEAN);
 	}
+
+	jump(data, data.stack.pop(), data.stack.pop());
 
 	if (condition) {
-		// Check if offset is valid.
-		const { offset } = arg;
-		goto_(arg);
-		arg.offset = offset;
-	} else {
-		goto_(arg);
+		data.sourceName = sourceName;
+		data.offset = offset;
 	}
-};
+}
 
-const commandMap = new Map<string, Executable['execute']>([
+export function enter_ ({ data }: types.ExecuteArg) {
+	data.aux.push(data.framePointer);
+	data.framePointer = data.stack.length;
+}
+
+export function leave_ ({ data }: types.ExecuteArg) {
+	const framePointer = data.aux.pop();
+
+	if (typeof framePointer !== 'number') {
+		throw new TypeError(Message.FRAME_POINTER_IS_NOT_NUMBER);
+	}
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+	}
+
+	data.framePointer = framePointer;
+}
+
+export function frame_ ({ data }: types.ExecuteArg) {
+	const { framePointer } = data;
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+	}
+
+	if (framePointer === 0) {
+		throw new RangeError(Message.FRAME_POINTER_IS_AT_START);
+	}
+
+	if (framePointer > data.stack.length) {
+		throw new RangeError(Message.FRAME_POINTER_IS_PAST_END);
+	}
+
+	data.stack.push(1 - framePointer);
+}
+
+export function local_ ({ data }: types.ExecuteArg) {
+	const { framePointer } = data;
+
+	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+	}
+
+	if (framePointer > data.stack.length) {
+		throw new RangeError(Message.FRAME_POINTER_IS_PAST_END);
+	}
+
+	data.stack.push(framePointer);
+}
+
+const commandList = NativeFunction.createArray([
 	['goto', goto_],
 	['call', call_],
 	['return', return_],
-	['if', if_()],
-	['while', if_('while')],
-]);
+	['if', if_],
+	['while', if_],
+	['enter', enter_],
+	['leave', leave_],
+	['frame', frame_],
+	['local', local_],
+], true);
 
-export default commandMap;
+export default commandList;

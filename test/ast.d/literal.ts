@@ -1,23 +1,31 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import { createAssets } from '#test-util/stakr.js';
 
-void _.test('Literal', (_) => {
-	void _.test('value', (_) => {
-		_.equal(new AST.Literal(123).value, 123, 'expected to preserve value');
-		_.end();
+await _.test('value', async (_) => {
+	const instance = new ast.Literal(123);
+
+	_.equal(instance.value, 123,
+		'expected to preserve value');
+
+	_.end();
+});
+
+await _.test('execute', async (_) => {
+	const instance = new ast.Literal(123);
+
+	const { context, source, data } = await createAssets({
+		source: [instance],
 	});
 
-	void _.test('execute', (_) => {
-		const instance = new AST.Literal(123);
-		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
-
-		context.addSource(source);
-		instance.execute({ context, source, offset: 0 });
-		_.strictSame(context.stack, [instance.value], 'expected to push onto the stack');
-		_.end();
+	instance.execute({
+		context,
+		source,
+		data,
 	});
+
+	_.strictSame(data.stack.toNewArray(), [instance.value],
+		'expected to push onto the stack');
 
 	_.end();
 });

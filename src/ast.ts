@@ -1,186 +1,157 @@
 import * as commands from './commands.js';
-import type * as Stakr from './stakr.js';
+import type * as types from './types.js';
 
-export type Item =
-	| Literal
-	| Label
-	| Operator
-	| Refer
-	| BlockStart
-	| BlockEnd
-	| WhileEnd
-	| FunctionEnd
-	| FunctionStatement
-	| ImportStatement;
+/** @internal */
+export const enum Message {
+	BLOCK_START_NOT_INIT = 'Block does not have a end offset',
+	BLOCK_END_NOT_INIT = 'Block does not have a start offset',
+	START_IS_NOT_BLOCK_START = 'Start of block is not a BlockStart',
+}
 
-export type Source = readonly Item[];
+export { NativeFunction } from './commands.js';
 
-export class Literal implements Stakr.Executable {
-	constructor (readonly value: Stakr.StackItem) {}
+export class Literal implements types.ASTNode {
+	constructor (readonly value: types.StackItem) {}
 
-	execute ({ context }: Stakr.ExecuteArg) {
-		context.push(this.value);
+	execute ({ data }: types.ExecuteArg) {
+		data.stack.push(this.value);
 	}
 }
 
-export class Label implements Stakr.Assemblable {
-	constructor (readonly name: string) {}
+export class Label implements types.ASTNode {
+	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, offset }: Stakr.AssembleArg) {
-		if (source.identifiers.has(this.name)) {
-			throw new Error(`Identifier '${this.name}' already defined.`);
-		}
-
-		source.identifiers.set(this.name, { call: false, offset });
+	assemble ({ source, data, offset }: types.AssembleArg) {
+		data.addIdentifier(this.name, {
+			offset,
+			sourceName: source.name,
+			exported: this.exported,
+			implicitlyCalled: false,
+		});
 	}
 }
 
-export class Operator implements Stakr.Executable {
-	constructor (readonly name: string) {}
+export class Refer implements types.ASTNode {
+	constructor (readonly name: string, readonly referOnly: boolean) {}
 
-	execute (arg: Stakr.ExecuteArg) {
-		const operator = arg.context.commandMap.get(this.name);
-
-		if (operator === undefined) {
-			throw new Error(`Undefined operator '${this.name}'`);
-		}
-
-		operator(arg);
-	}
-}
-
-export class Refer implements Stakr.Executable {
-	constructor (readonly name: string) {}
-
-	execute (arg: Stakr.ExecuteArg) {
-		const definition = arg.source.identifiers.get(this.name);
+	execute (arg: types.ExecuteArg) {
+		const definition = arg.source.assemble().identifiers.get(this.name) ??
+			arg.source.linkData.get(arg.context)?.identifiers.get(this.name);
 
 		if (definition === undefined) {
 			throw new Error(`Undefined identifier '${this.name}'`);
 		}
 
-		arg.context.push(definition.offset);
+		arg.data.stack.push(definition.offset, definition.sourceName);
 
-		if (definition.source !== undefined) {
-			if (!definition.call) {
-				throw new Error('Uncallable external label referred');
-			}
-
-			arg.context.push(definition.source);
-		}
-
-		if (definition.call) {
+		if (!this.referOnly && definition.implicitlyCalled) {
 			commands.call_(arg);
 		}
 	}
 }
 
-export class BlockStart implements Stakr.Assemblable, Stakr.Executable {
-	endOffset?: number;
+export class BlockStart implements types.ASTNode {
+	/** @internal */
+	_endOffset?: number;
 
-	get offset () {
-		if (this.endOffset === undefined) {
-			throw new Error('Block does not have a end offset');
+	get endOffset () {
+		if (this._endOffset === undefined) {
+			throw new Error(Message.BLOCK_START_NOT_INIT);
 		}
 
-		return this.endOffset;
+		return this._endOffset;
 	}
 
-	assemble ({ blockStack, offset }: Stakr.AssembleArg) {
+	assemble ({ blockStack, offset }: types.AssembleArg) {
 		blockStack.push(offset);
 	}
 
-	execute ({ context }: Stakr.ExecuteArg) {
-		context.push(this.offset);
+	execute ({ data }: types.ExecuteArg) {
+		data.stack.push(this.endOffset, data.sourceName);
 	}
 }
 
-export class BlockEnd implements Stakr.Assemblable {
-	startOffset?: number;
+export class BlockEnd implements types.ASTNode {
+	/** @internal */
+	_startOffset?: number;
 
-	get offset () {
-		if (this.startOffset === undefined) {
-			throw new Error('Block does not have a start offset');
+	get startOffset () {
+		if (this._startOffset === undefined) {
+			throw new Error(Message.BLOCK_END_NOT_INIT);
 		}
 
-		return this.startOffset;
+		return this._startOffset;
 	}
 
-	assemble ({ source, blockStack, offset }: Stakr.AssembleArg) {
+	assemble ({ source, blockStack, offset }: types.AssembleArg) {
 		const startOffset = blockStack.pop();
 
 		if (startOffset === undefined) {
 			throw new Error(`Extraneous end of block at ${offset}`);
 		}
 
-		this.startOffset = startOffset;
-		(source.source[startOffset] as BlockStart).endOffset = offset + 1;
+		this._startOffset = startOffset;
+		const start = source.ast[startOffset];
+
+		if (!(start instanceof BlockStart)) {
+			throw new TypeError(Message.START_IS_NOT_BLOCK_START);
+		}
+
+		// Skip BlockEnd itself
+		start._endOffset = offset + 1;
 	}
 }
 
-export class WhileEnd extends BlockEnd implements Stakr.Executable {
-	execute (arg: Stakr.ExecuteArg) {
-		arg.offset = this.offset;
+export class WhileEnd extends BlockEnd implements types.ASTNode {
+	execute (arg: types.ExecuteArg) {
+		arg.data.offset = this.startOffset;
 	}
 }
 
-export class FunctionEnd extends BlockEnd implements Stakr.Executable {
-	execute (arg: Stakr.ExecuteArg) {
+export class FunctionEnd extends BlockEnd implements types.ASTNode {
+	execute (arg: types.ExecuteArg) {
 		commands.return_(arg);
 	}
 }
 
-export class FunctionStatement implements Stakr.Assemblable, Stakr.Executable {
+export class FunctionStatement implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
-	assemble ({ source, offset }: Stakr.AssembleArg) {
-		if (source.identifiers.has(this.name)) {
-			throw new Error(`Identifier '${this.name}' is already defined`);
-		}
-
-		const definition = { call: true, offset: offset + 1 };
-		source.identifiers.set(this.name, definition);
-
-		if (this.exported) {
-			source.exports.set(this.name, { ...definition, source: source.name });
-		}
+	assemble ({ source, data, offset }: types.AssembleArg) {
+		data.addIdentifier(this.name, {
+			sourceName: source.name,
+			// Skip FunctionStatement itself.
+			offset: offset + 1,
+			exported: this.exported,
+			implicitlyCalled: true,
+		});
 	}
 
-	execute (arg: Stakr.ExecuteArg) {
+	execute (arg: types.ExecuteArg) {
 		commands.goto_(arg);
 	}
 }
 
-export class ImportStatement implements Stakr.Assemblable, Stakr.PostAssemblable {
-	constructor (readonly prefix: string, readonly source: string) {}
+export class ImportStatement implements types.ASTNode {
+	constructor (readonly namespace: string, readonly source: string) {}
 
-	assemble ({ source }: Stakr.AssembleArg) {
-		if (source.imports.has(this.source)) {
+	assemble ({ data }: types.AssembleArg) {
+		if (data.imports.has(this.source)) {
 			throw new Error(`Source '${this.source}' already imported`);
 		}
 
-		source.imports.add(this.source);
+		if (data.namespaces.has(this.namespace)) {
+			throw new Error(`Namespace '${this.namespace}' is already defined`);
+		}
+
+		data.imports.add(this.source);
+		data.namespaces.add(this.namespace);
 	}
 
-	postAssemble ({ context, source }: Readonly<Stakr.ExecuteArg>) {
-		const other = context.sourceMap.get(this.source);
+	link ({ context, source, data }: types.LinkArg) {
+		const resolved = context.loader.resolve(this.source, source.name);
+		const otherSource = context.getSource(resolved);
 
-		if (other === undefined) {
-			throw new Error(`Undefined source '${this.source}'`);
-		}
-
-		if (!other.isAssembled) {
-			throw new Error(`Importing unassembled source '${this.source}'`);
-		}
-
-		if (source.namespaces.has(this.prefix)) {
-			throw new Error(`Namespace '${this.prefix}' is already defined`);
-		}
-
-		source.namespaces.add(this.prefix);
-
-		for (const [key, value] of other.exports) {
-			source.identifiers.set(`${this.prefix}:${key}`, value);
-		}
+		data.importSource(otherSource, `${this.namespace}:`);
 	}
 }

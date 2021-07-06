@@ -1,26 +1,29 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import testGoto from '#test-util/goto.js';
+import { createAssets } from '#test-util/stakr.js';
 
-void _.test('FunctionEnd', (_) => {
-	void _.test('execute', (_) => {
-		const instance = new AST.FunctionEnd();
-		const context = new Stakr.ExecutionContext();
+await _.test('execute', async (_) => {
+	const instance = new ast.FunctionEnd();
 
-		const source = new Stakr.Source('test', [
-			new AST.BlockStart(),
+	const { data, arg } = await createAssets({
+		source: [
+			new ast.BlockStart(),
 			instance,
-		]);
+		],
+		offset: 2,
+	});
 
-		const arg = { context, source, offset: 2 };
-
-		context.addSource(source);
-		context.aux.push(123);
-		source.assemble();
+	await testGoto(_, async (...items) => {
+		data.aux.clear();
+		data.aux.push(...items);
 		instance.execute(arg);
-		_.equal(arg.offset, 123, 'expected to return');
-		_.strictSame(context.aux, [], 'expected to pop value from aux');
-		_.end();
+
+		return {
+			stack: data.aux,
+			offset: data.offset,
+			sourceName: data.sourceName,
+		};
 	});
 
 	_.end();

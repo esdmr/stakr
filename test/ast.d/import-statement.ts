@@ -1,72 +1,100 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
-void _.test('ImportStatement', (_) => {
-	void _.test('prefix', (_) => {
-		_.equal(new AST.ImportStatement('lib', 'test-lib').prefix, 'lib', 'expected to preserve prefix');
-		_.end();
+await _.test('prefix', async (_) => {
+	const instance = new ast.ImportStatement('lib', 'test-lib');
+
+	_.equal(instance.namespace, 'lib',
+		'expected to preserve prefix');
+
+	_.end();
+});
+
+await _.test('source', async (_) => {
+	const instance = new ast.ImportStatement('lib', 'test-lib');
+
+	_.equal(instance.source, 'test-lib',
+		'expected to preserve source');
+
+	_.end();
+});
+
+await _.test('assemble', async (_) => {
+	const instance = new ast.ImportStatement('lib', 'test-lib');
+
+	const { assembleData, assembleArg: arg } = await createAssets({
+		source: [instance],
+		state: SourceState.RAW,
 	});
 
-	void _.test('source', (_) => {
-		_.equal(new AST.ImportStatement('lib', 'test-lib').source, 'test-lib', 'expected to preserve source');
-		_.end();
-	});
+	instance.assemble(arg);
 
-	void _.test('assemble', (_) => {
-		const instance = new AST.ImportStatement('lib', 'test-lib');
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
+	_.strictSame(assembleData.imports, new Set(['test-lib']),
+		'expected to add to import list');
 
-		instance.assemble(arg);
-		_.ok(source.imports.has('test-lib'), 'expected to add to import list');
+	_.strictSame(assembleData.namespaces, new Set(['lib']),
+		'expected to add to namespace list');
 
-		_.throws(() => {
+	_.throws(
+		() => {
 			instance.assemble(arg);
-		}, 'expected to throw if source is already imported');
+		},
+		'expected to throw if source is already imported',
+	);
 
-		_.end();
+	const instance2 = new ast.ImportStatement('lib', 'test-lib2');
+
+	_.throws(
+		() => {
+			instance2.assemble(arg);
+		},
+		'expected to throw if namespace is already defined',
+	);
+
+	_.end();
+});
+
+await _.test('link', async (_) => {
+	const instance = new ast.ImportStatement('lib', 'test-lib');
+
+	const { context, source, lib, linkArg: arg } = await createAssets({
+		lib: [
+			new ast.BlockStart(),
+			new ast.FunctionStatement('test-internal', false),
+			new ast.FunctionEnd(),
+			new ast.BlockStart(),
+			new ast.FunctionStatement('test-function', true),
+			new ast.FunctionEnd(),
+		],
+		source: [instance],
+		state: SourceState.ADDED,
 	});
 
-	void _.test('postAssemble', (_) => {
-		const instance = new AST.ImportStatement('lib', 'test-lib');
-		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.ExecuteArg = { context, source, offset: 0 };
+	const { identifiers: libExports } = lib.assemble();
+	context.sourceMap.delete('test-lib');
 
-		const lib = new Stakr.Source('test-lib', [
-			new AST.BlockStart(),
-			new AST.FunctionStatement('test-function', true),
-			new AST.FunctionEnd(),
-		]);
+	_.throws(
+		() => {
+			instance.link(arg);
+		},
+		'expected to throw if target source is not found',
+	);
 
-		context.addSource(source);
-		context.addSource(lib);
+	context.addSource(lib);
+	await context.link(source.name);
 
-		_.throws(() => {
-			instance.postAssemble(arg);
-		}, 'expected to throw if target source is not assembled');
+	_.strictSame(
+		source.linkData.get(context)?.identifiers.get('lib:test-function'),
+		libExports.get('test-function'),
+		'expected to copy definition for exported function',
+	);
 
-		lib.assemble();
-		source.assemble();
-		context.sourceMap.delete('test-lib');
-
-		_.throws(() => {
-			instance.postAssemble(arg);
-		}, 'expected to throw if target source is not found');
-
-		context.addSource(lib);
-		instance.postAssemble(arg);
-
-		_.strictSame(source.identifiers.get('lib:test-function'), lib.exports.get('test-function'), 'expected to copy definition for exported function');
-		_.ok(source.namespaces.has('lib'), 'expected to register namespace');
-
-		_.throws(() => {
-			instance.postAssemble(arg);
-		}, 'expected to throw if namespace is already defined');
-
-		_.end();
-	});
+	_.equal(
+		source.linkData.get(context)?.identifiers.get('lib:test-internal'),
+		undefined,
+		'expected to not copy unexported identifiers',
+	);
 
 	_.end();
 });

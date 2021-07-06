@@ -1,50 +1,66 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import * as stakr from '#src/stakr.js';
+import testGoto from '#test-util/goto.js';
+import { createAssets } from '#test-util/stakr.js';
 
-void _.test('FunctionStatement', (_) => {
-	void _.test('name', (_) => {
-		_.equal(new AST.FunctionStatement('test', false).name, 'test', 'expected to preserve name');
-		_.end();
+await _.test('name', async (_) => {
+	const instance = new ast.FunctionStatement('test', false);
+
+	_.equal(instance.name, 'test',
+		'expected to preserve name');
+
+	_.end();
+});
+
+await _.test('exported', async (_) => {
+	const instance = new ast.FunctionStatement('test', true);
+
+	_.equal(instance.exported, true,
+		'expected to preserve exported flag');
+
+	_.end();
+});
+
+await _.test('assemble', async (_) => {
+	const instance = new ast.FunctionStatement('test-function', true);
+	const source = new stakr.Source('test', [instance]);
+	const definition = source.assemble().identifiers.get('test-function');
+
+	_.strictSame(
+		definition,
+		{
+			offset: 1,
+			sourceName: 'test',
+			implicitlyCalled: true,
+			exported: true,
+		},
+		'expected to correctly add a definition',
+	);
+
+	const sourceDup = new stakr.Source('test', [instance, instance]);
+
+	_.throws(() => {
+		sourceDup.assemble();
+	}, 'expected to throw if identifier already exists');
+
+	_.end();
+});
+
+await _.test('execute', async (_) => {
+	const instance = new ast.FunctionStatement('test-function', false);
+
+	const { data, arg } = await createAssets({
+		source: [instance],
+		offset: 1,
 	});
 
-	void _.test('exported', (_) => {
-		_.equal(new AST.FunctionStatement('test', true).exported, true, 'expected to preserve exported flag');
-		_.end();
-	});
-
-	void _.test('assemble', (_) => {
-		const instance = new AST.FunctionStatement('test-function', true);
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
-
-		instance.assemble(arg);
-
-		const definition = source.identifiers.get('test-function');
-		const exported = source.exports.get('test-function');
-
-		_.strictSame(definition, { call: true, offset: 0 + 1 }, 'expected to correctly add a definition');
-		_.strictSame(exported, { call: true, offset: 0 + 1, source: 'test' }, 'expected to correctly add a export');
-
-		_.throws(() => {
-			instance.assemble(arg);
-		}, 'expected to throw if identifier already exists');
-
-		_.end();
-	});
-
-	void _.test('execute', (_) => {
-		const instance = new AST.FunctionStatement('test-function', false);
-		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.ExecuteArg = { context, source, offset: 1 };
-
-		context.addSource(source);
-		source.assemble();
-		context.push(123);
+	await testGoto(_, async (...items) => {
+		data.stack.clear();
+		data.stack.push(...items);
 		instance.execute(arg);
-		_.equal(arg.offset, 123, 'expected to jump');
-		_.end();
+
+		return data;
 	});
 
 	_.end();

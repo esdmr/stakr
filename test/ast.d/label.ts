@@ -1,29 +1,44 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import { createAssets } from '#test-util/stakr.js';
 
-void _.test('Label', (_) => {
-	void _.test('name', (_) => {
-		_.equal(new AST.Label('test').name, 'test', 'expected to preserve name');
-		_.end();
+await _.test('name', async (_) => {
+	const instance = new ast.Label('test', false);
+
+	_.equal(instance.name, 'test',
+		'expected to preserve name');
+
+	_.end();
+});
+
+await _.test('assemble', async (_) => {
+	const instance = new ast.Label('test-label', false);
+
+	const { source, assembleArg: arg } = await createAssets({
+		source: [instance],
 	});
 
-	void _.test('assemble', (_) => {
-		const instance = new AST.Label('test-label');
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
+	instance.assemble(arg);
 
-		instance.assemble(arg);
+	const definition = arg.data.identifiers.get('test-label');
 
-		const definition = source.identifiers.get('test-label');
-		_.strictSame(definition, { call: false, offset: 0 }, 'expected to correctly add a definition');
+	_.strictSame(
+		definition,
+		{
+			offset: 0,
+			sourceName: source.name,
+			implicitlyCalled: false,
+			exported: false,
+		},
+		'expected to correctly add a definition',
+	);
 
-		_.throws(() => {
+	_.throws(
+		() => {
 			instance.assemble(arg);
-		}, 'expected to throw if identifier already exists');
-
-		_.end();
-	});
+		},
+		'expected to throw if identifier already exists',
+	);
 
 	_.end();
 });

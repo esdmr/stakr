@@ -1,99 +1,200 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
+import { promisify } from 'node:util';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import * as stakr from '#src/stakr.js';
+import * as types from '#src/types.js';
+import { StakrMessage } from '#test-util/message.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
-void _.test('push', (_) => {
-	const instance = new Stakr.ExecutionContext();
-	instance.push(123, 456);
-	_.strictSame(instance.stack, [123, 456], 'expected to push onto the stack');
+const nextTick: () => Promise<void> = promisify(process.nextTick);
+
+await _.test('link', async (_) => {
+	const { context, lib, source } = await createAssets({
+		lib: [new ast.FunctionStatement('test-function', true)],
+		source: [new ast.ImportStatement('lib', 'test-lib')],
+		state: SourceState.ADDED,
+	});
+
+	await _.rejects(
+		async () => context.link(),
+		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		'expected to throw if given no source',
+	);
+
+	_.strictSame(await context.link(source.name), [lib.name, source.name],
+		'expected to return dependency graph');
+
+	await _.resolves(async () => context.link(source.name),
+		'expected to not throw if linked twice');
+
+	// @ts-expect-error Accessing private property
+	_.ok(lib.assembleData instanceof stakr.AssembleData,
+		'expected to assemble library');
+
+	// @ts-expect-error Accessing private property
+	_.ok(source.assembleData instanceof stakr.AssembleData,
+		'expected to assemble source');
+
+	_.ok(lib.linkData.get(context) instanceof stakr.LinkData,
+		'expected to link library');
+
+	_.ok(source.linkData.get(context) instanceof stakr.LinkData,
+		'expected to link source');
+
 	_.end();
 });
 
-void _.test('pop', (_) => {
-	const instance = new Stakr.ExecutionContext();
-	instance.push(123);
-	const item = instance.pop();
-	_.strictSame({ item, stack: instance.stack }, { item: 123, stack: [] }, 'expected to pop from stack');
-	_.throws(() => instance.pop(), 'expected to throw if stack is empty');
-	_.end();
-});
-
-void _.test('assemble', (_) => {
-	const context = new Stakr.ExecutionContext();
-
-	const lib = new Stakr.Source('test-lib', [
-		new AST.FunctionStatement('test-function', true),
-	]);
-
-	const source = new Stakr.Source('test', [
-		new AST.ImportStatement('lib', 'test-lib'),
-	]);
-
-	context.addSource(lib);
-	context.addSource(source);
-
-	_.throws(() => {
-		context.assemble(new Set());
-	}, 'expected to throw if given no source');
-
-	_.strictSame(context.assemble(new Set(['test'])), ['test-lib', 'test'], 'expected to return dependency graph');
-	_.equal(lib.isAssembled, true, 'expected to assemble library');
-	_.equal(lib.isAssembled, true, 'expected to assemble source');
-	_.equal(lib.isPostAssembled, true, 'expected to postAssemble library');
-	_.equal(lib.isPostAssembled, true, 'expected to postAssemble source');
-
-	_.end();
-});
-
-void _.test('execute', (_) => {
-	const instance = new Stakr.ExecutionContext();
-
-	const source = new Stakr.Source('test', [
-		// @ts-expect-error
-		{
-			execute () {
-				called = true;
-			},
-		},
-	]);
-
+void _.test('executeAll', async (_) => {
 	let called = false;
+	let jumped = true;
 
-	_.throws(() => {
-		instance.execute([]);
-	}, 'expected to throw if given no source');
+	const { context, data, source } = await createAssets({
+		state: SourceState.ASSEMBLED,
+		source: [
+			{
+				execute (arg: types.ExecuteArg) {
+					called = true;
 
-	instance.addSource(source);
-	instance.execute(['test']);
-	_.ok(called, 'expected to execute sources');
-	_.end();
-});
+					_.strictSame(
+						arg,
+						{
+							context,
+							source,
+							data,
+						},
+						'expected to provide an execute argument',
+					);
 
-void _.test('addSource', (_) => {
-	const source = new Stakr.Source('test', []);
-	const context = new Stakr.ExecutionContext();
+					data.offset = 2;
+
+					_.equal(data.offset, 2,
+						'expected to preserve offset');
+				},
+			},
+			{
+				execute () {
+					jumped = false;
+				},
+			},
+			{
+				execute ({ data }: types.ExecuteArg) {
+					_.ok(jumped,
+						'expected to jump on set offset');
+
+					_.throws(
+						() => {
+							data.offset = -1;
+						},
+						'expected to throw if offset is set to a negative value',
+					);
+
+					_.throws(
+						() => {
+							data.offset = 1.1;
+						},
+						'expected to throw if offset is set to a fractional value',
+					);
+
+					_.throws(
+						() => {
+							data.offset = Number.NaN;
+						},
+						'expected to throw if offset is set to NaN',
+					);
+
+					_.throws(
+						() => {
+							data.offset = Number.POSITIVE_INFINITY;
+						},
+						'expected to throw if offset is set to Infinity',
+					);
+
+					_.throws(
+						() => {
+							data.offset = Number.MAX_SAFE_INTEGER + 1;
+						},
+						'expected to throw if offset is set to a non-safe integer',
+					);
+				},
+			},
+			{},
+		],
+	});
+
+	await _.rejects(
+		async () => context.executeAll([], data),
+		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		'expected to throw if given no source',
+	);
+
+	await _.rejects(
+		async () => context.executeAll([source.name], data),
+		'expected to throw if given source is not added',
+	);
+
 	context.addSource(source);
-	_.strictSame(context.sourceMap, new Map([['test', source]]), 'expected to add source to sourceMap');
-	const source2 = new Stakr.Source('test', []);
+	await context.executeAll([source.name], data);
 
-	_.throws(() => {
-		context.addSource(source2);
-	}, 'expected to throw if a different source with same name is added');
+	_.ok(called,
+		'expected to execute sources');
+
+	await _.test('async', async (_) => {
+		let called = false;
+
+		const { context, source, data } = await createAssets({
+			source: [{
+				async execute () {
+					await nextTick();
+					called = true;
+				},
+			}],
+		});
+
+		await context.execute(source.name, data);
+
+		_.ok(called,
+			'expected to await all ast items when executing them');
+
+		_.end();
+	});
 
 	_.end();
 });
 
-void _.test('resolveSource', (_) => {
-	const context = new Stakr.ExecutionContext();
-	const source = new Stakr.Source('test', []);
+await _.test('addSource', async (_) => {
+	const { source, context } = await createAssets({
+		context: {
+			addStandardLibrary: false,
+		},
+	});
 
-	_.throws(() => {
-		context.resolveSource('test');
-	}, 'expected to throw if source is not found');
+	const source2 = new stakr.Source(source.name, []);
+
+	_.strictSame(context.sourceMap, new Map([[source.name, source]]),
+		'expected to add source to sourceMap');
+
+	_.throws(
+		() => {
+			context.addSource(source2);
+		},
+		'expected to throw if a different source with same name is added',
+	);
+
+	_.end();
+});
+
+await _.test('getSource', async (_) => {
+	const { context, source } = await createAssets({
+		state: SourceState.ASSEMBLED,
+	});
+
+	_.throws(() => context.getSource(source.name),
+		'expected to throw if source is not found');
 
 	context.addSource(source);
-	_.equal(context.resolveSource('test'), source, 'expected to return the source');
+
+	_.equal(context.getSource(source.name), source,
+		'expected to return the source');
+
 	_.end();
 });
-
-_.end();

@@ -1,37 +1,53 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import { ASTMessage } from '#test-util/message.js';
+import { createAssets, SourceState } from '#test-util/stakr.js';
 
-void _.test('BlockStart', (_) => {
-	void _.test('offset', (_) => {
-		const instance = new AST.BlockStart();
+await _.test('offset', async (_) => {
+	const instance = new ast.BlockStart();
 
-		_.throws(() => instance.offset, 'expected to throw if not initialized');
-		instance.endOffset = 123;
-		_.equal(instance.offset, instance.endOffset, 'expected to preserve offset');
-		_.end();
+	_.throws(
+		() => instance.endOffset,
+		new Error(ASTMessage.BLOCK_START_NOT_INIT),
+		'expected to throw if not initialized',
+	);
+
+	instance._endOffset = 123;
+
+	_.equal(instance.endOffset, instance._endOffset,
+		'expected to preserve offset');
+
+	_.end();
+});
+
+await _.test('assemble', async (_) => {
+	const instance = new ast.BlockStart();
+
+	const { assembleArg: arg } = await createAssets({
+		source: [instance],
+		state: SourceState.RAW,
 	});
 
-	void _.test('assemble', (_) => {
-		const instance = new AST.BlockStart();
-		const source = new Stakr.Source('test', [instance]);
-		const arg: Stakr.AssembleArg = { source, blockStack: [], offset: 0 };
+	instance.assemble(arg);
 
-		instance.assemble(arg);
-		_.strictSame(arg.blockStack, [0], 'expected to push offset');
-		_.end();
+	_.strictSame(arg.blockStack, [0],
+		'expected to push offset');
+
+	_.end();
+});
+
+await _.test('execute', async (_) => {
+	const instance = new ast.BlockStart();
+
+	const { context, source, data } = await createAssets({
+		source: [instance, new ast.BlockEnd()],
 	});
 
-	void _.test('execute', (_) => {
-		const instance = new AST.BlockStart();
-		const context = new Stakr.ExecutionContext();
-		const source = new Stakr.Source('test', [instance]);
+	instance._endOffset = 123;
+	await context.execute(source.name, data);
 
-		instance.endOffset = 123;
-		source.execute(context, 0);
-		_.strictSame(context.stack, [123], 'expected to push offset');
-		_.end();
-	});
+	_.strictSame(data.stack.toNewArray(), [123, source.name],
+		'expected to push offset');
 
 	_.end();
 });

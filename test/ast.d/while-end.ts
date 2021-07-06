@@ -1,25 +1,22 @@
-import * as AST from 'src/ast.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
+import * as ast from '#src/ast.js';
+import { createAssets } from '#test-util/stakr.js';
 
-void _.test('WhileEnd', (_) => {
-	void _.test('execute', (_) => {
-		const instance = new AST.WhileEnd();
-		const context = new Stakr.ExecutionContext();
+await _.test('execute', async (_) => {
+	const instance = new ast.WhileEnd();
 
-		const source = new Stakr.Source('test', [
-			new AST.BlockStart(),
+	const { data, arg } = await createAssets({
+		source: [
+			new ast.BlockStart(),
 			instance,
-		]);
-
-		const arg: Stakr.ExecuteArg = { context, source, offset: 2 };
-
-		context.addSource(source);
-		source.assemble();
-		instance.execute(arg);
-		_.equal(arg.offset, 0, 'expected to jump to start');
-		_.end();
+		],
+		offset: 2,
 	});
+
+	instance.execute(arg);
+
+	_.equal(data.offset, 0,
+		'expected to jump to start');
 
 	_.end();
 });

@@ -1,29 +1,50 @@
-import { if_ } from 'src/commands.js';
-import * as Stakr from 'src/stakr.js';
 import * as _ from 'tap';
-import { testGoto } from './goto.js';
+import { if_ } from '#src/commands.js';
+import testGoto from '#test-util/goto.js';
+import { CommandsMessage, SafeArrayMessage } from '#test-util/message.js';
+import { createAssets } from '#test-util/stakr.js';
 
-const command = if_();
-const context = new Stakr.ExecutionContext();
-const source = new Stakr.Source('test', []);
-const arg: Stakr.ExecuteArg = { context, source, offset: 0 };
+const { source, lib, data, arg } = await createAssets();
 
-_.throws(command.bind(null, arg), 'expected to throw if stack is empty');
-context.push('abc');
-_.throws(command.bind(null, arg), 'expected to throw if poped value is not a boolean');
-context.stack.length = 0;
-context.push(123, true);
-command(arg);
-_.equal(arg.offset, 0, 'expected to not jump if poped value is true');
-_.strictSame(arg.context.stack, [], 'expected to pop twice from the stack even if the condition is true');
+_.throws(
+	() => {
+		if_(arg);
+	},
+	new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+	'expected to throw if stack is empty',
+);
 
-void _.test('goto', (_) => {
-	testGoto(_, () => {
-		context.push(false);
-		command(arg);
-	}, arg);
+data.stack.push('abc');
+
+_.throws(
+	() => {
+		if_(arg);
+	},
+	new TypeError(CommandsMessage.CONDITION_IS_NOT_BOOLEAN),
+	'expected to throw if poped value is not a boolean',
+);
+
+data.stack.clear();
+data.stack.push(123, lib.name, true);
+if_(arg);
+
+_.equal(data.offset, 0,
+	'expected to not jump to offset if poped value is true');
+
+_.equal(data.sourceName, source.name,
+	'expected to not jump to source if poped value is true');
+
+_.strictSame(data.stack.toNewArray(), [],
+	'expected to pop twice from the stack even if the condition is true');
+
+await _.test('goto', async (_) => {
+	await testGoto(_, async (...items) => {
+		data.stack.clear();
+		data.stack.push(...items, false);
+		if_(arg);
+
+		return data;
+	});
 
 	_.end();
 });
-
-_.end();

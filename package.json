@@ -1,18 +1,23 @@
 {
   "private": true,
   "type": "module",
+  "imports": {
+    "#src/*": "./build/*",
+    "#test-util/*": "./build/test/test-util/*"
+  },
   "scripts": {
+    "preinstall": "npx -y only-allow pnpm",
     "tspm": "node add-paths.js",
-    "clean": "rimraf build .nyc_output coverage && npm run tspm",
-    "build": "npm run tspm && tsc -b",
-    "watch": "npm run tspm && tsc -b -w",
+    "clean": "rimraf build .nyc_output coverage",
+    "build": "tsc -b",
+    "watch": "tsc -b -w",
     "prepare": "npm run clean && npm run build",
     "lint": "xo",
     "lint:fix": "npm run lint -- --fix",
-    "tap": "tap --no-coverage",
-    "tap:coverage": "NODE_OPTIONS=\"--no-warnings --experimental-loader @istanbuljs/esm-loader-hook\" tap",
-    "tap:coverage-report": "npm run tap:coverage -- --no-check-coverage --reporter silent && npm run tap:coverage -- --coverage-report=html",
-    "test": "npm run lint && npm run tap:coverage"
+    "test": "tap --no-coverage",
+    "test:coverage": "NODE_OPTIONS=\"--no-warnings --experimental-loader @istanbuljs/esm-loader-hook\" tap",
+    "test:coverage-html": "npm run test:coverage -- --coverage-report=html",
+    "test:coverage-lcov": "npm run test:coverage -- --coverage-report=lcovonly"
   },
   "author": "Saeed M Rad",
   "license": "MIT",
