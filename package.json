@@ -7,13 +7,12 @@
   },
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
-    "tspm": "node add-paths.js",
     "clean": "rimraf build .nyc_output coverage",
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "prepare": "npm run clean && npm run build",
     "lint": "xo",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "xo --fix",
     "test": "tap --no-coverage",
     "test:coverage": "NODE_OPTIONS=\"--no-warnings --experimental-loader @istanbuljs/esm-loader-hook\" tap",
     "test:coverage-html": "npm run test:coverage -- --coverage-report=html",
@@ -22,7 +21,8 @@
   "author": "Saeed M Rad",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0",
+    "pnpm": ">=6.9.0"
   },
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "0.1.2",
@@ -35,5 +35,10 @@
   },
   "dependencies": {
     "dependency-graph": "0.11.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/node": "15.0.1"
+    }
   }
 }

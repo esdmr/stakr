@@ -3,17 +3,101 @@
   "extends": [
     "config:base"
   ],
-  "compatibility": {
-    "pnpm": "^6.7.6"
+  "constraints": {
+    "pnpm": "6.9.x"
   },
+  "labels": [
+    "renovate"
+  ],
+  "prCreation": "status-success",
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "addLabels": [
+      "renovate/lockfile"
+    ]
   },
   "packageRules": [
     {
+      "matchDatasources": [
+        "npm"
+      ],
+      "stabilityDays": 3
+    },
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "addLabels": [
+        "renovate/development"
+      ]
+    },
+    {
+      "matchDepTypes": [
+        "dependencies",
+        "optionalDependencies",
+        "peerDependencies"
+      ],
+      "addLabels": [
+        "renovate/production"
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "@istanbuljs/esm-loader-hook",
+        "@types/tap",
+        "tap"
+      ],
+      "addLabels": [
+        "renovate/testing"
+      ],
+      "groupName": "testing"
+    },
+    {
+      "matchPackagePatterns": [
+        "^typescript$",
+        "^@types/"
+      ],
+      "addLabels": [
+        "renovate/typescript"
+      ]
+    },
+    {
       "description": "node: prefixes are no longer working due to https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52595",
-      "matchPackageNames": ["@types/node"],
-      "allowedVersions": "<=15.0.1"
+      "matchPackageNames": [
+        "@types/node"
+      ],
+      "allowedVersions": "15.0.1"
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    },
+    {
+      "matchDepTypes": [
+        "dependencies",
+        "optionalDependencies",
+        "peerDependencies"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "automerge": false
+    },
+    {
+      "matchPackageNames": [
+        "@istanbuljs/esm-loader-hook",
+        "typescript",
+        "xo"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "automerge": false
     }
   ]
 }
