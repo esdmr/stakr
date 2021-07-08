@@ -8,6 +8,7 @@ export const enum Message {
 	EMPTY_SOURCE_LIST = 'Empty source list',
 	LOADER_NO_RELATIVE = 'Source with a non-absolute name can not resolve a relative path',
 	LOADER_INVALID = 'Invalid source specifier',
+	HALTED_IN_WRONG_SOURCE = 'Halted in a different source than the one started with',
 }
 
 const AUX_MAX_LENGTH = 1024;
@@ -260,6 +261,14 @@ export class ExecutionContext {
 		while (!data.halted) {
 			const source = this.getSource(data.sourceName);
 			await source.execute(this, data);
+		}
+
+		// In stakr, Assertions can happen by forcefully halting the execution.
+		// The following condition will try to detect if such assertions have
+		// been made. In addition, the following condition will also detect
+		// missing returns in functions which have exited their boundaries.
+		if (data.sourceName !== sourceName) {
+			throw new Error(Message.HALTED_IN_WRONG_SOURCE);
 		}
 	}
 

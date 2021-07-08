@@ -128,12 +128,12 @@ void _.test('executeAll', async (_) => {
 	);
 
 	await _.rejects(
-		async () => context.executeAll([source.name], data),
+		async () => context.execute(source.name, data),
 		'expected to throw if given source is not added',
 	);
 
 	context.addSource(source);
-	await context.executeAll([source.name], data);
+	await context.execute(source.name, data);
 
 	_.ok(called,
 		'expected to execute sources');
@@ -154,6 +154,26 @@ void _.test('executeAll', async (_) => {
 
 		_.ok(called,
 			'expected to await all ast items when executing them');
+
+		_.end();
+	});
+
+	await _.test('halt in wrong source', async (_) => {
+		const { context, source, lib, data } = await createAssets({
+			lib: [],
+			source: [{
+				execute ({ data }) {
+					data.sourceName = lib.name;
+					data.offset = 0;
+				},
+			}],
+		});
+
+		await _.rejects(
+			async () => context.execute(source.name, data),
+			new Error(StakrMessage.HALTED_IN_WRONG_SOURCE),
+			'expected to throw if halted or reached EOF in the wrong file',
+		);
 
 		_.end();
 	});
