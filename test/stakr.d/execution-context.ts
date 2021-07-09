@@ -44,7 +44,38 @@ await _.test('link', async (_) => {
 	_.end();
 });
 
-void _.test('executeAll', async (_) => {
+await _.test('executeAll', async (_) => {
+	class MockExecutionContext extends stakr.ExecutionContext {
+		async execute (sourceName: string, data: stakr.ExecuteData) {
+			data.sourceName = sourceName;
+			data.offset = 0;
+			data.halted = true;
+		}
+	}
+
+	const context = new MockExecutionContext();
+
+	const { source, data } = await createAssets();
+
+	await _.rejects(
+		async () => context.executeAll([], data),
+		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		'expected to throw if given no source',
+	);
+
+	await _.test('execute', async (_) => {
+		await context.executeAll([source.name], data);
+
+		_.equal(data.sourceName, source.name,
+			'expected to jump to source');
+
+		_.end();
+	});
+
+	_.end();
+});
+
+void _.test('execute', async (_) => {
 	let called = false;
 	let jumped = true;
 
@@ -122,12 +153,6 @@ void _.test('executeAll', async (_) => {
 	});
 
 	await _.rejects(
-		async () => context.executeAll([], data),
-		new Error(StakrMessage.EMPTY_SOURCE_LIST),
-		'expected to throw if given no source',
-	);
-
-	await _.rejects(
 		async () => context.execute(source.name, data),
 		'expected to throw if given source is not added',
 	);
@@ -136,7 +161,7 @@ void _.test('executeAll', async (_) => {
 	await context.execute(source.name, data);
 
 	_.ok(called,
-		'expected to execute sources');
+		'expected to execute source');
 
 	await _.test('async', async (_) => {
 		let called = false;
