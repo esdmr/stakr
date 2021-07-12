@@ -9,7 +9,6 @@
   "labels": [
     "renovate"
   ],
-  "prCreation": "status-success",
   "lockFileMaintenance": {
     "enabled": true,
     "addLabels": [
