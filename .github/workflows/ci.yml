@@ -75,6 +75,6 @@ jobs:
       - name: Export coverage report
         run: pnpm run test:coverage-lcov
       - name: Upload report to CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
           files: ./coverage/lcov.info
