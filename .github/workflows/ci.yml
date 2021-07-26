@@ -70,6 +70,8 @@ jobs:
             ${{ runner.OS }}-pnpm-
       - name: Install packages
         run: pnpm install
+      - name: Build
+        run: pnpm run build
       - name: Run tests
         run: pnpm run test:coverage
       - name: Export coverage report

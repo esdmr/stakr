@@ -10,7 +10,6 @@
     "clean": "rimraf build .nyc_output coverage",
     "build": "tsc -b",
     "watch": "tsc -b -w",
-    "prepare": "npm run clean && npm run build",
     "lint": "xo",
     "lint:fix": "xo --fix",
     "test": "tap --no-coverage",
