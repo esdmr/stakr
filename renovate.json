@@ -58,11 +58,11 @@
       ]
     },
     {
-      "description": "node: prefixes are no longer working due to https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52595",
+      "description": "node: prefixes are only supported in version 16 of @types/node",
       "matchPackageNames": [
         "@types/node"
       ],
-      "allowedVersions": "15.0.1"
+      "allowedVersions": "^16.0.0"
     },
     {
       "matchUpdateTypes": [
