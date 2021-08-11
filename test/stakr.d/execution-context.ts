@@ -1,4 +1,5 @@
 import { promisify } from 'node:util';
+import * as process from 'node:process';
 import * as _ from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';

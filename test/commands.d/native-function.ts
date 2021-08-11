@@ -1,4 +1,5 @@
 import { promisify } from 'node:util';
+import * as process from 'node:process';
 import * as _ from 'tap';
 import { NativeFunction } from '#src/commands.js';
 import testGoto from '#test-util/goto.js';
