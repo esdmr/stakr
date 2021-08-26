@@ -1,75 +1,75 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as stakr from '#src/stakr.js';
-import { StakrMessage } from '#test-util/message.js';
-import { createAssets } from '#test-util/stakr.js';
+import { StakrMessage } from '#test/test-util/message.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
 const loader = new stakr.DefaultLoader();
 
-await _.test('resolve', async (_) => {
-	_.throws(
+await test('resolve', async (t) => {
+	t.throws(
 		() => loader.resolve('%2f', ''),
 		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
 		'expected to throw on invalid character %2f',
 	);
 
-	_.throws(
+	t.throws(
 		() => loader.resolve('%2F', ''),
 		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
 		'expected to throw on invalid character %2F',
 	);
 
-	_.throws(
+	t.throws(
 		() => loader.resolve('%5c', ''),
 		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
 		'expected to throw on invalid character %5c',
 	);
 
-	_.throws(
+	t.throws(
 		() => loader.resolve('%5C', ''),
 		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
 		'expected to throw on invalid character %5C',
 	);
 
-	await _.test('relative', async (_) => {
-		_.throws(
+	await t.test('relative', async (t) => {
+		t.throws(
 			() => loader.resolve('./a', 'b'),
 			new stakr.ResolutionError(StakrMessage.LOADER_NO_RELATIVE),
 			'expected to throw on relative . if parent is not absolute',
 		);
 
-		_.throws(
+		t.throws(
 			() => loader.resolve('../a', 'b'),
 			new stakr.ResolutionError(StakrMessage.LOADER_NO_RELATIVE),
 			'expected to throw on relative .. if parent is not absolute',
 		);
 
-		_.equal(loader.resolve('./a', '/b/c'), '/b/a',
+		t.equal(loader.resolve('./a', '/b/c'), '/b/a',
 			'expected to resolve relative . path');
 
-		_.equal(loader.resolve('../a', '/b/c/d'), '/b/a',
+		t.equal(loader.resolve('../a', '/b/c/d'), '/b/a',
 			'expected to resolve relative .. path');
 
-		_.end();
+		t.end();
 	});
 
-	await _.test('absolute', async (_) => {
-		_.equal(loader.resolve('/a', '/b/c'), '/a',
+	await t.test('absolute', async (t) => {
+		t.equal(loader.resolve('/a', '/b/c'), '/a',
 			'expected to resolve absolute path');
 
-		_.end();
+		t.end();
 	});
 
-	await _.test('bare specifier', async (_) => {
-		_.equal(loader.resolve('stdlib:commands', '/b/c'), 'stdlib:commands',
+	await t.test('bare specifier', async (t) => {
+		t.equal(loader.resolve('stdlib:commands', '/b/c'), 'stdlib:commands',
 			'expected to resolve bare specifier');
 
-		_.end();
+		t.end();
 	});
 
-	_.end();
+	t.end();
 });
 
-await _.test('getSource', async (_) => {
+await test('getSource', async (t) => {
 	const { context, source } = await createAssets();
 
 	let callSourceName;
@@ -79,11 +79,11 @@ await _.test('getSource', async (_) => {
 		return source;
 	};
 
-	_.equal(await loader.getSource('abc', context), source,
+	t.equal(await loader.getSource('abc', context), source,
 		'expected to return the result of ExecutionContext.getSource');
 
-	_.equal(callSourceName, 'abc',
+	t.equal(callSourceName, 'abc',
 		'expected to call ExecutionContext.getSource');
 
-	_.end();
+	t.end();
 });

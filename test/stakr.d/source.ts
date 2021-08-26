@@ -1,25 +1,25 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
 import * as types from '#src/types.js';
 
-await _.test('name', async (_) => {
-	_.equal(new stakr.Source('test', []).name, 'test',
+await test('name', async (t) => {
+	t.equal(new stakr.Source('test', []).name, 'test',
 		'expected to preserve name');
 
-	_.end();
+	t.end();
 });
 
-await _.test('source', async (_) => {
+await test('source', async (t) => {
 	const ast = [] as const;
 
-	_.equal(new stakr.Source('test', ast).ast, ast,
+	t.equal(new stakr.Source('test', ast).ast, ast,
 		'expected to preserve source list');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	let called = false;
 
 	const source = new stakr.Source('test-source', [
@@ -27,7 +27,7 @@ await _.test('assemble', async (_) => {
 			assemble (arg: types.AssembleArg) {
 				called = true;
 
-				_.strictSame(
+				t.strictSame(
 					arg,
 					{
 						source,
@@ -46,17 +46,17 @@ await _.test('assemble', async (_) => {
 
 	source.assemble();
 
-	_.ok(called,
+	t.ok(called,
 		'expected to call assemble');
 
 	called = false;
 	source.assemble();
 
-	_.notOk(called,
+	t.notOk(called,
 		'expected to not call assemble again');
 
-	_.throws(() => source2.assemble(),
+	t.throws(() => source2.assemble(),
 		'expected to throw on extraneous start blocks');
 
-	_.end();
+	t.end();
 });

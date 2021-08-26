@@ -1,12 +1,12 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { ASTMessage } from '#test-util/message.js';
-import { createAssets, SourceState } from '#test-util/stakr.js';
+import { ASTMessage } from '#test/test-util/message.js';
+import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
-await _.test('offset', async (_) => {
+await test('offset', async (t) => {
 	const instance = new ast.BlockEnd();
 
-	_.throws(
+	t.throws(
 		() => instance.startOffset,
 		new Error(ASTMessage.BLOCK_END_NOT_INIT),
 		'expected to throw if not initialized',
@@ -14,13 +14,13 @@ await _.test('offset', async (_) => {
 
 	instance._startOffset = 123;
 
-	_.equal(instance.startOffset, instance._startOffset,
+	t.equal(instance.startOffset, instance._startOffset,
 		'expected to preserve offset');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	const start = new ast.BlockStart();
 	const instance = new ast.BlockEnd();
 
@@ -30,7 +30,7 @@ await _.test('assemble', async (_) => {
 		state: SourceState.RAW,
 	});
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.assemble({
 				source,
@@ -42,7 +42,7 @@ await _.test('assemble', async (_) => {
 		'expected to throw if extraneous',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.assemble({
 				source: lib,
@@ -57,11 +57,11 @@ await _.test('assemble', async (_) => {
 
 	source.assemble();
 
-	_.equal(instance._startOffset, 0,
+	t.equal(instance._startOffset, 0,
 		'expected to correctly set start offset');
 
-	_.equal(start._endOffset, 2,
+	t.equal(start._endOffset, 2,
 		'expected to correctly set end offset');
 
-	_.end();
+	t.end();
 });

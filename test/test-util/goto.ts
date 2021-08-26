@@ -10,34 +10,34 @@ type Command = (...items: StackItem[]) => Promise<{
 }>;
 
 export default async function testGoto (
-	_: Tap.Test,
+	t: Tap.Test,
 	command: Command,
 ): Promise<void> {
-	await _.rejects(
+	await t.rejects(
 		async () => command(),
 		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
 		'expected to throw if stack is empty',
 	);
 
-	await _.rejects(
+	await t.rejects(
 		async () => command('abc'),
 		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
 		'expected to throw if there is not enough parameters',
 	);
 
-	await _.rejects(
+	await t.rejects(
 		async () => command(123),
 		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
 		'expected to throw if only given a number',
 	);
 
-	await _.rejects(
+	await t.rejects(
 		async () => command(true, false),
 		new TypeError(CommandsMessage.SOURCE_NAME_IS_NOT_STRING),
 		'expected to throw if poped value is not string',
 	);
 
-	await _.rejects(
+	await t.rejects(
 		async () => command(true, 'abc'),
 		new TypeError(CommandsMessage.OFFSET_IS_NOT_NUMBER),
 		'expected to throw if poped value is not number',
@@ -45,22 +45,22 @@ export default async function testGoto (
 
 	const { stack, offset, sourceName } = await command(123, 'test-source');
 
-	_.equal(offset, 123,
+	t.equal(offset, 123,
 		'expected to jump to given offset');
 
-	_.equal(sourceName, 'test-source',
+	t.equal(sourceName, 'test-source',
 		'expected to jump to given source');
 
-	_.strictSame(stack.toNewArray(), [],
+	t.strictSame(stack.toNewArray(), [],
 		'expected to pop from the stack');
 }
 
 export async function testCall (
-	_: Tap.Test,
+	t: Tap.Test,
 	data: ExecuteData,
 	command: () => Promise<void>,
 ): Promise<void> {
-	return testGoto(_, async (...items) => {
+	return testGoto(t, async (...items) => {
 		data.sourceName = 'test-source';
 		data.offset = 1;
 		data.aux.clear();
@@ -68,7 +68,7 @@ export async function testCall (
 		data.stack.push(...items);
 		await command();
 
-		_.strictSame(data.aux.toNewArray(), [1, 'test-source'],
+		t.strictSame(data.aux.toNewArray(), [1, 'test-source'],
 			'expected to push to the aux');
 
 		return data;

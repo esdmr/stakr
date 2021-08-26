@@ -1,33 +1,33 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
-import testGoto from '#test-util/goto.js';
-import { createAssets } from '#test-util/stakr.js';
+import testGoto from '#test/test-util/goto.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
-await _.test('name', async (_) => {
+await test('name', async (t) => {
 	const instance = new ast.FunctionStatement('test', false);
 
-	_.equal(instance.name, 'test',
+	t.equal(instance.name, 'test',
 		'expected to preserve name');
 
-	_.end();
+	t.end();
 });
 
-await _.test('exported', async (_) => {
+await test('exported', async (t) => {
 	const instance = new ast.FunctionStatement('test', true);
 
-	_.equal(instance.exported, true,
+	t.equal(instance.exported, true,
 		'expected to preserve exported flag');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	const instance = new ast.FunctionStatement('test-function', true);
 	const source = new stakr.Source('test', [instance]);
 	const definition = source.assemble().identifiers.get('test-function');
 
-	_.strictSame(
+	t.strictSame(
 		definition,
 		{
 			offset: 1,
@@ -40,14 +40,14 @@ await _.test('assemble', async (_) => {
 
 	const sourceDup = new stakr.Source('test', [instance, instance]);
 
-	_.throws(() => {
+	t.throws(() => {
 		sourceDup.assemble();
 	}, 'expected to throw if identifier already exists');
 
-	_.end();
+	t.end();
 });
 
-await _.test('execute', async (_) => {
+await test('execute', async (t) => {
 	const instance = new ast.FunctionStatement('test-function', false);
 
 	const { data, arg } = await createAssets({
@@ -55,7 +55,7 @@ await _.test('execute', async (_) => {
 		offset: 1,
 	});
 
-	await testGoto(_, async (...items) => {
+	await testGoto(t, async (...items) => {
 		data.stack.clear();
 		data.stack.push(...items);
 		instance.execute(arg);
@@ -63,5 +63,5 @@ await _.test('execute', async (_) => {
 		return data;
 	});
 
-	_.end();
+	t.end();
 });

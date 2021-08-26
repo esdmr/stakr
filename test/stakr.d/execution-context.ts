@@ -1,51 +1,51 @@
 import { promisify } from 'node:util';
 import * as process from 'node:process';
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
 import * as types from '#src/types.js';
-import { StakrMessage } from '#test-util/message.js';
-import { createAssets, SourceState } from '#test-util/stakr.js';
+import { StakrMessage } from '#test/test-util/message.js';
+import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
 const nextTick: () => Promise<void> = promisify(process.nextTick);
 
-await _.test('link', async (_) => {
+await test('link', async (t) => {
 	const { context, lib, source } = await createAssets({
 		lib: [new ast.FunctionStatement('test-function', true)],
 		source: [new ast.ImportStatement('lib', 'test-lib')],
 		state: SourceState.ADDED,
 	});
 
-	await _.rejects(
+	await t.rejects(
 		async () => context.link(),
 		new Error(StakrMessage.EMPTY_SOURCE_LIST),
 		'expected to throw if given no source',
 	);
 
-	_.strictSame(await context.link(source.name), [lib.name, source.name],
+	t.strictSame(await context.link(source.name), [lib.name, source.name],
 		'expected to return dependency graph');
 
-	await _.resolves(async () => context.link(source.name),
+	await t.resolves(async () => context.link(source.name),
 		'expected to not throw if linked twice');
 
 	// @ts-expect-error Accessing private property
-	_.ok(lib.assembleData instanceof stakr.AssembleData,
+	t.ok(lib.assembleData instanceof stakr.AssembleData,
 		'expected to assemble library');
 
 	// @ts-expect-error Accessing private property
-	_.ok(source.assembleData instanceof stakr.AssembleData,
+	t.ok(source.assembleData instanceof stakr.AssembleData,
 		'expected to assemble source');
 
-	_.ok(lib.linkData.get(context) instanceof stakr.LinkData,
+	t.ok(lib.linkData.get(context) instanceof stakr.LinkData,
 		'expected to link library');
 
-	_.ok(source.linkData.get(context) instanceof stakr.LinkData,
+	t.ok(source.linkData.get(context) instanceof stakr.LinkData,
 		'expected to link source');
 
-	_.end();
+	t.end();
 });
 
-await _.test('executeAll', async (_) => {
+await test('executeAll', async (t) => {
 	class MockExecutionContext extends stakr.ExecutionContext {
 		async execute (sourceName: string, data: stakr.ExecuteData) {
 			data.sourceName = sourceName;
@@ -58,25 +58,25 @@ await _.test('executeAll', async (_) => {
 
 	const { source, data } = await createAssets();
 
-	await _.rejects(
+	await t.rejects(
 		async () => context.executeAll([], data),
 		new Error(StakrMessage.EMPTY_SOURCE_LIST),
 		'expected to throw if given no source',
 	);
 
-	await _.test('execute', async (_) => {
+	await t.test('execute', async (t) => {
 		await context.executeAll([source.name], data);
 
-		_.equal(data.sourceName, source.name,
+		t.equal(data.sourceName, source.name,
 			'expected to jump to source');
 
-		_.end();
+		t.end();
 	});
 
-	_.end();
+	t.end();
 });
 
-void _.test('execute', async (_) => {
+void test('execute', async (t) => {
 	let called = false;
 	let jumped = true;
 
@@ -87,7 +87,7 @@ void _.test('execute', async (_) => {
 				execute (arg: types.ExecuteArg) {
 					called = true;
 
-					_.strictSame(
+					t.strictSame(
 						arg,
 						{
 							context,
@@ -99,7 +99,7 @@ void _.test('execute', async (_) => {
 
 					data.offset = 2;
 
-					_.equal(data.offset, 2,
+					t.equal(data.offset, 2,
 						'expected to preserve offset');
 				},
 			},
@@ -110,38 +110,38 @@ void _.test('execute', async (_) => {
 			},
 			{
 				execute ({ data }: types.ExecuteArg) {
-					_.ok(jumped,
+					t.ok(jumped,
 						'expected to jump on set offset');
 
-					_.throws(
+					t.throws(
 						() => {
 							data.offset = -1;
 						},
 						'expected to throw if offset is set to a negative value',
 					);
 
-					_.throws(
+					t.throws(
 						() => {
 							data.offset = 1.1;
 						},
 						'expected to throw if offset is set to a fractional value',
 					);
 
-					_.throws(
+					t.throws(
 						() => {
 							data.offset = Number.NaN;
 						},
 						'expected to throw if offset is set to NaN',
 					);
 
-					_.throws(
+					t.throws(
 						() => {
 							data.offset = Number.POSITIVE_INFINITY;
 						},
 						'expected to throw if offset is set to Infinity',
 					);
 
-					_.throws(
+					t.throws(
 						() => {
 							data.offset = Number.MAX_SAFE_INTEGER + 1;
 						},
@@ -153,7 +153,7 @@ void _.test('execute', async (_) => {
 		],
 	});
 
-	await _.rejects(
+	await t.rejects(
 		async () => context.execute(source.name, data),
 		'expected to throw if given source is not added',
 	);
@@ -161,10 +161,10 @@ void _.test('execute', async (_) => {
 	context.addSource(source);
 	await context.execute(source.name, data);
 
-	_.ok(called,
+	t.ok(called,
 		'expected to execute source');
 
-	await _.test('async', async (_) => {
+	await t.test('async', async (t) => {
 		let called = false;
 
 		const { context, source, data } = await createAssets({
@@ -178,13 +178,13 @@ void _.test('execute', async (_) => {
 
 		await context.execute(source.name, data);
 
-		_.ok(called,
+		t.ok(called,
 			'expected to await all ast items when executing them');
 
-		_.end();
+		t.end();
 	});
 
-	await _.test('halt in wrong source', async (_) => {
+	await t.test('halt in wrong source', async (t) => {
 		const { context, source, lib, data } = await createAssets({
 			lib: [],
 			source: [{
@@ -195,19 +195,19 @@ void _.test('execute', async (_) => {
 			}],
 		});
 
-		await _.rejects(
+		await t.rejects(
 			async () => context.execute(source.name, data),
 			new Error(StakrMessage.HALTED_IN_WRONG_SOURCE),
 			'expected to throw if halted or reached EOF in the wrong file',
 		);
 
-		_.end();
+		t.end();
 	});
 
-	_.end();
+	t.end();
 });
 
-await _.test('addSource', async (_) => {
+await test('addSource', async (t) => {
 	const { source, context } = await createAssets({
 		context: {
 			addStandardLibrary: false,
@@ -216,31 +216,31 @@ await _.test('addSource', async (_) => {
 
 	const source2 = new stakr.Source(source.name, []);
 
-	_.strictSame(context.sourceMap, new Map([[source.name, source]]),
+	t.strictSame(context.sourceMap, new Map([[source.name, source]]),
 		'expected to add source to sourceMap');
 
-	_.throws(
+	t.throws(
 		() => {
 			context.addSource(source2);
 		},
 		'expected to throw if a different source with same name is added',
 	);
 
-	_.end();
+	t.end();
 });
 
-await _.test('getSource', async (_) => {
+await test('getSource', async (t) => {
 	const { context, source } = await createAssets({
 		state: SourceState.ASSEMBLED,
 	});
 
-	_.throws(() => context.getSource(source.name),
+	t.throws(() => context.getSource(source.name),
 		'expected to throw if source is not found');
 
 	context.addSource(source);
 
-	_.equal(context.getSource(source.name), source,
+	t.equal(context.getSource(source.name), source,
 		'expected to return the source');
 
-	_.end();
+	t.end();
 });
