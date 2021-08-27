@@ -1,43 +1,93 @@
 {
-  "private": true,
+  "name": "@esdmr/stakr",
+  "version": "0.0.0",
+  "description": "Stack based programming language",
+  "homepage": "https://github.com/esdmr/stakr#readme",
+  "bugs": "https://github.com/esdmr/stakr/issues",
+  "repository": "https://github.com/esdmr/stakr",
+  "license": "MIT",
+  "author": "Saeed M Rad <esdmr0@gmail.com> (https://github.com/esdmr)",
   "type": "module",
-  "imports": {
-    "#src/*": "./build/*",
-    "#test/*": "./build/test/*"
+  "exports": {
+    "./*": {
+      "import": "./build/*.js",
+      "types": "./build/*.d.ts"
+    }
   },
+  "files": [
+    "build/**/*.js",
+    "build/**/*.d.ts",
+    "!build/api/**/*",
+    "!build/docs/**/*",
+    "!build/examples/**/*",
+    "!build/test/**/*"
+  ],
   "scripts": {
-    "preinstall": "npx -y only-allow pnpm",
-    "clean": "rimraf build .nyc_output coverage",
     "build": "tsc -b",
-    "watch": "tsc -b -w",
+    "build:examples": "pnpm link . && tsc -b examples",
+    "build:update-paths": "node scripts/update-ts-paths.js",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "clean": "rimraf build .nyc_output coverage",
+    "preinstall": "npx -y only-allow pnpm",
     "lint": "xo",
     "lint:fix": "xo --fix",
+    "prepack": "node scripts/prepack.js",
+    "postpack": "node scripts/postpack.js",
     "test": "tap --no-coverage",
     "test:coverage": "NODE_OPTIONS=\"--no-warnings --experimental-loader @istanbuljs/esm-loader-hook\" tap",
-    "test:coverage-html": "npm run test:coverage -- --coverage-report=html",
-    "test:coverage-lcov": "npm run test:coverage -- --coverage-report=lcovonly"
+    "test:coverage-html": "pnpm run test:coverage -- --coverage-report=html",
+    "test:coverage-lcov": "pnpm run test:coverage -- --coverage-report=lcovonly",
+    "watch": "tsc -b -w"
   },
-  "author": "Saeed M Rad",
-  "license": "MIT",
-  "engines": {
-    "node": ">=16.0.0",
-    "pnpm": ">=6.9.0"
+  "dependencies": {
+    "dependency-graph": "0.11.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "7.15.0",
+    "@changesets/cli": "2.16.0",
     "@istanbuljs/esm-loader-hook": "0.1.2",
-    "@types/node": "16.4.3",
+    "@types/node": "16.7.1",
     "@types/tap": "15.0.5",
     "rimraf": "3.0.2",
     "tap": "15.0.9",
     "typescript": "4.3.5",
     "xo": "0.44.0"
   },
-  "dependencies": {
-    "dependency-graph": "0.11.0"
+  "engines": {
+    "node": ">=16",
+    "pnpm": "6"
+  },
+  "imports": {
+    "#src/*": {
+      "imports": "./build/*",
+      "types": "./build/*"
+    },
+    "#test/*": {
+      "imports": "./build/test/*",
+      "types": "./build/test/*"
+    }
   },
   "pnpm": {
     "overrides": {
-      "@types/node": "^16.0.0"
+      "@types/node": "^16.0.0",
+      "es-abstract": "^1.18.5"
+    },
+    "packageExtensions": {
+      "eslint-import-resolver-webpack": {
+        "peerDependenciesMeta": {
+          "webpack": {
+            "optional": true
+          }
+        }
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "build/*.d.ts"
+      ]
     }
   }
 }

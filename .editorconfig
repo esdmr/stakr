@@ -13,6 +13,10 @@ indent_size = 4
 indent_style = space
 indent_size = 4
 
-[*.{json,yaml,yml}]
+[*.fish]
+indent_style = space
+indent_size = 4
+
+[*.{json,yaml,yml,md}]
 indent_style = space
 indent_size = 2

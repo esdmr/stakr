@@ -2,16 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "../build",
-    "baseUrl": ".",
-    "paths": {
-      "#src/*": [
-        "*"
-      ]
-    }
+    "noEmit": true,
+    "checkJs": true
   },
   "include": [
-    "**/*"
+    "**/*.js",
+    "**/*.cjs"
   ],
   "references": []
 }

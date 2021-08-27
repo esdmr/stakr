@@ -1,0 +1,19 @@
+gh_edit_link: false
+incremental: false
+lsi: false
+safe: true
+highlighter: rouge
+theme: just-the-docs
+url: https://esdmr.github.io
+baseurl: stakr/
+
+aux_links:
+  "Open repo in GitHub":
+    - https://github.com/esdmr/stakr/
+
+gist:
+  noscript: false
+
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge

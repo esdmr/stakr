@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest a feature
+labels:
+  - enhancement
+
+body:
+  - type: textarea
+    attributes:
+      label: Suggestion
+      description: What do you want this project to do?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Benefit
+      description: Why do you need this project to do this?
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: This suggestion is unique
+      options:
+        - label: I have searched the issue tracker and did not find an issue describing my suggestion, especially not one that has been rejected.
+          required: true
+
+  - type: textarea
+    attributes:
+      label: You may use the editor below to elaborate further.

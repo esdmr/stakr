@@ -5,13 +5,16 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   pull_request:
-    branches: [master]
+    branches:
+      - master
+      - releases/**
 
 env:
   JOB_NODE_VERSION: 16.x
-  JOB_PNPM_VERSION: "6.9.0"
+  JOB_PNPM_VERSION: 6
 
 jobs:
   lint:
@@ -19,26 +22,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.JOB_NODE_VERSION }}
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.JOB_NODE_VERSION }}
-      - name: Use PNPM ${{ env.JOB_PNPM_VERSION }}
+
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2.0.1
         with:
           version: ${{ env.JOB_PNPM_VERSION }}
-      - name: Set PNPM StoreDir
+
+      - name: Set pnpm store-dir
         run: pnpm config set store-dir ~/.pnpm-store
-      - name: Cache PNPM modules
+
+      - name: Cache pnpm modules
         uses: actions/cache@v2
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.OS }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.OS }}-pnpm-current-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.OS }}-pnpm-
+            ${{ runner.OS }}-pnpm-current
+
       - name: Install packages
         run: pnpm install
+
       - name: Run linter
         run: pnpm run lint
 
@@ -50,32 +60,42 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.JOB_NODE_VERSION }}
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.JOB_NODE_VERSION }}
-      - name: Use PNPM ${{ env.JOB_PNPM_VERSION }}
+
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2.0.1
         with:
           version: ${{ env.JOB_PNPM_VERSION }}
-      - name: Set PNPM StoreDir
+
+      - name: Set pnpm store-dir
         run: pnpm config set store-dir ~/.pnpm-store
-      - name: Cache PNPM modules
+
+      - name: Cache pnpm modules
         uses: actions/cache@v2
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.OS }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.OS }}-pnpm-current-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.OS }}-pnpm-
+            ${{ runner.OS }}-pnpm-current
+
       - name: Install packages
         run: pnpm install
+
       - name: Build
         run: pnpm run build
+
       - name: Run tests
-        run: pnpm run test:coverage
+        run: pnpm run test:coverage -- --no-check-coverage
+
       - name: Export coverage report
-        run: pnpm run test:coverage-lcov
+        run: pnpm run test:coverage-lcov -- --no-check-coverage
+
       - name: Upload report to CodeCov
         uses: codecov/codecov-action@v2
         with:
