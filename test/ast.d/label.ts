@@ -1,17 +1,17 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { createAssets } from '#test-util/stakr.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
-await _.test('name', async (_) => {
+await test('name', async (t) => {
 	const instance = new ast.Label('test', false);
 
-	_.equal(instance.name, 'test',
+	t.equal(instance.name, 'test',
 		'expected to preserve name');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	const instance = new ast.Label('test-label', false);
 
 	const { source, assembleArg: arg } = await createAssets({
@@ -22,7 +22,7 @@ await _.test('assemble', async (_) => {
 
 	const definition = arg.data.identifiers.get('test-label');
 
-	_.strictSame(
+	t.strictSame(
 		definition,
 		{
 			offset: 0,
@@ -33,12 +33,12 @@ await _.test('assemble', async (_) => {
 		'expected to correctly add a definition',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.assemble(arg);
 		},
 		'expected to throw if identifier already exists',
 	);
 
-	_.end();
+	t.end();
 });

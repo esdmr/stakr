@@ -1,0 +1,33 @@
+name: Lint fish scripts
+
+on:
+  push:
+    branches:
+      - master
+      - releases/**
+    paths:
+      - '**.fish'
+  pull_request:
+    branches:
+      - master
+      - releases/**
+    paths:
+      - '**.fish'
+
+defaults:
+  run:
+    shell: fish {0}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install fish
+        uses: fish-actions/install-fish@v1.1.0
+
+      - name: Checkout branch
+        uses: actions/checkout@v2
+
+      - name: Lint fish scripts
+        run: source .github/scripts/lint-fish.fish

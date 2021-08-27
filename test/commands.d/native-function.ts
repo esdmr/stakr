@@ -1,41 +1,41 @@
 import { promisify } from 'node:util';
 import * as process from 'node:process';
-import * as _ from 'tap';
+import { test } from 'tap';
 import { NativeFunction } from '#src/commands.js';
-import testGoto from '#test-util/goto.js';
-import { createAssets } from '#test-util/stakr.js';
+import testGoto from '#test/test-util/goto.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
 const nextTick: () => Promise<void> = promisify(process.nextTick);
 
-await _.test('name', async (_) => {
+await test('name', async (t) => {
 	const instance = new NativeFunction('test', () => undefined, true);
 
-	_.equal(instance.name, 'test',
+	t.equal(instance.name, 'test',
 		'expected to preserve name');
 
-	_.end();
+	t.end();
 });
 
-await _.test('executable', async (_) => {
+await test('executable', async (t) => {
 	const executable = () => undefined;
 	const instance = new NativeFunction('test', executable, true);
 
-	_.equal(instance.executable, executable,
+	t.equal(instance.executable, executable,
 		'expected to preserve executable');
 
-	_.end();
+	t.end();
 });
 
-await _.test('exported', async (_) => {
+await test('exported', async (t) => {
 	const instance = new NativeFunction('test', () => undefined, true);
 
-	_.equal(instance.exported, true,
+	t.equal(instance.exported, true,
 		'expected to preserve exported flag');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	const instance = new NativeFunction('test-function', () => undefined, false);
 
 	const { source, assembleArg: arg } = await createAssets({
@@ -46,7 +46,7 @@ await _.test('assemble', async (_) => {
 
 	const definition = arg.data.identifiers.get('test-function');
 
-	_.strictSame(
+	t.strictSame(
 		definition,
 		{
 			offset: 0,
@@ -57,17 +57,17 @@ await _.test('assemble', async (_) => {
 		'expected to correctly add a definition',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.assemble(arg);
 		},
 		'expected to throw if identifier already exists',
 	);
 
-	_.end();
+	t.end();
 });
 
-await _.test('execute', async (_) => {
+await test('execute', async (t) => {
 	let called = false;
 
 	const instance = new NativeFunction('test-function', () => {
@@ -79,20 +79,20 @@ await _.test('execute', async (_) => {
 	data.aux.push(123, 'test-lib');
 	await instance.execute(arg);
 
-	_.ok(called,
+	t.ok(called,
 		'expected to call the given function');
 
-	_.equal(data.sourceName, 'test-lib',
+	t.equal(data.sourceName, 'test-lib',
 		'expected to return to source');
 
-	_.equal(data.offset, 123,
+	t.equal(data.offset, 123,
 		'expected to return to offset');
 
-	_.strictSame(data.aux.toNewArray(), [],
+	t.strictSame(data.aux.toNewArray(), [],
 		'expected to pop from aux');
 
-	await _.test('return', async (_) => {
-		await testGoto(_, async (...items) => {
+	await t.test('return', async (t) => {
+		await testGoto(t, async (...items) => {
 			data.aux.clear();
 			data.aux.push(...items);
 			await instance.execute(arg);
@@ -104,10 +104,10 @@ await _.test('execute', async (_) => {
 			};
 		});
 
-		_.end();
+		t.end();
 	});
 
-	await _.test('async', async (_) => {
+	await t.test('async', async (t) => {
 		let called = false;
 
 		const instance = new NativeFunction('test-function', async () => {
@@ -120,20 +120,20 @@ await _.test('execute', async (_) => {
 		data.aux.push(123, 'test-lib');
 		await instance.execute(arg);
 
-		_.ok(called,
+		t.ok(called,
 			'expected to call the given function');
 
-		_.equal(data.sourceName, 'test-lib',
+		t.equal(data.sourceName, 'test-lib',
 			'expected to return to source');
 
-		_.equal(data.offset, 123,
+		t.equal(data.offset, 123,
 			'expected to return to offset');
 
-		_.strictSame(data.aux.toNewArray(), [],
+		t.strictSame(data.aux.toNewArray(), [],
 			'expected to pop from aux');
 
-		_.end();
+		t.end();
 	});
 
-	_.end();
+	t.end();
 });

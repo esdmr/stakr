@@ -1,0 +1,55 @@
+name: Bug Report
+description: File a bug report
+labels:
+  - bug
+
+body:
+  - type: textarea
+    attributes:
+      label: Description of bug
+      description: What did you expect to happen, what happened, and why is it incorrect?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: A bulleted list, or an exported instance if relevant.
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Operating system
+      description: If you know this bug occurs on multiple operating systems, select all you have tested.
+      multiple: true
+      options:
+        - Windows
+        - Mac OS
+        - Linuxes
+        - Other
+
+  - type: input
+    attributes:
+      label: NodeJS version
+      description: Using `node --version`.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Version or git tag
+      description: From `package.json` or via `git rev-parse --short HEAD`
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: This issue is unique
+      options:
+        - label: I have searched the issue tracker and did not find an issue describing my bug.
+          required: true
+
+  - type: textarea
+    attributes:
+      label: You may use the editor below to elaborate further.

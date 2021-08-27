@@ -1,17 +1,17 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { createAssets } from '#test-util/stakr.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
-await _.test('value', async (_) => {
+await test('value', async (t) => {
 	const instance = new ast.Literal(123);
 
-	_.equal(instance.value, 123,
+	t.equal(instance.value, 123,
 		'expected to preserve value');
 
-	_.end();
+	t.end();
 });
 
-await _.test('execute', async (_) => {
+await test('execute', async (t) => {
 	const instance = new ast.Literal(123);
 
 	const { context, source, data } = await createAssets({
@@ -24,8 +24,8 @@ await _.test('execute', async (_) => {
 		data,
 	});
 
-	_.strictSame(data.stack.toNewArray(), [instance.value],
+	t.strictSame(data.stack.toNewArray(), [instance.value],
 		'expected to push onto the stack');
 
-	_.end();
+	t.end();
 });

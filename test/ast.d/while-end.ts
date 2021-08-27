@@ -1,8 +1,8 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { createAssets } from '#test-util/stakr.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
-await _.test('execute', async (_) => {
+await test('execute', async (t) => {
 	const instance = new ast.WhileEnd();
 
 	const { data, arg } = await createAssets({
@@ -15,8 +15,8 @@ await _.test('execute', async (_) => {
 
 	instance.execute(arg);
 
-	_.equal(data.offset, 0,
+	t.equal(data.offset, 0,
 		'expected to jump to start');
 
-	_.end();
+	t.end();
 });

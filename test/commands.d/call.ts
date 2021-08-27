@@ -1,10 +1,12 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import { call_ } from '#src/commands.js';
-import { testCall } from '#test-util/goto.js';
-import { createAssets } from '#test-util/stakr.js';
+import { testCall } from '#test/test-util/goto.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
 const { data, arg } = await createAssets();
 
-await testCall(_, data, async () => {
-	call_(arg);
+await test('call', async (t) => {
+	await testCall(t, data, async () => {
+		call_(arg);
+	});
 });

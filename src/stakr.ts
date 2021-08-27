@@ -4,7 +4,7 @@ import type * as types from './types.js';
 import SafeArray from './util/safe-array.js';
 
 /** @internal */
-export const enum Message {
+export const enum _Message {
 	EMPTY_SOURCE_LIST = 'Empty source list',
 	LOADER_NO_RELATIVE = 'Source with a non-absolute name can not resolve a relative path',
 	LOADER_INVALID = 'Invalid source specifier',
@@ -13,6 +13,7 @@ export const enum Message {
 
 const AUX_MAX_LENGTH = 1024;
 
+/** @public */
 export class AssembleData {
 	readonly identifiers = new Map<string, types.Definition>();
 	readonly imports = new Set<string>();
@@ -27,6 +28,7 @@ export class AssembleData {
 	}
 }
 
+/** @public */
 export class LinkData {
 	readonly identifiers = new Map<string, types.Definition>();
 
@@ -39,6 +41,7 @@ export class LinkData {
 	}
 }
 
+/** @public */
 export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
 	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
@@ -60,6 +63,7 @@ export class ExecuteData {
 	}
 }
 
+/** @public */
 export class Source {
 	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
 	private assembleData?: AssembleData = undefined;
@@ -71,7 +75,7 @@ export class Source {
 			return this.assembleData;
 		}
 
-		const arg: types.Writable<types.AssembleArg> = {
+		const arg: types._Writable<types.AssembleArg> = {
 			source: this,
 			blockStack: [] as number[],
 			data: new AssembleData(),
@@ -103,7 +107,7 @@ export class Source {
 
 		const data = new LinkData();
 
-		const arg: types.Writable<types.LinkArg> = {
+		const arg: types._Writable<types.LinkArg> = {
 			context,
 			source: this,
 			data,
@@ -153,17 +157,19 @@ export class Source {
 	}
 }
 
+/** @public */
 export class ResolutionError extends Error {
 	name = ResolutionError.name;
 }
 
+/** @public */
 export class DefaultLoader implements types.Loader {
 	resolve (specifier: string, parentName: string) {
 		let resolved;
 
 		if (specifier.startsWith('./') || specifier.startsWith('../')) {
 			if (!parentName.startsWith('/')) {
-				throw new ResolutionError(Message.LOADER_NO_RELATIVE);
+				throw new ResolutionError(_Message.LOADER_NO_RELATIVE);
 			}
 
 			resolved = this.resolvePath(parentName, specifier);
@@ -175,7 +181,7 @@ export class DefaultLoader implements types.Loader {
 		}
 
 		if (/%2f|%5c/ui.test(resolved)) {
-			throw new ResolutionError(Message.LOADER_INVALID);
+			throw new ResolutionError(_Message.LOADER_INVALID);
 		}
 
 		return resolved;
@@ -194,6 +200,7 @@ const defaultLoader = new DefaultLoader();
 const commands = new Source('stdlib:commands', commandList);
 commands.assemble();
 
+/** @public */
 export class ExecutionContext {
 	readonly sourceMap = new Map<string, Source>();
 	readonly persistentSources: string[] = [];
@@ -219,7 +226,7 @@ export class ExecutionContext {
 		const sourceSet = new Set(sources);
 
 		if (sourceSet.size === 0) {
-			throw new Error(Message.EMPTY_SOURCE_LIST);
+			throw new Error(_Message.EMPTY_SOURCE_LIST);
 		}
 
 		for (const sourceName of sourceSet) {
@@ -245,7 +252,7 @@ export class ExecutionContext {
 
 	async executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
-			throw new Error(Message.EMPTY_SOURCE_LIST);
+			throw new Error(_Message.EMPTY_SOURCE_LIST);
 		}
 
 		for (const sourceName of sourceList) {
@@ -268,7 +275,7 @@ export class ExecutionContext {
 		// been made. In addition, the following condition will also detect
 		// missing returns in functions which have exited their boundaries.
 		if (data.sourceName !== sourceName) {
-			throw new Error(Message.HALTED_IN_WRONG_SOURCE);
+			throw new Error(_Message.HALTED_IN_WRONG_SOURCE);
 		}
 	}
 

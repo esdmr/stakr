@@ -1,9 +1,9 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import { Label } from '#src/ast.js';
 import * as types from '#src/types.js';
-import { createAssets } from '#test-util/stakr.js';
+import { createAssets } from '#test/test-util/stakr.js';
 
-await _.test('importSource', async (_) => {
+await test('importSource', async (t) => {
 	const { source, linkData } = await createAssets({
 		source: [
 			new Label('test-label', false),
@@ -13,7 +13,7 @@ await _.test('importSource', async (_) => {
 
 	linkData.importSource(source, '');
 
-	_.strictSame(
+	t.strictSame(
 		linkData.identifiers,
 		new Map<string, types.Definition>([
 			['test-label2', {
@@ -29,7 +29,7 @@ await _.test('importSource', async (_) => {
 	linkData.identifiers.clear();
 	linkData.importSource(source, 'lib:');
 
-	_.strictSame(
+	t.strictSame(
 		linkData.identifiers,
 		new Map<string, types.Definition>([
 			['lib:test-label2', {
@@ -42,5 +42,5 @@ await _.test('importSource', async (_) => {
 		'expected to import all exported identifiers given prefix',
 	);
 
-	_.end();
+	t.end();
 });

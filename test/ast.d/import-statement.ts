@@ -1,26 +1,26 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { createAssets, SourceState } from '#test-util/stakr.js';
+import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
-await _.test('prefix', async (_) => {
+await test('prefix', async (t) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	_.equal(instance.namespace, 'lib',
+	t.equal(instance.namespace, 'lib',
 		'expected to preserve prefix');
 
-	_.end();
+	t.end();
 });
 
-await _.test('source', async (_) => {
+await test('source', async (t) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
-	_.equal(instance.source, 'test-lib',
+	t.equal(instance.source, 'test-lib',
 		'expected to preserve source');
 
-	_.end();
+	t.end();
 });
 
-await _.test('assemble', async (_) => {
+await test('assemble', async (t) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
 	const { assembleData, assembleArg: arg } = await createAssets({
@@ -30,13 +30,13 @@ await _.test('assemble', async (_) => {
 
 	instance.assemble(arg);
 
-	_.strictSame(assembleData.imports, new Set(['test-lib']),
+	t.strictSame(assembleData.imports, new Set(['test-lib']),
 		'expected to add to import list');
 
-	_.strictSame(assembleData.namespaces, new Set(['lib']),
+	t.strictSame(assembleData.namespaces, new Set(['lib']),
 		'expected to add to namespace list');
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.assemble(arg);
 		},
@@ -45,17 +45,17 @@ await _.test('assemble', async (_) => {
 
 	const instance2 = new ast.ImportStatement('lib', 'test-lib2');
 
-	_.throws(
+	t.throws(
 		() => {
 			instance2.assemble(arg);
 		},
 		'expected to throw if namespace is already defined',
 	);
 
-	_.end();
+	t.end();
 });
 
-await _.test('link', async (_) => {
+await test('link', async (t) => {
 	const instance = new ast.ImportStatement('lib', 'test-lib');
 
 	const { context, source, lib, linkArg: arg } = await createAssets({
@@ -74,7 +74,7 @@ await _.test('link', async (_) => {
 	const { identifiers: libExports } = lib.assemble();
 	context.sourceMap.delete('test-lib');
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.link(arg);
 		},
@@ -84,17 +84,17 @@ await _.test('link', async (_) => {
 	context.addSource(lib);
 	await context.link(source.name);
 
-	_.strictSame(
+	t.strictSame(
 		source.linkData.get(context)?.identifiers.get('lib:test-function'),
 		libExports.get('test-function'),
 		'expected to copy definition for exported function',
 	);
 
-	_.equal(
+	t.equal(
 		source.linkData.get(context)?.identifiers.get('lib:test-internal'),
 		undefined,
 		'expected to not copy unexported identifiers',
 	);
 
-	_.end();
+	t.end();
 });

@@ -1,4 +1,8 @@
 {
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false
+  },
   "rules": {
     "arrow-parens": [
       "error",

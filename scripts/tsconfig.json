@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "checkJs": true
+  },
+  "include": [
+    "**/*.js",
+    "**/*.cjs"
+  ],
+  "references": []
+}

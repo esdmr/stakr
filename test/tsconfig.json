@@ -5,11 +5,17 @@
     "outDir": "../build/test",
     "baseUrl": ".",
     "paths": {
-      "#src/*": ["../src/*"],
-      "#test-util/*": ["./test-util/*"],
+      "#src/*": [
+        "../src/*"
+      ],
+      "#test/*": [
+        "*"
+      ]
     }
   },
-  "include": ["**/*"],
+  "include": [
+    "**/*"
+  ],
   "references": [
     {
       "path": "../src"

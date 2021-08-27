@@ -1,54 +1,54 @@
-import * as _ from 'tap';
-import SafeArray, { Message } from '#src/util/safe-array.js';
+import { test } from 'tap';
+import SafeArray, { _Message } from '#src/util/safe-array.js';
 
 const error = (message: string) => new RangeError(message);
 
-const assertIndex = (fn: (index: number) => void, length: number) => async (_: Tap.Test) => {
-	_.throws(
+const assertIndex = (fn: (index: number) => void, length: number) => async (t: Tap.Test) => {
+	t.throws(
 		() => {
 			fn(Number.EPSILON);
 		},
-		error(Message.INDEX_IS_NOT_INT),
+		error(_Message.INDEX_IS_NOT_INT),
 		'expected to throw if index is not an integer',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			fn(Number.MAX_SAFE_INTEGER + 1);
 		},
-		error(Message.INDEX_IS_NOT_INT),
+		error(_Message.INDEX_IS_NOT_INT),
 		'expected to throw if index is not a safe integer',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			fn(Number.NaN);
 		},
-		error(Message.INDEX_IS_NOT_INT),
+		error(_Message.INDEX_IS_NOT_INT),
 		'expected to throw if index is NaN',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			fn(Number.POSITIVE_INFINITY);
 		},
-		error(Message.INDEX_IS_NOT_INT),
+		error(_Message.INDEX_IS_NOT_INT),
 		'expected to throw if index is +∞',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			fn(-1);
 		},
-		error(Message.INDEX_IS_NEGATIVE),
+		error(_Message.INDEX_IS_NEGATIVE),
 		'expected to throw if index is negative',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			fn(length);
 		},
-		error(Message.INDEX_OUT_OF_BOUNDS),
+		error(_Message.INDEX_OUT_OF_BOUNDS),
 		'expected to throw if index is after the last element',
 	);
 
@@ -56,7 +56,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (_: T
 		skip: length > 0 ? undefined : 'Array is empty',
 	};
 
-	_.doesNotThrow(
+	t.doesNotThrow(
 		() => {
 			fn(0);
 		},
@@ -64,7 +64,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (_: T
 		skipIfArrayIsEmpty,
 	);
 
-	_.doesNotThrow(
+	t.doesNotThrow(
 		() => {
 			fn(-0);
 		},
@@ -72,7 +72,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (_: T
 		skipIfArrayIsEmpty,
 	);
 
-	_.doesNotThrow(
+	t.doesNotThrow(
 		() => {
 			for (let i = 0; i < length; i++) {
 				fn(i);
@@ -83,130 +83,130 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (_: T
 	);
 };
 
-await _.test('constructor', async (_) => {
-	_.throws(
+await test('constructor', async (t) => {
+	t.throws(
 		() => new SafeArray(Number.EPSILON),
-		error(Message.MAX_IS_NOT_INT),
+		error(_Message.MAX_IS_NOT_INT),
 		'expected to throw if maximum length is not an integer',
 	);
 
-	_.throws(
+	t.throws(
 		() => new SafeArray(Number.MAX_SAFE_INTEGER + 1),
-		error(Message.MAX_IS_NOT_INT),
+		error(_Message.MAX_IS_NOT_INT),
 		'expected to throw if maximum length is not a safe integer',
 	);
 
-	_.throws(
+	t.throws(
 		() => new SafeArray(Number.NaN),
-		error(Message.MAX_IS_NOT_INT),
+		error(_Message.MAX_IS_NOT_INT),
 		'expected to throw if maximum length is NaN',
 	);
 
-	_.throws(
+	t.throws(
 		() => new SafeArray(-1),
-		error(Message.MAX_IS_NEGATIVE),
+		error(_Message.MAX_IS_NEGATIVE),
 		'expected to throw if maximum length is negative',
 	);
 
-	_.doesNotThrow(() => new SafeArray(0),
+	t.doesNotThrow(() => new SafeArray(0),
 		'expected to not throw if maximum length is a safe integer');
 
-	_.doesNotThrow(() => new SafeArray(Number.POSITIVE_INFINITY),
+	t.doesNotThrow(() => new SafeArray(Number.POSITIVE_INFINITY),
 		'expected to not throw if maximum length is +∞');
 
-	_.doesNotThrow(() => new SafeArray(),
+	t.doesNotThrow(() => new SafeArray(),
 		'expected to not throw if maximum length is not set');
 
-	_.strictSame(new SafeArray().toNewArray(), [],
+	t.strictSame(new SafeArray().toNewArray(), [],
 		'expected to return an empty safe-array');
 
-	_.end();
+	t.end();
 });
 
-await _.test('length', async (_) => {
-	_.equal(new SafeArray().length, 0,
+await test('length', async (t) => {
+	t.equal(new SafeArray().length, 0,
 		'expected to return correct length if empty');
 
-	_.equal(SafeArray.from([1]).length, 1,
+	t.equal(SafeArray.from([1]).length, 1,
 		'expected to return correct length if not empty');
 
-	_.equal(SafeArray.from([1, 2], 2).length, 2,
+	t.equal(SafeArray.from([1, 2], 2).length, 2,
 		'expected to return correct length if full');
 
-	_.end();
+	t.end();
 });
 
-await _.test('static from', async (_) => {
-	_.throws(
+await test('static from', async (t) => {
+	t.throws(
 		() => SafeArray.from([1], 0),
-		error(Message.LARGER_THAN_MAX),
+		error(_Message.LARGER_THAN_MAX),
 		'expected to throw if maximum length is less than array length',
 	);
 
-	_.doesNotThrow(() => SafeArray.from([1], 1),
+	t.doesNotThrow(() => SafeArray.from([1], 1),
 		'expected to not throw if maximum length is equal to array length');
 
-	_.doesNotThrow(() => SafeArray.from([1], 2),
+	t.doesNotThrow(() => SafeArray.from([1], 2),
 		'expected to not throw if maximum length is more than array length');
 
-	_.doesNotThrow(() => SafeArray.from([1]),
+	t.doesNotThrow(() => SafeArray.from([1]),
 		'expected to not throw if maximum length is not set');
 
-	_.ok(new SafeArray() instanceof SafeArray,
+	t.ok(new SafeArray() instanceof SafeArray,
 		'expected to return a safe-array');
 
-	_.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
+	t.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
 		'expected to copy array onto safe-array');
 
-	_.end();
+	t.end();
 });
 
-await _.test('toNewArray', async (_) => {
-	_.ok(Array.isArray(new SafeArray().toNewArray()),
+await test('toNewArray', async (t) => {
+	t.ok(Array.isArray(new SafeArray().toNewArray()),
 		'expected to return an array');
 
-	_.strictSame(new SafeArray().toNewArray(), [],
+	t.strictSame(new SafeArray().toNewArray(), [],
 		'expected to return an empty array if empty');
 
 	const instance = new SafeArray();
-	_.not(instance.toNewArray(), instance.toNewArray(),
+	t.not(instance.toNewArray(), instance.toNewArray(),
 		'expected to return a new array on every call');
 
-	_.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
+	t.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
 		'expected to copy items');
 
-	_.strictSame(SafeArray.from([undefined]).toNewArray(), [undefined],
+	t.strictSame(SafeArray.from([undefined]).toNewArray(), [undefined],
 		'expected to copy undefined as an item');
 
 	const old = instance.toNewArray();
 	instance.push(1, 2, 3);
-	_.not(old, instance.toNewArray(),
+	t.not(old, instance.toNewArray(),
 		'expected to return a new array after modification');
 
-	_.strictSame(instance.toNewArray(), [1, 2, 3],
+	t.strictSame(instance.toNewArray(), [1, 2, 3],
 		'expected to return up-to-date array');
 
-	_.end();
+	t.end();
 });
 
-await _.test('push', async (_) => {
-	_.throws(
+await test('push', async (t) => {
+	t.throws(
 		() => {
 			new SafeArray(0).push(1);
 		},
-		error(Message.ARRAY_IS_FULL),
+		error(_Message.ARRAY_IS_FULL),
 		'expected to throw if full',
 	);
 
-	_.throws(
+	t.throws(
 		() => {
 			new SafeArray(1).push(1, 2);
 		},
-		error(Message.LARGER_THAN_MAX),
+		error(_Message.LARGER_THAN_MAX),
 		'expected to throw on too many items',
 	);
 
-	_.doesNotThrow(
+	t.doesNotThrow(
 		() => {
 			new SafeArray().push();
 			new SafeArray(0).push();
@@ -214,7 +214,7 @@ await _.test('push', async (_) => {
 		'expected to not throw with no inputs',
 	);
 
-	_.doesNotThrow(
+	t.doesNotThrow(
 		() => {
 			new SafeArray(1).push(1);
 		},
@@ -224,104 +224,104 @@ await _.test('push', async (_) => {
 	const instance = new SafeArray();
 	instance.push();
 
-	_.strictSame(instance.toNewArray(), [],
+	t.strictSame(instance.toNewArray(), [],
 		'expected to not change safe-array with no inputs');
 
-	_.equal(instance.length, 0,
+	t.equal(instance.length, 0,
 		'expected to not update length with no inputs');
 
 	instance.push(1);
-	_.strictSame(instance.toNewArray(), [1],
+	t.strictSame(instance.toNewArray(), [1],
 		'expected to push inputs');
 
-	_.equal(instance.length, 1,
+	t.equal(instance.length, 1,
 		'expected to update length');
 
-	_.end();
+	t.end();
 });
 
-await _.test('pop', async (_) => {
-	_.throws(
+await test('pop', async (t) => {
+	t.throws(
 		() => {
 			new SafeArray().pop();
 		},
-		error(Message.ARRAY_IS_EMPTY),
+		error(_Message.ARRAY_IS_EMPTY),
 		'expected to throw if safe-array is empty',
 	);
 
 	const instance = SafeArray.from([undefined, 1]);
-	_.equal(instance.pop(), 1,
+	t.equal(instance.pop(), 1,
 		'expected to return last element of array');
 
-	_.equal(instance.pop(), undefined,
+	t.equal(instance.pop(), undefined,
 		'expected to return undefined as last element of array');
 
-	_.equal(instance.length, 0,
+	t.equal(instance.length, 0,
 		'expected to update length');
 
-	_.end();
+	t.end();
 });
 
-await _.test('get', async (_) => {
+await test('get', async (t) => {
 	const instance = SafeArray.from([0, undefined, 2]);
 
-	await _.test('expected to assert index',
+	await t.test('expected to assert index',
 		assertIndex((index) => instance.get(index), instance.length));
 
-	_.equal(instance.get(2), 2,
+	t.equal(instance.get(2), 2,
 		'expected to return correct element');
 
-	_.equal(instance.get(1), undefined,
+	t.equal(instance.get(1), undefined,
 		'expected to return undefined as correct element');
 
-	_.end();
+	t.end();
 });
 
-await _.test('set', async (_) => {
+await test('set', async (t) => {
 	const instance = SafeArray.from([0, undefined, 2]);
 
 	instance.set(0, 1);
-	_.equal(instance.get(0), 1,
+	t.equal(instance.get(0), 1,
 		'expected to set correct value');
 
 	instance.set(0, undefined);
-	_.equal(instance.get(0), undefined,
+	t.equal(instance.get(0), undefined,
 		'expected to set undefined as an element');
 
-	await _.test('expected to assert index', assertIndex((index) => {
+	await t.test('expected to assert index', assertIndex((index) => {
 		instance.set(index, 3);
 	}, instance.length));
 
-	_.end();
+	t.end();
 });
 
-await _.test('clear', async (_) => {
+await test('clear', async (t) => {
 	const instance = SafeArray.from([1, 2]);
 	instance.clear();
 
-	_.strictSame(instance.toNewArray(), [], 'expected to clear the array');
-	_.equal(instance.length, 0, 'expected to update the length');
+	t.strictSame(instance.toNewArray(), [], 'expected to clear the array');
+	t.equal(instance.length, 0, 'expected to update the length');
 
-	_.end();
+	t.end();
 });
 
-await _.test('toString', async (_) => {
-	_.equal(SafeArray.from([1, 2]).toString(), [1, 2].toString(),
+await test('toString', async (t) => {
+	t.equal(SafeArray.from([1, 2]).toString(), [1, 2].toString(),
 		'expected to return the correct value');
 
-	_.end();
+	t.end();
 });
 
-await _.test('toLocaleString', async (_) => {
-	_.equal(SafeArray.from([1, 2]).toLocaleString(), [1, 2].toLocaleString(),
+await test('toLocaleString', async (t) => {
+	t.equal(SafeArray.from([1, 2]).toLocaleString(), [1, 2].toLocaleString(),
 		'expected to return the correct value');
 
-	_.end();
+	t.end();
 });
 
-await _.test('@@iterator', async (_) => {
-	_.strictSame([...SafeArray.from([1, 2])], [1, 2],
+await test('@@iterator', async (t) => {
+	t.strictSame([...SafeArray.from([1, 2])], [1, 2],
 		'expected to match the array');
 
-	_.end();
+	t.end();
 });

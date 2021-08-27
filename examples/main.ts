@@ -1,6 +1,6 @@
 import { inspect } from 'node:util';
-import * as ast from './ast.js';
-import * as stakr from './stakr.js';
+import * as ast from '@esdmr/stakr/ast';
+import * as stakr from '@esdmr/stakr/stakr';
 
 export { };
 

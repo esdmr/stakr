@@ -1,8 +1,8 @@
-import * as _ from 'tap';
+import { test } from 'tap';
 import * as stakr from '#src/stakr.js';
 import * as types from '#src/types.js';
 
-await _.test('addIdentifier', async (_) => {
+await test('addIdentifier', async (t) => {
 	const instance = new stakr.AssembleData();
 
 	const definition: types.Definition = {
@@ -14,15 +14,15 @@ await _.test('addIdentifier', async (_) => {
 
 	instance.addIdentifier('test', definition);
 
-	_.strictSame(instance.identifiers, new Map([['test', definition]]),
+	t.strictSame(instance.identifiers, new Map([['test', definition]]),
 		'expected to add identifier');
 
-	_.throws(
+	t.throws(
 		() => {
 			instance.addIdentifier('test', definition);
 		},
 		'expected to throw if identifier already exists',
 	);
 
-	_.end();
+	t.end();
 });
