@@ -1,7 +1,9 @@
 import type * as stakr from './stakr.js';
 
+/** @public */
 export type StackItem = string | number | boolean | null;
 
+/** @public */
 export interface Definition {
 	readonly offset: number;
 	readonly sourceName: string;
@@ -9,6 +11,7 @@ export interface Definition {
 	readonly implicitlyCalled: boolean;
 }
 
+/** @public */
 export interface AssembleArg {
 	readonly source: stakr.Source;
 	readonly blockStack: number[];
@@ -16,6 +19,7 @@ export interface AssembleArg {
 	offset: number;
 }
 
+/** @public */
 export interface LinkArg {
 	readonly context: stakr.ExecutionContext;
 	readonly source: stakr.Source;
@@ -23,22 +27,28 @@ export interface LinkArg {
 	readonly offset: number;
 }
 
+/** @public */
 export interface ExecuteArg {
 	readonly context: stakr.ExecutionContext;
 	readonly source: stakr.Source;
 	readonly data: stakr.ExecuteData;
 }
 
-export type Writable<T> = { -readonly [K in keyof T]: T[K] };
+/** @internal */
+export type _Writable<T> = { -readonly [K in keyof T]: T[K] };
+/** @public */
 export type Executable = (arg: ExecuteArg) => void | Promise<void>;
+/** @public */
 export type ASTTree = readonly ASTNode[];
 
+/** @public */
 export interface ASTNode {
 	readonly assemble?: (arg: AssembleArg) => void;
 	readonly link?: (arg: LinkArg) => void;
 	readonly execute?: Executable;
 }
 
+/** @public */
 export interface Loader {
 	readonly resolve: (
 		specifier: string,

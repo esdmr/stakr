@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 /** @internal */
-export const enum Message {
+export const enum _Message {
 	INDEX_IS_NEGATIVE = 'Index is negative',
 	INDEX_IS_NOT_INT = 'Index is not a safe (positive) integer',
 	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
@@ -13,6 +13,8 @@ export const enum Message {
 
 /**
  * A dense array with bound checks.
+ *
+ * @public
  */
 export default class SafeArray<T> {
 	private readonly _array: T[] = [];
@@ -31,19 +33,19 @@ export default class SafeArray<T> {
 
 	/**
 	 * @nosideeffects
-	 * @throws {RangeError}
-	 * @param maxLength Maximum number of elements allowed in the safe-array.
+	 * @throws RangeError
+	 * @param maxLength - Maximum number of elements allowed in the safe-array.
 	 * Must be a positive safe integer. (`+Infinity` for no limitation)
 	 */
 	constructor (maxLength = Number.POSITIVE_INFINITY) {
 		this._maxLength = maxLength;
 
 		if (!Number.isSafeInteger(maxLength) && maxLength !== Number.POSITIVE_INFINITY) {
-			throw new RangeError(Message.MAX_IS_NOT_INT);
+			throw new RangeError(_Message.MAX_IS_NOT_INT);
 		}
 
 		if (maxLength < 0) {
-			throw new RangeError(Message.MAX_IS_NEGATIVE);
+			throw new RangeError(_Message.MAX_IS_NEGATIVE);
 		}
 	}
 
@@ -51,10 +53,10 @@ export default class SafeArray<T> {
 	 * Creates a new instance of safe-array and copies a safe-array into it.
 	 *
 	 * @nosideeffects
-	 * @throws {RangeError}
-	 * @param array The array to copy into the safe-array. It should not have
+	 * @throws RangeError
+	 * @param array - The array to copy into the safe-array. It should not have
 	 * more elements than the provided maximum length.
-	 * @param maxLength Maximum number of elements allowed in the safe-array.
+	 * @param maxLength - Maximum number of elements allowed in the safe-array.
 	 * Must be a positive safe integer. (`+Infinity` for no limitation)
 	 * @returns The new instance of safe-array.
 	 */
@@ -62,7 +64,7 @@ export default class SafeArray<T> {
 		const safeArray = new SafeArray<T>(maxLength);
 
 		if (array.length > safeArray._maxLength) {
-			throw new RangeError(Message.LARGER_THAN_MAX);
+			throw new RangeError(_Message.LARGER_THAN_MAX);
 		}
 
 		safeArray.push(...array);
@@ -82,8 +84,8 @@ export default class SafeArray<T> {
 	/**
 	 * Appends new elements to the end of a safe-array.
 	 *
-	 * @throws {RangeError}
-	 * @param items New elements to add to the safe-array.
+	 * @throws RangeError
+	 * @param items - New elements to add to the safe-array.
 	 */
 	push (...items: readonly T[]): void {
 		if (items.length === 0) {
@@ -91,11 +93,11 @@ export default class SafeArray<T> {
 		}
 
 		if (this.length === this._maxLength) {
-			throw new RangeError(Message.ARRAY_IS_FULL);
+			throw new RangeError(_Message.ARRAY_IS_FULL);
 		}
 
 		if (this.length + items.length > this._maxLength) {
-			throw new RangeError(Message.LARGER_THAN_MAX);
+			throw new RangeError(_Message.LARGER_THAN_MAX);
 		}
 
 		this._length = this._array.push(...items);
@@ -105,11 +107,11 @@ export default class SafeArray<T> {
 	 * Removes the last element from a safe-array and returns it. If the
 	 * safe-array is empty, a RangeError is thrown.
 	 *
-	 * @throws {RangeError}
+	 * @throws RangeError
 	 */
 	pop (): T {
 		if (this._array.length === 0) {
-			throw new RangeError(Message.ARRAY_IS_EMPTY);
+			throw new RangeError(_Message.ARRAY_IS_EMPTY);
 		}
 
 		this._length--;
@@ -120,9 +122,9 @@ export default class SafeArray<T> {
 	 * Reads an element from a safe-array and returns it.
 	 *
 	 * @nosideeffects
-	 * @throws {RangeError}
-	 * @param index Index of element to return.
-	 * @returns Value of element.
+	 * @throws RangeError
+	 * @param index - Index of element to return.
+	 * @returns - Value of element.
 	 */
 	get (index: number): T {
 		this._assertIndex(index);
@@ -132,9 +134,9 @@ export default class SafeArray<T> {
 	/**
 	 * Sets an element to a safe-array.
 	 *
-	 * @throws {RangeError}
-	 * @param index Index of element to change.
-	 * @param value New value to set to the element.
+	 * @throws RangeError
+	 * @param index - Index of element to change.
+	 * @param value - New value to set to the element.
 	 */
 	set (index: number, value: T): void {
 		this._assertIndex(index);
@@ -177,15 +179,15 @@ export default class SafeArray<T> {
 
 	private _assertIndex (index: number): void {
 		if (!Number.isSafeInteger(index)) {
-			throw new RangeError(Message.INDEX_IS_NOT_INT);
+			throw new RangeError(_Message.INDEX_IS_NOT_INT);
 		}
 
 		if (index < 0) {
-			throw new RangeError(Message.INDEX_IS_NEGATIVE);
+			throw new RangeError(_Message.INDEX_IS_NEGATIVE);
 		}
 
 		if (index >= this.length) {
-			throw new RangeError(Message.INDEX_OUT_OF_BOUNDS);
+			throw new RangeError(_Message.INDEX_OUT_OF_BOUNDS);
 		}
 	}
 }

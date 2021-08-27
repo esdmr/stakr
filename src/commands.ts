@@ -2,7 +2,7 @@ import type * as stakr from './stakr.js';
 import type * as types from './types.js';
 
 /** @internal */
-export const enum Message {
+export const enum _Message {
 	SOURCE_NAME_IS_NOT_STRING = 'Source name is not a string',
 	OFFSET_IS_NOT_NUMBER = 'Offset is not a number',
 	CONDITION_IS_NOT_BOOLEAN = 'Condition is not a boolean',
@@ -12,6 +12,7 @@ export const enum Message {
 	FRAME_POINTER_IS_PAST_END = 'Frame pointer is past the end of stack',
 }
 
+/** @public */
 export class NativeFunction implements types.ASTNode {
 	constructor (
 		readonly name: string,
@@ -52,36 +53,40 @@ function jump (
 	offset: types.StackItem,
 ) {
 	if (typeof sourceName !== 'string') {
-		throw new TypeError(Message.SOURCE_NAME_IS_NOT_STRING);
+		throw new TypeError(_Message.SOURCE_NAME_IS_NOT_STRING);
 	}
 
 	if (typeof offset !== 'number') {
-		throw new TypeError(Message.OFFSET_IS_NOT_NUMBER);
+		throw new TypeError(_Message.OFFSET_IS_NOT_NUMBER);
 	}
 
 	data.sourceName = sourceName;
 	data.offset = offset;
 }
 
+/** @public */
 export function goto_ ({ data }: types.ExecuteArg) {
 	jump(data, data.stack.pop(), data.stack.pop());
 }
 
+/** @public */
 export function call_ ({ data }: types.ExecuteArg) {
 	data.aux.push(data.offset, data.sourceName);
 	jump(data, data.stack.pop(), data.stack.pop());
 }
 
+/** @public */
 export function return_ ({ data }: types.ExecuteArg) {
 	jump(data, data.aux.pop(), data.aux.pop());
 }
 
+/** @public */
 export function if_ ({ data }: types.ExecuteArg) {
 	const { sourceName, offset } = data;
 	const condition = data.stack.pop();
 
 	if (typeof condition !== 'boolean') {
-		throw new TypeError(Message.CONDITION_IS_NOT_BOOLEAN);
+		throw new TypeError(_Message.CONDITION_IS_NOT_BOOLEAN);
 	}
 
 	jump(data, data.stack.pop(), data.stack.pop());
@@ -92,57 +97,62 @@ export function if_ ({ data }: types.ExecuteArg) {
 	}
 }
 
+/** @public */
 export function enter_ ({ data }: types.ExecuteArg) {
 	data.aux.push(data.framePointer);
 	data.framePointer = data.stack.length;
 }
 
+/** @public */
 export function leave_ ({ data }: types.ExecuteArg) {
 	const framePointer = data.aux.pop();
 
 	if (typeof framePointer !== 'number') {
-		throw new TypeError(Message.FRAME_POINTER_IS_NOT_NUMBER);
+		throw new TypeError(_Message.FRAME_POINTER_IS_NOT_NUMBER);
 	}
 
 	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
 	data.framePointer = framePointer;
 }
 
+/** @public */
 export function frame_ ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
 	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
 	if (framePointer === 0) {
-		throw new RangeError(Message.FRAME_POINTER_IS_AT_START);
+		throw new RangeError(_Message.FRAME_POINTER_IS_AT_START);
 	}
 
 	if (framePointer > data.stack.length) {
-		throw new RangeError(Message.FRAME_POINTER_IS_PAST_END);
+		throw new RangeError(_Message.FRAME_POINTER_IS_PAST_END);
 	}
 
 	data.stack.push(1 - framePointer);
 }
 
+/** @public */
 export function local_ ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
 	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
 	if (framePointer > data.stack.length) {
-		throw new RangeError(Message.FRAME_POINTER_IS_PAST_END);
+		throw new RangeError(_Message.FRAME_POINTER_IS_PAST_END);
 	}
 
 	data.stack.push(framePointer);
 }
 
+/** @public */
 const commandList = NativeFunction.createArray([
 	['goto', goto_],
 	['call', call_],

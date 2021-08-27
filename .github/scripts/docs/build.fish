@@ -38,9 +38,9 @@ for line in (assert node (status dirname)/parse-exports.cjs $dts_files)
             string replace '_temp' '')
 
         cat $file |
-            string replace /$placeholder /(escape_path $map[1]) |
-            string replace (string replace -a '_' '\_' $placeholder) $map[1] |
-            string replace $placeholder $map[1] >$destination
+            string replace -a /$placeholder /(escape_path $map[1]) |
+            string replace -a (string replace -a '_' '\_' $placeholder) $map[1] |
+            string replace -a $placeholder $map[1] >$destination
     end
 
     echo \| '['$map[1]'](./'(escape_path $map[1])'.md)' \| >>build/docs/index.md

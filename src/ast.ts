@@ -2,14 +2,16 @@ import * as commands from './commands.js';
 import type * as types from './types.js';
 
 /** @internal */
-export const enum Message {
+export const enum _Message {
 	BLOCK_START_NOT_INIT = 'Block does not have a end offset',
 	BLOCK_END_NOT_INIT = 'Block does not have a start offset',
 	START_IS_NOT_BLOCK_START = 'Start of block is not a BlockStart',
 }
 
+/** @public */
 export { NativeFunction } from './commands.js';
 
+/** @public */
 export class Literal implements types.ASTNode {
 	constructor (readonly value: types.StackItem) {}
 
@@ -18,6 +20,7 @@ export class Literal implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class Label implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
@@ -31,6 +34,7 @@ export class Label implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class Refer implements types.ASTNode {
 	constructor (readonly name: string, readonly referOnly: boolean) {}
 
@@ -50,13 +54,14 @@ export class Refer implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class BlockStart implements types.ASTNode {
 	/** @internal */
 	_endOffset?: number;
 
 	get endOffset () {
 		if (this._endOffset === undefined) {
-			throw new Error(Message.BLOCK_START_NOT_INIT);
+			throw new Error(_Message.BLOCK_START_NOT_INIT);
 		}
 
 		return this._endOffset;
@@ -71,13 +76,14 @@ export class BlockStart implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class BlockEnd implements types.ASTNode {
 	/** @internal */
 	_startOffset?: number;
 
 	get startOffset () {
 		if (this._startOffset === undefined) {
-			throw new Error(Message.BLOCK_END_NOT_INIT);
+			throw new Error(_Message.BLOCK_END_NOT_INIT);
 		}
 
 		return this._startOffset;
@@ -94,7 +100,7 @@ export class BlockEnd implements types.ASTNode {
 		const start = source.ast[startOffset];
 
 		if (!(start instanceof BlockStart)) {
-			throw new TypeError(Message.START_IS_NOT_BLOCK_START);
+			throw new TypeError(_Message.START_IS_NOT_BLOCK_START);
 		}
 
 		// Skip BlockEnd itself
@@ -102,18 +108,21 @@ export class BlockEnd implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class WhileEnd extends BlockEnd implements types.ASTNode {
 	execute (arg: types.ExecuteArg) {
 		arg.data.offset = this.startOffset;
 	}
 }
 
+/** @public */
 export class FunctionEnd extends BlockEnd implements types.ASTNode {
 	execute (arg: types.ExecuteArg) {
 		commands.return_(arg);
 	}
 }
 
+/** @public */
 export class FunctionStatement implements types.ASTNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
@@ -132,6 +141,7 @@ export class FunctionStatement implements types.ASTNode {
 	}
 }
 
+/** @public */
 export class ImportStatement implements types.ASTNode {
 	constructor (readonly namespace: string, readonly source: string) {}
 

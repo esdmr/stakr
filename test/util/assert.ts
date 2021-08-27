@@ -14,7 +14,7 @@ await test('assert', async (t) => {
 
 	t.throws(() => {
 		assert(false);
-	}, error(AssertionError.defaultMessage));
+	}, error(AssertionError._defaultMessage));
 
 	t.throws(() => {
 		assert(false, 'Custom message (arity 0)');
