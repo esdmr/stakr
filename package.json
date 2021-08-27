@@ -59,14 +59,8 @@
     "pnpm": "6"
   },
   "imports": {
-    "#src/*": {
-      "imports": "./build/*",
-      "types": "./build/*"
-    },
-    "#test/*": {
-      "imports": "./build/test/*",
-      "types": "./build/test/*"
-    }
+    "#src/*": "./build/*",
+    "#test/*": "./build/test/*"
   },
   "pnpm": {
     "overrides": {
