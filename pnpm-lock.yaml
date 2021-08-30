@@ -25,7 +25,7 @@ devDependencies:
   '@babel/eslint-parser': 7.15.0
   '@changesets/cli': 2.16.0
   '@istanbuljs/esm-loader-hook': 0.1.2
-  '@types/node': 16.7.6
+  '@types/node': 16.7.7
   '@types/tap': 15.0.5
   rimraf: 3.0.2
   tap: 15.0.9_typescript@4.4.2
@@ -617,7 +617,7 @@ packages:
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
     dependencies:
       '@babel/runtime': 7.15.3
-      '@types/node': 16.7.6
+      '@types/node': 16.7.7
       find-up: 4.1.0
       fs-extra: 8.1.0
     dev: true
@@ -676,8 +676,8 @@ packages:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
 
-  /@types/node/16.7.6:
-    resolution: {integrity: sha512-VESVNFoa/ahYA62xnLBjo5ur6gPsgEE5cNRy8SrdnkZ2nwJSW0kJ4ufbFr2zuU9ALtHM8juY53VcRoTA7htXSg==}
+  /@types/node/16.7.7:
+    resolution: {integrity: sha512-bxWC4rgIF/FjM7JsPvpk6ZKGITgw27qsYCbi6h4kWZWYpchOLENgvFaRBZUc64Q/M1y+X2EteahRbyo8QFCKdw==}
     dev: true
 
   /@types/normalize-package-data/2.4.1:
@@ -695,7 +695,7 @@ packages:
   /@types/tap/15.0.5:
     resolution: {integrity: sha512-MaP+EgZNFAGRvVjHWv8ldrLvYBn4PnmAlzY7IL3/RPAPkOXdggTSTgLFONbnTpdQTe8+ixYGAySKAm9ESlZm1A==}
     dependencies:
-      '@types/node': 16.7.6
+      '@types/node': 16.7.7
     dev: true
 
   /@typescript-eslint/eslint-plugin/4.29.3_5b13bab190e8051f191796d8c4619073:
