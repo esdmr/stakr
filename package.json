@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.15.0",
-    "@changesets/cli": "2.16.0",
+    "@changesets/cli": "2.17.0",
     "@istanbuljs/esm-loader-hook": "0.1.2",
     "@types/node": "16.7.1",
     "@types/tap": "15.0.5",
