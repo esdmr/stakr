@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { call_ } from '#src/commands.js';
+import { call_ } from '#src/stdlib/commands.js';
 import { testCall } from '#test/test-util/goto.js';
 import { createAssets } from '#test/test-util/stakr.js';
 

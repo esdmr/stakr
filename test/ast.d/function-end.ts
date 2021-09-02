@@ -25,6 +25,4 @@ await test('execute', async (t) => {
 			sourceName: data.sourceName,
 		};
 	});
-
-	t.end();
 });

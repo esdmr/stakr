@@ -7,8 +7,6 @@ await test('value', async (t) => {
 
 	t.equal(instance.value, 123,
 		'expected to preserve value');
-
-	t.end();
 });
 
 await test('execute', async (t) => {
@@ -26,6 +24,4 @@ await test('execute', async (t) => {
 
 	t.strictSame(data.stack.toNewArray(), [instance.value],
 		'expected to push onto the stack');
-
-	t.end();
 });

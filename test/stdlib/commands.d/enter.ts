@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { enter_ } from '#src/commands.js';
+import { enter_ } from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('enter', async (t) => {

@@ -6,8 +6,6 @@ import * as types from '#src/types.js';
 await test('name', async (t) => {
 	t.equal(new stakr.Source('test', []).name, 'test',
 		'expected to preserve name');
-
-	t.end();
 });
 
 await test('source', async (t) => {
@@ -15,8 +13,6 @@ await test('source', async (t) => {
 
 	t.equal(new stakr.Source('test', ast).ast, ast,
 		'expected to preserve source list');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -49,6 +45,9 @@ await test('assemble', async (t) => {
 	t.ok(called,
 		'expected to call assemble');
 
+	t.ok(source._isAssembled,
+		'expected to cache assembled data');
+
 	called = false;
 	source.assemble();
 
@@ -57,6 +56,4 @@ await test('assemble', async (t) => {
 
 	t.throws(() => source2.assemble(),
 		'expected to throw on extraneous start blocks');
-
-	t.end();
 });

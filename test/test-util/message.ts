@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ast from '#src/ast.js';
-import * as commands from '#src/commands.js';
+import * as commands from '#src/stdlib/commands.js';
 import * as stakr from '#src/stakr.js';
 import * as safeArray from '#src/util/safe-array.js';
 

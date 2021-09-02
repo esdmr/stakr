@@ -3,26 +3,24 @@
 
 <!-- omit in toc -->
 ## Table of contents
-- [Internal API](#internal-api)
-	- [Definitions](#definitions)
-	- [Naming convention](#naming-convention)
-	- [Calling convention](#calling-convention)
-		- [Caller](#caller)
-		- [Callee](#callee)
-	- [Commands](#commands)
-		- [`call`](#call)
-		- [`enter`](#enter)
-		- [`frame`](#frame)
-		- [`goto`](#goto)
-		- [`if`](#if)
-		- [`leave`](#leave)
-		- [`local`](#local)
-		- [`return`](#return)
-		- [`while`](#while)
+- [Definitions](#definitions)
+- [Naming convention](#naming-convention)
+- [Calling convention](#calling-convention)
+  - [Caller](#caller)
+  - [Callee](#callee)
+- [Standard libraries](#standard-libraries)
+  - [`stdlib:commands`](#stdlibcommands)
+    - [`call`](#call)
+    - [`enter`](#enter)
+    - [`frame`](#frame)
+    - [`goto`](#goto)
+    - [`if`](#if)
+    - [`leave`](#leave)
+    - [`local`](#local)
+    - [`return`](#return)
+    - [`while`](#while)
 
-## Internal API
-
-### Definitions
+## Definitions
 
 <dl>
     <dt>Main Stack</dt>
@@ -75,97 +73,111 @@
     </dd>
 </dl>
 
-### Naming convention
+## Naming convention
 
-+ Operator: `get`, `getThing`. Lower camel case.
-+ Subroutine: `Get`, `GetThing`. Pascal case.
-+ Constant: `E_`, `PI`, `EMPTY_STRING`. Upper snake case. Single letter
+- Operator: `get`, `getThing`. Lower camel case.
+- Subroutine: `Get`, `GetThing`. Pascal case.
+- Constant: `E_`, `PI`, `EMPTY_STRING`. Upper snake case. Single letter
   constants must be postfixed with an underline to differentiate them with a
   single letter subroutine.
-+ Label: `loop_`, `end_loop`. Lower snake case. Single-word labels must be
+- Label: `loop_`, `end_loop`. Lower snake case. Single-word labels must be
   postfixed with an underline to differentiate them with a single word operator.
-+ Type: `Array_`, `Array_Iterator`. Title snake case. It can not be a single
-  letter or series of single letters seperated by underline. Single-word types must
+- Type: `Array_`, `Array_Iterator`. Title snake case. It can not be a single
+  letter or series of single letters separated by underline. Single-word types must
   be postfixed with an underline to differentiate them with a single word
   subroutine.
 
-### Calling convention
+## Calling convention
 
-#### Caller
+### Caller
 
-+ If not constant, push arguments to the stack.
-+ Call function
-+ Use and then optionally pop the return value. Return type may be provided
+- If not constant, push arguments to the stack.
+- Call function
+- Use and then optionally pop the return value. Return type may be provided
   through `:Return_`.
-+ If subroutine, pop the parameters. Parameter type may be provided through
+- If subroutine, pop the parameters. Parameter type may be provided through
   `:Parameter_`.
 
-#### Callee
+### Callee
 
-+ Optionally `enter`.
-+ ...
-+ If operator, replace parameters with the return value, poping any locals.
-+ `leave` if necessary.
-+ Return.
+- Optionally `enter`.
+- …
+- If operator, replace parameters with the return value, popping any locals.
+- `leave` if necessary.
+- Return.
 
-### Commands
+## Standard libraries
+
+### `stdlib:commands`
+
+This library should be loaded as a persistent source.
 
 #### `call`
-- Let <var>S</var> be pop().
-- Let <var>O</var> be pop().
+
+- Let <var>S</var> be `pop()`.
+- Assert: <var>S</var> is a source name.
+- Let <var>O</var> be `pop()`.
 - Assert: <var>O</var> is a valid offset.
-- auxPush(offset, sourceName).
+- `auxPush(offset, sourceName)`.
 - Jump to <var>O</var> at source <var>S</var>.
 
 #### `enter`
-- auxPush(framePointer).
-- Set framePointer to length(stack).
+
+- `auxPush(framePointer)`.
+- Set frame pointer to `length(stack)`.
 
 #### `frame`
-- Assert: framePointer is a valid safe integer.
-- Assert: framePointer is not less than or equal to zero.
-- Assert: framePointer is not more than length(stack).
-- push(1 - framePointer).
-- Note: The expression (framePointer - 1) is inverted to correctly specify the
+
+- Assert: frame pointer is a valid safe integer.
+- Assert: frame pointer is not less than or equal to zero.
+- Assert: frame pointer is not more than `length(stack)`.
+- `push(1 - frame pointer)`.
+- Note: The expression `frame pointer - 1` is inverted to correctly specify the
   growth direction of the function parameter array.
 
 #### `goto`
+
 - Let <var>S</var> be pop().
-- Assert: <var>S</var> is a valid source name.
+- Assert: <var>S</var> is a source name.
 - Let <var>O</var> be pop().
 - Assert: <var>O</var> is a valid offset.
 - Jump to <var>O</var> at source <var>S</var>.
 
 #### `if`
+
 - Let <var>C</var> be pop().
 - Assert: <var>C</var> is a Boolean.
 - If <var>C</var>, then
   - Let <var>S</var> be pop().
-  - Assert: <var>S</var> is a valid source name.
+  - Assert: <var>S</var> is a source name.
   - Let <var>O</var> be pop().
   - Assert: <var>O</var> is a valid offset.
 - Else,
   - Forward to [`goto`](#goto).
 
 #### `leave`
-- Let <var>F</var> be auxPop().
-- Assert: framePointer is a valid safe integer.
-- Assert: framePointer is not less than or equal to zero.
-- Set framePointer to <var>F</var>.
+
+- Let <var>F</var> be aux pop().
+- Assert: frame pointer is a valid safe integer.
+- Assert: frame pointer is not less than or equal to zero.
+- Set frame pointer to <var>F</var>.
 
 #### `local`
-- Assert: framePointer is a valid safe integer.
-- Assert: framePointer is not more than length(stack).
-- push(framePointer).
-- Note: the expression (framePointer) is positive, which correctly specifies the
+
+- Assert: frame pointer is a valid safe integer.
+- Assert: frame pointer is not more than length(stack).
+- Push(frame pointer).
+- Note: the expression (frame pointer) is positive, which correctly specifies the
   growth direction of the function locals array.
 
 #### `return`
-- Let <var>S</var> be auxPop().
+
+- Let <var>S</var> be aux pop().
 - Assert: <var>S</var> is a valid source name.
-- Let <var>O</var> be auxPop().
+- Let <var>O</var> be aux pop().
 - Assert: <var>O</var> is a valid offset.
 - Jump to <var>O</var> at source <var>S</var>.
 
 #### `while`
+
 - Forward to [`If`](#if).

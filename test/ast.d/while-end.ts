@@ -17,6 +17,4 @@ await test('execute', async (t) => {
 
 	t.equal(data.offset, 0,
 		'expected to jump to start');
-
-	t.end();
 });

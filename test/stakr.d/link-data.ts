@@ -41,6 +41,4 @@ await test('importSource', async (t) => {
 		]),
 		'expected to import all exported identifiers given prefix',
 	);
-
-	t.end();
 });

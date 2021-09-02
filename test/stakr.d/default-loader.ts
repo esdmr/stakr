@@ -48,25 +48,17 @@ await test('resolve', async (t) => {
 
 		t.equal(loader.resolve('../a', '/b/c/d'), '/b/a',
 			'expected to resolve relative .. path');
-
-		t.end();
 	});
 
 	await t.test('absolute', async (t) => {
 		t.equal(loader.resolve('/a', '/b/c'), '/a',
 			'expected to resolve absolute path');
-
-		t.end();
 	});
 
 	await t.test('bare specifier', async (t) => {
 		t.equal(loader.resolve('stdlib:commands', '/b/c'), 'stdlib:commands',
 			'expected to resolve bare specifier');
-
-		t.end();
 	});
-
-	t.end();
 });
 
 await test('getSource', async (t) => {
@@ -84,6 +76,4 @@ await test('getSource', async (t) => {
 
 	t.equal(callSourceName, 'abc',
 		'expected to call ExecutionContext.getSource');
-
-	t.end();
 });

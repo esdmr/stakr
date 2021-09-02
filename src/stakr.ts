@@ -1,5 +1,4 @@
 import { DepGraph } from 'dependency-graph';
-import commandList from './commands.js';
 import type * as types from './types.js';
 import SafeArray from './util/safe-array.js';
 
@@ -68,6 +67,11 @@ export class Source {
 	readonly linkData = new WeakMap<ExecutionContext, LinkData>();
 	private assembleData?: AssembleData = undefined;
 
+	/** @internal */
+	get _isAssembled () {
+		return this.assembleData !== undefined;
+	}
+
 	constructor (readonly name: string, readonly ast: types.ASTTree) {}
 
 	assemble () {
@@ -98,7 +102,7 @@ export class Source {
 	}
 
 	/** @internal */
-	link (context: ExecutionContext) {
+	_link (context: ExecutionContext) {
 		if (this.linkData.has(context)) {
 			return this.linkData.get(context);
 		}
@@ -130,7 +134,7 @@ export class Source {
 	}
 
 	/** @internal */
-	async execute (
+	async _execute (
 		context: ExecutionContext,
 		data: ExecuteData,
 	) {
@@ -197,8 +201,6 @@ export class DefaultLoader implements types.Loader {
 }
 
 const defaultLoader = new DefaultLoader();
-const commands = new Source('stdlib:commands', commandList);
-commands.assemble();
 
 /** @public */
 export class ExecutionContext {
@@ -206,19 +208,8 @@ export class ExecutionContext {
 	readonly persistentSources: string[] = [];
 	readonly loader: types.Loader;
 
-	constructor ({
-		loader = defaultLoader,
-		addStandardLibrary = true,
-	}: {
-		loader?: types.Loader;
-		addStandardLibrary?: boolean;
-	} = {}) {
+	constructor ({ loader = defaultLoader }: { loader?: types.Loader } = {}) {
 		this.loader = loader;
-
-		if (addStandardLibrary) {
-			this.addSource(commands);
-			this.persistentSources.push(commands.name);
-		}
 	}
 
 	async link (...sources: readonly string[]) {
@@ -240,7 +231,7 @@ export class ExecutionContext {
 
 		for (const sourceName of sourceSet) {
 			const source = deps.getNodeData(sourceName);
-			source.link(this);
+			source._link(this);
 
 			for (const target of source.assemble().imports) {
 				deps.addDependency(sourceName, target);
@@ -267,7 +258,7 @@ export class ExecutionContext {
 
 		while (!data.halted) {
 			const source = this.getSource(data.sourceName);
-			await source.execute(this, data);
+			await source._execute(this, data);
 		}
 
 		// In stakr, Assertions can happen by forcefully halting the execution.

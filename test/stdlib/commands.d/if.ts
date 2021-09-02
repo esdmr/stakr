@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { if_ } from '#src/commands.js';
+import { if_ } from '#src/stdlib/commands.js';
 import testGoto from '#test/test-util/goto.js';
 import { CommandsMessage, SafeArrayMessage } from '#test/test-util/message.js';
 import { createAssets } from '#test/test-util/stakr.js';
@@ -46,7 +46,5 @@ await test('if', async (t) => {
 
 			return data;
 		});
-
-		t.end();
 	});
 });

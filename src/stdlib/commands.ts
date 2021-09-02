@@ -1,50 +1,18 @@
-import type * as stakr from './stakr.js';
-import type * as types from './types.js';
+import type * as stakr from '../stakr.js';
+import type * as types from '../types.js';
 
 /** @internal */
 export const enum _Message {
 	SOURCE_NAME_IS_NOT_STRING = 'Source name is not a string',
-	OFFSET_IS_NOT_NUMBER = 'Offset is not a number',
+	OFFSET_IS_NOT_SAFE_INT = 'Offset is not a safe integer',
 	CONDITION_IS_NOT_BOOLEAN = 'Condition is not a boolean',
-	FRAME_POINTER_IS_NOT_NUMBER = 'Frame pointer is not a number',
 	FRAME_POINTER_IS_NOT_VALID = 'Frame pointer is not valid',
 	FRAME_POINTER_IS_AT_START = 'Frame pointer points to the start of stack',
 	FRAME_POINTER_IS_PAST_END = 'Frame pointer is past the end of stack',
 }
 
-/** @public */
-export class NativeFunction implements types.ASTNode {
-	constructor (
-		readonly name: string,
-		readonly executable: types.Executable,
-		readonly exported: boolean,
-	) {}
-
-	static createArray (
-		map: ReadonlyArray<[string, types.Executable]>,
-		exported: boolean,
-	): NativeFunction[] {
-		return map.map(([name, executable]) => new NativeFunction(name, executable, exported));
-	}
-
-	assemble ({ source, data, offset }: types.AssembleArg) {
-		data.addIdentifier(this.name, {
-			sourceName: source.name,
-			offset,
-			exported: this.exported,
-			implicitlyCalled: true,
-		});
-	}
-
-	async execute (arg: types.ExecuteArg) {
-		const value = this.executable(arg);
-
-		if (value !== undefined) {
-			await value;
-		}
-
-		return_(arg);
-	}
+function isSafeInteger (value: unknown): value is number {
+	return Number.isSafeInteger(value);
 }
 
 function jump (
@@ -56,8 +24,8 @@ function jump (
 		throw new TypeError(_Message.SOURCE_NAME_IS_NOT_STRING);
 	}
 
-	if (typeof offset !== 'number') {
-		throw new TypeError(_Message.OFFSET_IS_NOT_NUMBER);
+	if (!isSafeInteger(offset)) {
+		throw new RangeError(_Message.OFFSET_IS_NOT_SAFE_INT);
 	}
 
 	data.sourceName = sourceName;
@@ -107,11 +75,7 @@ export function enter_ ({ data }: types.ExecuteArg) {
 export function leave_ ({ data }: types.ExecuteArg) {
 	const framePointer = data.aux.pop();
 
-	if (typeof framePointer !== 'number') {
-		throw new TypeError(_Message.FRAME_POINTER_IS_NOT_NUMBER);
-	}
-
-	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+	if (!isSafeInteger(framePointer) || framePointer < 0) {
 		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
@@ -122,7 +86,7 @@ export function leave_ ({ data }: types.ExecuteArg) {
 export function frame_ ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
-	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+	if (!isSafeInteger(framePointer) || framePointer < 0) {
 		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
@@ -141,7 +105,7 @@ export function frame_ ({ data }: types.ExecuteArg) {
 export function local_ ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
-	if (!Number.isSafeInteger(framePointer) || framePointer < 0) {
+	if (!isSafeInteger(framePointer) || framePointer < 0) {
 		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
 	}
 
@@ -153,7 +117,7 @@ export function local_ ({ data }: types.ExecuteArg) {
 }
 
 /** @public */
-const commandList = NativeFunction.createArray([
+const commands: Array<[string, types.Executable]> = [
 	['goto', goto_],
 	['call', call_],
 	['return', return_],
@@ -163,6 +127,6 @@ const commandList = NativeFunction.createArray([
 	['leave', leave_],
 	['frame', frame_],
 	['local', local_],
-], true);
+];
 
-export default commandList;
+export default commands;

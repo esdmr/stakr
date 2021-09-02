@@ -1,5 +1,5 @@
 import * as _ from 'tap';
-import { return_ } from '#src/commands.js';
+import { return_ } from '#src/stdlib/commands.js';
 import testGoto from '#test/test-util/goto.js';
 import { createAssets } from '#test/test-util/stakr.js';
 

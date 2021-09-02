@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { leave_ } from '#src/commands.js';
+import { leave_ } from '#src/stdlib/commands.js';
 import { CommandsMessage } from '#test/test-util/message.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
@@ -27,8 +27,8 @@ await test('leave', async (t) => {
 		() => {
 			leave_(arg);
 		},
-		new TypeError(CommandsMessage.FRAME_POINTER_IS_NOT_NUMBER),
-		'expected to throw if frame pointer is not a number',
+		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		'expected to throw if frame pointer is not a safe integer',
 	);
 
 	data.aux.push(0.3);

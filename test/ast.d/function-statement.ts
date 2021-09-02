@@ -9,8 +9,6 @@ await test('name', async (t) => {
 
 	t.equal(instance.name, 'test',
 		'expected to preserve name');
-
-	t.end();
 });
 
 await test('exported', async (t) => {
@@ -18,8 +16,6 @@ await test('exported', async (t) => {
 
 	t.equal(instance.exported, true,
 		'expected to preserve exported flag');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -43,8 +39,6 @@ await test('assemble', async (t) => {
 	t.throws(() => {
 		sourceDup.assemble();
 	}, 'expected to throw if identifier already exists');
-
-	t.end();
 });
 
 await test('execute', async (t) => {
@@ -62,6 +56,4 @@ await test('execute', async (t) => {
 
 		return data;
 	});
-
-	t.end();
 });
