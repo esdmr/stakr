@@ -108,7 +108,7 @@ jobs:
 
       - name: Check GitHub Pages status
         if: success() && steps.skip_check.outputs.should_skip != 'true'
-        uses: crazy-max/ghaction-github-status@ed37d4d8e60bd7e87b5108c08e942b2e662e76eb
+        uses: crazy-max/ghaction-github-status@0dd2af863806a7b6700f97378d78ba797e49a222
         with:
           pages_threshold: major_outage
 
