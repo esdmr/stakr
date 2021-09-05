@@ -1,10 +1,10 @@
 lockfileVersion: 5.3
 
 specifiers:
-  katex: 0.13.16
+  katex: 0.13.18
 
 dependencies:
-  katex: 0.13.16
+  katex: 0.13.18
 
 packages:
 
@@ -13,8 +13,8 @@ packages:
     engines: {node: '>= 6'}
     dev: false
 
-  /katex/0.13.16:
-    resolution: {integrity: sha512-Q+odt4vx4Og/B5CbuMqE1uiTLnS5EWUFic40xsx8drbqYYiuPPHct7PNj84dFiJ5AFxSZhNPkeBULAtxzEndNg==}
+  /katex/0.13.18:
+    resolution: {integrity: sha512-a3dC4NSVSDU3O1WZbTnOiA8rVNJ2lSiomOl0kmckCIGObccIHXof7gAseIY0o1gjEspe+34ZeSEX2D1ChFKIvA==}
     hasBin: true
     dependencies:
       commander: 6.2.1
