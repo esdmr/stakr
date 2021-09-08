@@ -1,7 +1,7 @@
 import { promisify } from 'node:util';
 import * as process from 'node:process';
 import { test } from 'tap';
-import { NativeFunction } from '#src/ast.js';
+import { Halt, NativeFunction } from '#src/ast.js';
 import testGoto from '#test/test-util/goto.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
@@ -23,13 +23,19 @@ await test('executable', async (t) => {
 });
 
 await test('static createArray', async (t) => {
-	t.strictSame(NativeFunction.createArray([]), [],
+	t.strictSame(NativeFunction.createArray(new Map([])), [new Halt()],
 		'expected to return an empty array if input was empty');
 
 	const arg = ['test-function', () => undefined] as const;
 
-	t.strictSame(NativeFunction.createArray([arg]), [new NativeFunction(...arg)],
-		'expected to convert all elements to a native function');
+	t.strictSame(
+		NativeFunction.createArray(new Map([arg])),
+		[
+			new Halt(),
+			new NativeFunction(...arg),
+		],
+		'expected to convert all elements to a native function',
+	);
 });
 
 await test('assemble', async (t) => {

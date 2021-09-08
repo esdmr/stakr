@@ -9,6 +9,15 @@ export const enum _Message {
 }
 
 /** @public */
+export class Halt implements types.ASTNode {
+	static readonly instance = new Halt();
+
+	execute (arg: types.ExecuteArg) {
+		commands.halt_(arg);
+	}
+}
+
+/** @public */
 export class Literal implements types.ASTNode {
 	constructor (readonly value: types.StackItem) {}
 
@@ -175,6 +184,8 @@ export class NativeFunction implements types.ASTNode {
 	): types.ASTTree {
 		const ast: types.ASTNode[] = map.map(([name, executable]) =>
 			new NativeFunction(name, executable));
+
+		ast.unshift(Halt.instance);
 
 		return ast;
 	}
