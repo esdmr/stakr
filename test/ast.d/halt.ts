@@ -10,15 +10,11 @@ await test('static instance', async (t) => {
 await test('execute', async (t) => {
 	const { instance } = ast.Halt;
 
-	const { context, source, data } = await createAssets({
+	const { data, arg } = await createAssets({
 		source: [instance],
 	});
 
-	instance.execute({
-		context,
-		source,
-		data,
-	});
+	instance.execute(arg);
 
 	t.strictSame(data.halted, true,
 		'expected to halt');
