@@ -3,15 +3,15 @@ import { leave_ } from '#src/stdlib/commands.js';
 import { CommandsMessage } from '#test/test-util/message.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
-const { data, arg } = await createAssets();
-const array = [1, 2, 3];
-
-data.stack.push(...array);
-data.framePointer = 123;
-data.aux.push(456);
-leave_(arg);
-
 await test('leave', async (t) => {
+	const { data, arg } = await createAssets();
+	const array = [1, 2, 3];
+
+	data.stack.push(...array);
+	data.framePointer = 123;
+	data.aux.push(456);
+	leave_(arg);
+
 	t.strictSame(data.stack.toNewArray(), array,
 		'expected to not change the stack');
 
