@@ -16,8 +16,6 @@ await test('offset', async (t) => {
 
 	t.equal(instance.startOffset, instance._startOffset,
 		'expected to preserve offset');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -62,6 +60,4 @@ await test('assemble', async (t) => {
 
 	t.equal(start._endOffset, 2,
 		'expected to correctly set end offset');
-
-	t.end();
 });

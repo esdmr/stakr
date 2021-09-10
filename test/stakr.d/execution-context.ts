@@ -28,12 +28,10 @@ await test('link', async (t) => {
 	await t.resolves(async () => context.link(source.name),
 		'expected to not throw if linked twice');
 
-	// @ts-expect-error Accessing private property
-	t.ok(lib.assembleData instanceof stakr.AssembleData,
+	t.ok(lib._isAssembled,
 		'expected to assemble library');
 
-	// @ts-expect-error Accessing private property
-	t.ok(source.assembleData instanceof stakr.AssembleData,
+	t.ok(source._isAssembled,
 		'expected to assemble source');
 
 	t.ok(lib.linkData.get(context) instanceof stakr.LinkData,
@@ -42,7 +40,22 @@ await test('link', async (t) => {
 	t.ok(source.linkData.get(context) instanceof stakr.LinkData,
 		'expected to link source');
 
-	t.end();
+	await t.test('persistentSources', async (t) => {
+		const { context, lib, source } = await createAssets({
+			lib: [new ast.FunctionStatement('test-function', true)],
+			source: [],
+			state: SourceState.ADDED,
+		});
+
+		context.persistentSources.push(lib.name);
+		await context.link(source.name);
+
+		t.equal(
+			source.linkData.get(context)?.identifiers.get('test-function'),
+			lib.assemble().identifiers.get('test-function'),
+			'expected to import all persistent sources without a prefix',
+		);
+	});
 });
 
 await test('executeAll', async (t) => {
@@ -69,11 +82,7 @@ await test('executeAll', async (t) => {
 
 		t.equal(data.sourceName, source.name,
 			'expected to jump to source');
-
-		t.end();
 	});
-
-	t.end();
 });
 
 void test('execute', async (t) => {
@@ -180,8 +189,6 @@ void test('execute', async (t) => {
 
 		t.ok(called,
 			'expected to await all ast items when executing them');
-
-		t.end();
 	});
 
 	await t.test('halt in wrong source', async (t) => {
@@ -200,19 +207,11 @@ void test('execute', async (t) => {
 			new Error(StakrMessage.HALTED_IN_WRONG_SOURCE),
 			'expected to throw if halted or reached EOF in the wrong file',
 		);
-
-		t.end();
 	});
-
-	t.end();
 });
 
 await test('addSource', async (t) => {
-	const { source, context } = await createAssets({
-		context: {
-			addStandardLibrary: false,
-		},
-	});
+	const { source, context } = await createAssets();
 
 	const source2 = new stakr.Source(source.name, []);
 
@@ -225,8 +224,6 @@ await test('addSource', async (t) => {
 		},
 		'expected to throw if a different source with same name is added',
 	);
-
-	t.end();
 });
 
 await test('getSource', async (t) => {
@@ -241,6 +238,4 @@ await test('getSource', async (t) => {
 
 	t.equal(context.getSource(source.name), source,
 		'expected to return the source');
-
-	t.end();
 });

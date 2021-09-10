@@ -60,3 +60,15 @@ export interface Loader {
 		context: stakr.ExecutionContext,
 	) => Promise<stakr.Source>;
 }
+
+/** @public */
+export interface Logger {
+	readonly log: (message: string) => void | Promise<void>;
+	readonly error: (message: string) => void | Promise<void>;
+}
+
+/** @public */
+export interface StandardLibraryArg {
+	readonly context: stakr.ExecutionContext;
+	readonly logger: Logger;
+}

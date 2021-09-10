@@ -41,6 +41,7 @@
     "watch": "tsc -b -w"
   },
   "dependencies": {
+    "@esdmr/assert": "1.1.0",
     "dependency-graph": "0.11.0"
   },
   "devDependencies": {

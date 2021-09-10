@@ -7,8 +7,6 @@ await test('name', async (t) => {
 
 	t.equal(instance.name, 'test',
 		'expected to preserve name');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -39,6 +37,4 @@ await test('assemble', async (t) => {
 		},
 		'expected to throw if identifier already exists',
 	);
-
-	t.end();
 });

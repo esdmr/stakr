@@ -7,8 +7,6 @@ await test('name', async (t) => {
 
 	t.equal(instance.name, 'test',
 		'expected to preserve name');
-
-	t.end();
 });
 
 await test('referOnly', async (t) => {
@@ -16,8 +14,6 @@ await test('referOnly', async (t) => {
 
 	t.equal(instance.referOnly, true,
 		'expected to preserve referOnly flag');
-
-	t.end();
 });
 
 await test('execute', async (t) => {
@@ -48,8 +44,6 @@ await test('execute', async (t) => {
 
 			t.strictSame(data.sourceName, source.name,
 				'expected to not change source');
-
-			t.end();
 		});
 
 		await t.test(`import label${referOnlyState}`, async (t) => {
@@ -85,8 +79,6 @@ await test('execute', async (t) => {
 
 			t.strictSame(data.sourceName, source.name,
 				'expected to not change source');
-
-			t.end();
 		});
 	}
 
@@ -116,8 +108,6 @@ await test('execute', async (t) => {
 
 		t.strictSame(data.aux.toNewArray(), [4, source.name],
 			'expected to push onto the aux stack');
-
-		t.end();
 	});
 
 	await t.test('import function', async (t) => {
@@ -157,8 +147,6 @@ await test('execute', async (t) => {
 
 		t.strictSame(data.aux.toNewArray(), [2, source.name],
 			'expected to push onto the aux stack');
-
-		t.end();
 	});
 
 	await t.test('function referOnly', async (t) => {
@@ -184,8 +172,6 @@ await test('execute', async (t) => {
 
 		t.strictSame(data.offset, 4,
 			'expected to not jump');
-
-		t.end();
 	});
 
 	await t.test('import function referOnly', async (t) => {
@@ -225,9 +211,5 @@ await test('execute', async (t) => {
 
 		t.strictSame(data.sourceName, source.name,
 			'expected to not change source');
-
-		t.end();
 	});
-
-	t.end();
 });

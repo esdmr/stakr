@@ -16,8 +16,6 @@ await test('offset', async (t) => {
 
 	t.equal(instance.endOffset, instance._endOffset,
 		'expected to preserve offset');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -32,8 +30,6 @@ await test('assemble', async (t) => {
 
 	t.strictSame(arg.blockStack, [0],
 		'expected to push offset');
-
-	t.end();
 });
 
 await test('execute', async (t) => {
@@ -48,6 +44,4 @@ await test('execute', async (t) => {
 
 	t.strictSame(data.stack.toNewArray(), [123, source.name],
 		'expected to push offset');
-
-	t.end();
 });

@@ -39,8 +39,8 @@ export default async function testGoto (
 
 	await t.rejects(
 		async () => command(true, 'abc'),
-		new TypeError(CommandsMessage.OFFSET_IS_NOT_NUMBER),
-		'expected to throw if poped value is not number',
+		new RangeError(CommandsMessage.OFFSET_IS_NOT_SAFE_INT),
+		'expected to throw if poped value is not a safe integer',
 	);
 
 	const { stack, offset, sourceName } = await command(123, 'test-source');

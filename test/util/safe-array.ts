@@ -119,8 +119,6 @@ await test('constructor', async (t) => {
 
 	t.strictSame(new SafeArray().toNewArray(), [],
 		'expected to return an empty safe-array');
-
-	t.end();
 });
 
 await test('length', async (t) => {
@@ -132,8 +130,6 @@ await test('length', async (t) => {
 
 	t.equal(SafeArray.from([1, 2], 2).length, 2,
 		'expected to return correct length if full');
-
-	t.end();
 });
 
 await test('static from', async (t) => {
@@ -157,8 +153,6 @@ await test('static from', async (t) => {
 
 	t.strictSame(SafeArray.from([1, 2]).toNewArray(), [1, 2],
 		'expected to copy array onto safe-array');
-
-	t.end();
 });
 
 await test('toNewArray', async (t) => {
@@ -185,8 +179,6 @@ await test('toNewArray', async (t) => {
 
 	t.strictSame(instance.toNewArray(), [1, 2, 3],
 		'expected to return up-to-date array');
-
-	t.end();
 });
 
 await test('push', async (t) => {
@@ -236,8 +228,6 @@ await test('push', async (t) => {
 
 	t.equal(instance.length, 1,
 		'expected to update length');
-
-	t.end();
 });
 
 await test('pop', async (t) => {
@@ -258,8 +248,6 @@ await test('pop', async (t) => {
 
 	t.equal(instance.length, 0,
 		'expected to update length');
-
-	t.end();
 });
 
 await test('get', async (t) => {
@@ -273,8 +261,6 @@ await test('get', async (t) => {
 
 	t.equal(instance.get(1), undefined,
 		'expected to return undefined as correct element');
-
-	t.end();
 });
 
 await test('set', async (t) => {
@@ -291,8 +277,6 @@ await test('set', async (t) => {
 	await t.test('expected to assert index', assertIndex((index) => {
 		instance.set(index, 3);
 	}, instance.length));
-
-	t.end();
 });
 
 await test('clear', async (t) => {
@@ -301,27 +285,19 @@ await test('clear', async (t) => {
 
 	t.strictSame(instance.toNewArray(), [], 'expected to clear the array');
 	t.equal(instance.length, 0, 'expected to update the length');
-
-	t.end();
 });
 
 await test('toString', async (t) => {
 	t.equal(SafeArray.from([1, 2]).toString(), [1, 2].toString(),
 		'expected to return the correct value');
-
-	t.end();
 });
 
 await test('toLocaleString', async (t) => {
 	t.equal(SafeArray.from([1, 2]).toLocaleString(), [1, 2].toLocaleString(),
 		'expected to return the correct value');
-
-	t.end();
 });
 
 await test('@@iterator', async (t) => {
 	t.strictSame([...SafeArray.from([1, 2])], [1, 2],
 		'expected to match the array');
-
-	t.end();
 });

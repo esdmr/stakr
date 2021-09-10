@@ -1,4 +1,4 @@
-import * as commands from './commands.js';
+import * as commands from './stdlib/commands.js';
 import type * as types from './types.js';
 
 /** @internal */
@@ -9,7 +9,13 @@ export const enum _Message {
 }
 
 /** @public */
-export { NativeFunction } from './commands.js';
+export class Halt implements types.ASTNode {
+	static readonly instance = new Halt();
+
+	execute (arg: types.ExecuteArg) {
+		commands.halt_(arg);
+	}
+}
 
 /** @public */
 export class Literal implements types.ASTNode {
@@ -163,5 +169,43 @@ export class ImportStatement implements types.ASTNode {
 		const otherSource = context.getSource(resolved);
 
 		data.importSource(otherSource, `${this.namespace}:`);
+	}
+}
+
+/** @public */
+export class NativeFunction implements types.ASTNode {
+	constructor (
+		readonly name: string,
+		readonly executable: types.Executable,
+	) {}
+
+	static createArray (
+		map: ReadonlyMap<string, types.Executable>,
+	): types.ASTTree {
+		const ast: types.ASTNode[] = [...map].map(([name, executable]) =>
+			new NativeFunction(name, executable));
+
+		ast.unshift(Halt.instance);
+
+		return ast;
+	}
+
+	assemble ({ source, data, offset }: types.AssembleArg) {
+		data.addIdentifier(this.name, {
+			sourceName: source.name,
+			offset,
+			exported: true,
+			implicitlyCalled: true,
+		});
+	}
+
+	async execute (arg: types.ExecuteArg) {
+		const value = this.executable(arg);
+
+		if (value !== undefined) {
+			await value;
+		}
+
+		commands.return_(arg);
 	}
 }

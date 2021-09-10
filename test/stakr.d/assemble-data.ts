@@ -23,6 +23,4 @@ await test('addIdentifier', async (t) => {
 		},
 		'expected to throw if identifier already exists',
 	);
-
-	t.end();
 });

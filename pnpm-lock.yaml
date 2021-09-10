@@ -9,6 +9,7 @@ packageExtensionsChecksum: c6269d4d2b8f53749e9a6ff01733da3a
 specifiers:
   '@babel/eslint-parser': 7.15.4
   '@changesets/cli': 2.17.0
+  '@esdmr/assert': 1.1.0
   '@istanbuljs/esm-loader-hook': 0.1.2
   '@types/node': ^16.0.0
   '@types/tap': 15.0.5
@@ -19,6 +20,7 @@ specifiers:
   xo: 0.44.0
 
 dependencies:
+  '@esdmr/assert': 1.1.0
   dependency-graph: 0.11.0
 
 devDependencies:
@@ -534,6 +536,11 @@ packages:
       human-id: 1.0.2
       prettier: 1.19.1
     dev: true
+
+  /@esdmr/assert/1.1.0:
+    resolution: {integrity: sha512-v0PxbyKi8y6ReJz4Ys5ArivdpNXNyY4CgG1XT2/iVIOowpEN74sVLhrpNxkODwC5OdOYqvIGXSMnbYdDAl7h0Q==}
+    engines: {node: '>=16'}
+    dev: false
 
   /@eslint/eslintrc/0.4.3:
     resolution: {integrity: sha512-J6KFFz5QCYUJq3pf0mjEcCJVERbzv71PUIDczuh9JkwGEzced6CO5ADLHB1rbf/+oPBtoPfMYNOpGDzCANlbXw==}

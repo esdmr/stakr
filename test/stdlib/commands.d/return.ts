@@ -1,23 +1,15 @@
 import { test } from 'tap';
-import * as ast from '#src/ast.js';
+import { return_ } from '#src/stdlib/commands.js';
 import testGoto from '#test/test-util/goto.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
-await test('execute', async (t) => {
-	const instance = new ast.FunctionEnd();
-
-	const { data, arg } = await createAssets({
-		source: [
-			new ast.BlockStart(),
-			instance,
-		],
-		offset: 2,
-	});
+await test('return', async (t) => {
+	const { data, arg } = await createAssets();
 
 	await testGoto(t, async (...items) => {
 		data.aux.clear();
 		data.aux.push(...items);
-		instance.execute(arg);
+		return_(arg);
 
 		return {
 			stack: data.aux,

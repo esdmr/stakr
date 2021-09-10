@@ -7,8 +7,6 @@ await test('prefix', async (t) => {
 
 	t.equal(instance.namespace, 'lib',
 		'expected to preserve prefix');
-
-	t.end();
 });
 
 await test('source', async (t) => {
@@ -16,8 +14,6 @@ await test('source', async (t) => {
 
 	t.equal(instance.source, 'test-lib',
 		'expected to preserve source');
-
-	t.end();
 });
 
 await test('assemble', async (t) => {
@@ -51,8 +47,6 @@ await test('assemble', async (t) => {
 		},
 		'expected to throw if namespace is already defined',
 	);
-
-	t.end();
 });
 
 await test('link', async (t) => {
@@ -95,6 +89,4 @@ await test('link', async (t) => {
 		undefined,
 		'expected to not copy unexported identifiers',
 	);
-
-	t.end();
 });
