@@ -82,21 +82,11 @@ native library).
 ### Execution Context
 
 An <dfn>execution context</dfn> (<abbr>context</abbr> for short) contains
-information about the context of the source files. This information includes:
-
-- List of sources currently loaded,
-- List of persistent sources,
--
+information about the context of the source files.
 
 ### Source
 
-A <dfn>source</dfn> contains information about a source file. This information
-includes:
-
-- The name,
-- The AST tree,
-- The assembly data,
-- And the link data.
+A <dfn>source</dfn> contains information about a source file.
 
 ### Persistent Source
 
