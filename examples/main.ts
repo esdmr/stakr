@@ -29,9 +29,9 @@ await context.executeAll(sourceList, data);
 console.log(inspect({
 	sourceList,
 	context,
-	linkData: [...context.sourceMap.values()].map((s) => s.linkData.get(context)),
 	data,
 }, {
 	colors: true,
 	depth: Number.POSITIVE_INFINITY,
+	showHidden: true,
 }));
