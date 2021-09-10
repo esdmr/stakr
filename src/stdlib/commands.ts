@@ -294,7 +294,7 @@ export function ctos_ ({ data: { stack } }: types.ExecuteArg) {
 	for (let i = 0; i < length; i++) {
 		const codePoint = stack.pop();
 
-		if (!isSafeInteger(codePoint) || length < 0 || length > 0x10_FF_FF) {
+		if (!isSafeInteger(codePoint) || codePoint < 0 || codePoint > 0x10_FF_FF) {
 			throw new TypeError(_Message.CODE_POINT_IS_INVALID);
 		}
 
