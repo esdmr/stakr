@@ -1,17 +1,27 @@
 import { test } from 'tap';
 import * as stdlib from '#src/stdlib.js';
 import { createAssets } from '#test/test-util/stakr.js';
+import * as commands_ from '#src/stdlib/commands.js';
+import * as log_ from '#src/stdlib/log.js';
 
 await test('addStdLib', async (t) => {
 	const { context } = await createAssets();
 
-	stdlib.addLibrary(context);
+	stdlib.addLibrary({
+		context,
+		logger: console,
+	});
 
-	for (const source of stdlib.default) {
-		t.equal(context.sourceMap.get(source.name), source,
-			`expected to add library to the context: ${source.name}`);
+	const libraries = [
+		commands_.name,
+		log_.name,
+	];
+
+	for (const source of libraries) {
+		t.ok(context.sourceMap.has(source),
+			`expected to add library to the context: ${source}`);
 	}
 
-	t.strictSame(context.persistentSources, [stdlib.commands.name],
+	t.strictSame(context.persistentSources, [commands_.name],
 		'expected to mark necessary libraries as persistent');
 });

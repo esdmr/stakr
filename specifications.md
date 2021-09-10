@@ -25,14 +25,26 @@
 - [Standard libraries](#standard-libraries)
   - [`stdlib:commands`](#stdlibcommands)
     - [`call`](#call)
+    - [`ctos`](#ctos)
     - [`enter`](#enter)
     - [`frame`](#frame)
+    - [`get`](#get)
     - [`goto`](#goto)
     - [`if`](#if)
     - [`leave`](#leave)
     - [`local`](#local)
+    - [`pop`](#pop)
     - [`return`](#return)
+    - [`set`](#set)
+    - [`stoc`](#stoc)
+    - [`type`](#type)
     - [`while`](#while)
+    - [Operators](#operators)
+  - [`stdlib:log`](#stdliblog)
+    - [`error`](#error)
+    - [`info`](#info)
+    - [`log`](#log)
+    - [`warning`](#warning)
 
 ## Definitions
 
@@ -127,8 +139,8 @@ commands `frame` and `local`. New frame pointers can be created using the
 
 ### Literal
 
-        A <dfn>literal</dfn> is a fixed constant value. A literal can have any
-        of the following types:
+A <dfn>literal</dfn> is a fixed constant value. A literal can have any
+of the following types:
 
 - String (Array of Unicode characters)
 - Number (64-bit binary floating-point)
@@ -186,6 +198,13 @@ This library should be loaded as a persistent source.
 - `auxPush(offset, sourceName)`.
 - Jump to <var>O</var> at source <var>S</var>.
 
+#### `ctos`
+
+- Let <var>L</var> be `pop()`.
+- Assert: <var>L</var> is a positive safe integer.
+- Pop <var>L</var> code-points from the stack and construct a string <var>S</var>.
+- `push(S)`.
+
 #### `enter`
 
 - `auxPush(framePointer)`.
@@ -199,6 +218,12 @@ This library should be loaded as a persistent source.
 - `push(1 - frame pointer)`.
 - Note: The expression `frame pointer - 1` is inverted to correctly specify the
   growth direction of the function parameter array.
+
+#### `get`
+
+- Let <var>A</var> be pop().
+- Assert: <var>A</var> is a valid address.
+- `push(stack[abs(A)])`.
 
 #### `goto`
 
@@ -235,6 +260,10 @@ This library should be loaded as a persistent source.
 - Note: the expression (frame pointer) is positive, which correctly specifies the
   growth direction of the function locals array.
 
+#### `pop`
+
+- Pop()
+
 #### `return`
 
 - Let <var>S</var> be aux pop().
@@ -243,6 +272,110 @@ This library should be loaded as a persistent source.
 - Assert: <var>O</var> is a valid offset.
 - Jump to <var>O</var> at source <var>S</var>.
 
+#### `set`
+
+- Let <var>A</var> be pop().
+- Assert: <var>A</var> is a valid address.
+- Let <var>V</var> be pop().
+- `stack[abs(A)] = V`.
+
+#### `stoc`
+
+- Let <var>S</var> be pop().
+- Assert: <var>S</var> is a String.
+- Let <var>L</var> be the length of S.
+- Push the code-points of <var>S</var> in reverse order to the stack.
+- `push(L)`.
+
+#### `type`
+
+- Let <var>V</var> be pop().
+- Let <var>T</var> be the corresponding output given the item type of <var>V</var> from the following table.
+- `push(T)`.
+
+| Item Type | Output | ASCII  |
+| --------: | :----: | ------ |
+|    String |   83   | `'S'`  |
+|    Number |   78   | `'N'`  |
+|   Boolean |   66   | `'B'`  |
+|      Null |   0    | `'\0'` |
+
 #### `while`
 
 - Forward to [`If`](#if).
+
+#### Operators
+
+- Let <var>A</var> be pop().
+- Assert: <var>A</var> is the correct type as specified in the table under
+  “Parameter 1”.
+- If the operator is binary, then
+  - Let <var>B</var> be pop().
+  - Assert: <var>B</var> is the correct type as specified in the table under
+    “Parameter 2”.
+- Call the specified operator with <var>A</var> and if applicable, <var>B</var>.
+- Push the result onto the stack.
+
+|                Symbol | Parameter 1  | Parameter 2  | Operator                       |
+| --------------------: | ------------ | ------------ | ------------------------------ |
+|                   `+` | Number       | Number       | Arithmetic addition            |
+|                   `-` | Number       | Number       | Arithmetic subtraction         |
+|                   `*` | Number       | Number       | Arithmetic multiplication      |
+|                   `/` | Number       | Number       | Arithmetic division            |
+|                   `%` | Number       | Number       | Arithmetic remainder           |
+|                  `**` | Number       | Number       | Arithmetic exponentiation      |
+|                 `and` | Boolean      | Boolean      | Logical and                    |
+|                  `or` | Boolean      | Boolean      | Logical or                     |
+|                 `not` | Boolean      | —            | Logical not                    |
+|                  `==` | Any          | Any          | Is equal                       |
+|                  `!=` | Any          | Any          | Is not equal                   |
+|                   `<` | Number       | Number       | Is less than                   |
+|                  `<=` | Number       | Number       | Is lesser than or equal        |
+|                   `>` | Number       | Number       | Is greater than                |
+|                  `>=` | Number       | Number       | Is greater than or equal       |
+|                   `&` | Safe Integer | Safe Integer | Bitwise and                    |
+|   <code>&#x7C;</code> | Safe Integer | Safe Integer | Bitwise or                     |
+|                   `^` | Safe Integer | Safe Integer | Bitwise xor                    |
+|                   `~` | Safe Integer | —            | Bitwise not                    |
+|                  `<<` | Safe Integer | Safe Integer | Bitwise left shift             |
+|                  `>>` | Safe Integer | Safe Integer | Bitwise arithmetic right shift |
+|                 `>>>` | Safe Integer | Safe Integer | Bitwise logical right shift    |
+| <code><<&#x7C;</code> | Safe Integer | Safe Integer | Bitwise left rotate            |
+| <code>&#x7C;>></code> | Safe Integer | Safe Integer | Bitwise right rotate           |
+
+### `stdlib:log`
+
+This library requires the following parameters which must be provided by the
+framework.
+
+- `logger`: An object providing access to the native logging mechanism.
+  - `log(message: string)`: Provides access to the ‘log’ level of output. It
+    should output to the Standard Output Stream if writing to a terminal.
+  - `error(message: string)`: Provides access to the ‘error’ level of output. It
+    should output to the Standard Error Stream if writing to a terminal.
+
+#### `error`
+
+- Let <var>S</var> be pop().
+- Assert: <var>S</var> is a String.
+- Use `logger.error` to log <var>S</var>.
+
+#### `info`
+
+(Note: If `logger` provides more varied levels of output, a better one may be
+preferred.)
+
+- Forward to [`log`](#log).
+
+#### `log`
+
+- Let <var>S</var> be pop().
+- Assert: <var>S</var> is a String.
+- Use `logger.log` to log <var>S</var>.
+
+#### `warning`
+
+(Note: If `logger` provides more varied levels of output, a better one may be
+preferred.)
+
+- Forward to [`error`](#error)

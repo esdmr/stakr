@@ -180,9 +180,9 @@ export class NativeFunction implements types.ASTNode {
 	) {}
 
 	static createArray (
-		map: ReadonlyArray<readonly [string, types.Executable]>,
+		map: ReadonlyMap<string, types.Executable>,
 	): types.ASTTree {
-		const ast: types.ASTNode[] = map.map(([name, executable]) =>
+		const ast: types.ASTNode[] = [...map].map(([name, executable]) =>
 			new NativeFunction(name, executable));
 
 		ast.unshift(Halt.instance);
