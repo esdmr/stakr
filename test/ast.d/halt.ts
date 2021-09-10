@@ -16,6 +16,6 @@ await test('execute', async (t) => {
 
 	instance.execute(arg);
 
-	t.strictSame(data.halted, true,
+	t.equal(data.halted, true,
 		'expected to halt');
 });
