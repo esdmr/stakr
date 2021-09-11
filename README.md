@@ -12,8 +12,9 @@
 [node]: https://nodejs.org/en/download/current
 [pnpm]: https://pnpm.io
 
-WIP stack based programming* language.
+Work-in-progress stack based programming language.
 
+<!--
 ## Install as a dependency
 
 This project requires [Node.JS][node] version 16 minimum. Ensure that you have
@@ -28,6 +29,7 @@ yarn add @esdmr/stakr
 # Or
 pnpm install @esdmr/stakr
 ```
+-->
 
 ## Install from source
 
@@ -46,9 +48,17 @@ pnpm install
 pnpm run build
 ```
 
+<!--
 ## Documentation
 
 Available at [the GitHub Pages](https://esdmr.github.io/stakr/).
+-->
+
+## Specification
+
+Work-in-progress specification is available at [`specification.md`][spec].
+
+[spec]: specification.md
 
 ## Template
 
