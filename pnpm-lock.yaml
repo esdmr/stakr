@@ -16,7 +16,7 @@ specifiers:
   dependency-graph: 0.11.0
   rimraf: 3.0.2
   tap: 15.0.9
-  typescript: 4.4.2
+  typescript: 4.4.3
   xo: 0.44.0
 
 dependencies:
@@ -30,8 +30,8 @@ devDependencies:
   '@types/node': 16.9.1
   '@types/tap': 15.0.5
   rimraf: 3.0.2
-  tap: 15.0.9_typescript@4.4.2
-  typescript: 4.4.2
+  tap: 15.0.9_typescript@4.4.3
+  typescript: 4.4.3
   xo: 0.44.0
 
 packages:
@@ -4380,7 +4380,7 @@ packages:
       yaml: 1.10.2
     dev: true
 
-  /tap/15.0.9_typescript@4.4.2:
+  /tap/15.0.9_typescript@4.4.3:
     resolution: {integrity: sha512-bqY5SxEqYKRd37PIUfKBf9HMs/hklyl/fGXkuStr9rYTIGa0/icpSLsm6IVOmx2qT0/TliPNJ6OvS5kddJYHdg==}
     engines: {node: '>=10'}
     hasBin: true
@@ -4419,7 +4419,7 @@ packages:
       tap-parser: 10.1.0
       tap-yaml: 1.0.0
       tcompare: 5.0.6
-      typescript: 4.4.2
+      typescript: 4.4.3
       which: 2.0.2
     transitivePeerDependencies:
       - supports-color
@@ -4611,6 +4611,12 @@ packages:
 
   /typescript/4.4.2:
     resolution: {integrity: sha512-gzP+t5W4hdy4c+68bfcv0t400HVJMMd2+H9B7gae1nQlBzCqvrXX+6GL/b3GAgyTH966pzrZ70/fRjwAtZksSQ==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
+  /typescript/4.4.3:
+    resolution: {integrity: sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
