@@ -100,7 +100,7 @@ jobs:
       # Deploy
       - name: Check for a concurrenct workflow
         id: skip_check
-        uses: fkirc/skip-duplicate-actions@f75dd6564bb646f95277dc8c3b80612e46a4a1ea
+        uses: fkirc/skip-duplicate-actions@5c9412dad1a25ec714d6a628f2e8d11c700d9c03
         with:
           cancel_others: true
           skip_after_successful_duplicate: false
