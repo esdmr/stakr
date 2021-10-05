@@ -1,6 +1,6 @@
 import { test } from 'tap';
-import { local_ } from '#src/stdlib/commands.js';
-import { CommandsMessage } from '#test/test-util/message.js';
+import { local } from '#src/stdlib/commands.js';
+import * as messages from '#src/messages.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('local', async (t) => {
@@ -9,7 +9,7 @@ await test('local', async (t) => {
 
 	data.stack.push(...array);
 	data.framePointer = 2;
-	local_(arg);
+	local(arg);
 
 	t.strictSame(data.stack.toNewArray(), [...array, data.framePointer],
 		'expected to push to the stack');
@@ -17,7 +17,7 @@ await test('local', async (t) => {
 	data.stack.clear();
 	data.stack.push(...array);
 	data.framePointer = 0;
-	local_(arg);
+	local(arg);
 
 	t.strictSame(data.stack.toNewArray(), [...array, data.framePointer],
 		'expected to push to the stack even if frame pointer is zero');
@@ -26,9 +26,9 @@ await test('local', async (t) => {
 
 	t.throws(
 		() => {
-			local_(arg);
+			local(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not an integer',
 	);
 
@@ -36,9 +36,9 @@ await test('local', async (t) => {
 
 	t.throws(
 		() => {
-			local_(arg);
+			local(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not a safe integer',
 	);
 
@@ -46,9 +46,9 @@ await test('local', async (t) => {
 
 	t.throws(
 		() => {
-			local_(arg);
+			local(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is negative',
 	);
 
@@ -56,9 +56,9 @@ await test('local', async (t) => {
 
 	t.throws(
 		() => {
-			local_(arg);
+			local(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_PAST_END),
+		new RangeError(messages.framePointerIsPastEnd),
 		'expected to throw if frame pointer is more than stack length',
 	);
 });

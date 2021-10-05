@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import SafeArray, { _Message } from '#src/util/safe-array.js';
+import SafeArray, { Message } from '#src/util/safe-array.js';
 
 const error = (message: string) => new RangeError(message);
 
@@ -8,7 +8,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(Number.EPSILON);
 		},
-		error(_Message.INDEX_IS_NOT_INT),
+		error(Message.indexIsNotInt),
 		'expected to throw if index is not an integer',
 	);
 
@@ -16,7 +16,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(Number.MAX_SAFE_INTEGER + 1);
 		},
-		error(_Message.INDEX_IS_NOT_INT),
+		error(Message.indexIsNotInt),
 		'expected to throw if index is not a safe integer',
 	);
 
@@ -24,7 +24,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(Number.NaN);
 		},
-		error(_Message.INDEX_IS_NOT_INT),
+		error(Message.indexIsNotInt),
 		'expected to throw if index is NaN',
 	);
 
@@ -32,7 +32,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(Number.POSITIVE_INFINITY);
 		},
-		error(_Message.INDEX_IS_NOT_INT),
+		error(Message.indexIsNotInt),
 		'expected to throw if index is +∞',
 	);
 
@@ -40,7 +40,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(-1);
 		},
-		error(_Message.INDEX_IS_NEGATIVE),
+		error(Message.indexIsNegative),
 		'expected to throw if index is negative',
 	);
 
@@ -48,7 +48,7 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 		() => {
 			fn(length);
 		},
-		error(_Message.INDEX_OUT_OF_BOUNDS),
+		error(Message.indexOutOfBounds),
 		'expected to throw if index is after the last element',
 	);
 
@@ -86,25 +86,25 @@ const assertIndex = (fn: (index: number) => void, length: number) => async (t: T
 await test('constructor', async (t) => {
 	t.throws(
 		() => new SafeArray(Number.EPSILON),
-		error(_Message.MAX_IS_NOT_INT),
+		error(Message.maxIsNotInt),
 		'expected to throw if maximum length is not an integer',
 	);
 
 	t.throws(
 		() => new SafeArray(Number.MAX_SAFE_INTEGER + 1),
-		error(_Message.MAX_IS_NOT_INT),
+		error(Message.maxIsNotInt),
 		'expected to throw if maximum length is not a safe integer',
 	);
 
 	t.throws(
 		() => new SafeArray(Number.NaN),
-		error(_Message.MAX_IS_NOT_INT),
+		error(Message.maxIsNotInt),
 		'expected to throw if maximum length is NaN',
 	);
 
 	t.throws(
 		() => new SafeArray(-1),
-		error(_Message.MAX_IS_NEGATIVE),
+		error(Message.maxIsNegative),
 		'expected to throw if maximum length is negative',
 	);
 
@@ -135,7 +135,7 @@ await test('length', async (t) => {
 await test('static from', async (t) => {
 	t.throws(
 		() => SafeArray.from([1], 0),
-		error(_Message.LARGER_THAN_MAX),
+		error(Message.largerThanMax),
 		'expected to throw if maximum length is less than array length',
 	);
 
@@ -186,7 +186,7 @@ await test('push', async (t) => {
 		() => {
 			new SafeArray(0).push(1);
 		},
-		error(_Message.ARRAY_IS_FULL),
+		error(Message.arrayIsFull),
 		'expected to throw if full',
 	);
 
@@ -194,7 +194,7 @@ await test('push', async (t) => {
 		() => {
 			new SafeArray(1).push(1, 2);
 		},
-		error(_Message.LARGER_THAN_MAX),
+		error(Message.largerThanMax),
 		'expected to throw on too many items',
 	);
 
@@ -235,7 +235,7 @@ await test('pop', async (t) => {
 		() => {
 			new SafeArray().pop();
 		},
-		error(_Message.ARRAY_IS_EMPTY),
+		error(Message.arrayIsEmpty),
 		'expected to throw if safe-array is empty',
 	);
 

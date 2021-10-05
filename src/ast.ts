@@ -1,24 +1,18 @@
 import * as commands from './stdlib/commands.js';
 import type * as types from './types.js';
-
-/** @internal */
-export const enum _Message {
-	BLOCK_START_NOT_INIT = 'Block does not have a end offset',
-	BLOCK_END_NOT_INIT = 'Block does not have a start offset',
-	START_IS_NOT_BLOCK_START = 'Start of block is not a BlockStart',
-}
+import * as messages from './messages.js';
 
 /** @public */
-export class Halt implements types.ASTNode {
+export class Halt implements types.AstNode {
 	static readonly instance = new Halt();
 
 	execute (arg: types.ExecuteArg) {
-		commands.halt_(arg);
+		commands.halt(arg);
 	}
 }
 
 /** @public */
-export class Literal implements types.ASTNode {
+export class Literal implements types.AstNode {
 	constructor (readonly value: types.StackItem) {}
 
 	execute ({ data }: types.ExecuteArg) {
@@ -27,7 +21,7 @@ export class Literal implements types.ASTNode {
 }
 
 /** @public */
-export class Label implements types.ASTNode {
+export class Label implements types.AstNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
@@ -41,7 +35,7 @@ export class Label implements types.ASTNode {
 }
 
 /** @public */
-export class Refer implements types.ASTNode {
+export class Refer implements types.AstNode {
 	constructor (readonly name: string, readonly referOnly: boolean) {}
 
 	execute (arg: types.ExecuteArg) {
@@ -55,19 +49,19 @@ export class Refer implements types.ASTNode {
 		arg.data.stack.push(definition.offset, definition.sourceName);
 
 		if (!this.referOnly && definition.implicitlyCalled) {
-			commands.call_(arg);
+			commands.call(arg);
 		}
 	}
 }
 
 /** @public */
-export class BlockStart implements types.ASTNode {
+export class BlockStart implements types.AstNode {
 	/** @internal */
 	_endOffset?: number;
 
 	get endOffset () {
 		if (this._endOffset === undefined) {
-			throw new Error(_Message.BLOCK_START_NOT_INIT);
+			throw new Error(messages.blockStartNotInit);
 		}
 
 		return this._endOffset;
@@ -83,13 +77,13 @@ export class BlockStart implements types.ASTNode {
 }
 
 /** @public */
-export class BlockEnd implements types.ASTNode {
+export class BlockEnd implements types.AstNode {
 	/** @internal */
 	_startOffset?: number;
 
 	get startOffset () {
 		if (this._startOffset === undefined) {
-			throw new Error(_Message.BLOCK_END_NOT_INIT);
+			throw new Error(messages.blockEndNotInit);
 		}
 
 		return this._startOffset;
@@ -106,7 +100,7 @@ export class BlockEnd implements types.ASTNode {
 		const start = source.ast[startOffset];
 
 		if (!(start instanceof BlockStart)) {
-			throw new TypeError(_Message.START_IS_NOT_BLOCK_START);
+			throw new TypeError(messages.startIsNotBlockStart);
 		}
 
 		// Skip BlockEnd itself
@@ -115,21 +109,21 @@ export class BlockEnd implements types.ASTNode {
 }
 
 /** @public */
-export class WhileEnd extends BlockEnd implements types.ASTNode {
+export class WhileEnd extends BlockEnd implements types.AstNode {
 	execute (arg: types.ExecuteArg) {
 		arg.data.offset = this.startOffset;
 	}
 }
 
 /** @public */
-export class FunctionEnd extends BlockEnd implements types.ASTNode {
+export class FunctionEnd extends BlockEnd implements types.AstNode {
 	execute (arg: types.ExecuteArg) {
 		commands.return_(arg);
 	}
 }
 
 /** @public */
-export class FunctionStatement implements types.ASTNode {
+export class FunctionStatement implements types.AstNode {
 	constructor (readonly name: string, readonly exported: boolean) {}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
@@ -143,12 +137,12 @@ export class FunctionStatement implements types.ASTNode {
 	}
 
 	execute (arg: types.ExecuteArg) {
-		commands.goto_(arg);
+		commands.goto(arg);
 	}
 }
 
 /** @public */
-export class ImportStatement implements types.ASTNode {
+export class ImportStatement implements types.AstNode {
 	constructor (readonly namespace: string, readonly source: string) {}
 
 	assemble ({ data }: types.AssembleArg) {
@@ -173,22 +167,22 @@ export class ImportStatement implements types.ASTNode {
 }
 
 /** @public */
-export class NativeFunction implements types.ASTNode {
-	constructor (
-		readonly name: string,
-		readonly executable: types.Executable,
-	) {}
-
+export class NativeFunction implements types.AstNode {
 	static createArray (
 		map: ReadonlyMap<string, types.Executable>,
-	): types.ASTTree {
-		const ast: types.ASTNode[] = [...map].map(([name, executable]) =>
+	): types.AstTree {
+		const ast: types.AstNode[] = [...map].map(([name, executable]) =>
 			new NativeFunction(name, executable));
 
 		ast.unshift(Halt.instance);
 
 		return ast;
 	}
+
+	constructor (
+		readonly name: string,
+		readonly executable: types.Executable,
+	) {}
 
 	assemble ({ source, data, offset }: types.AssembleArg) {
 		data.addIdentifier(this.name, {

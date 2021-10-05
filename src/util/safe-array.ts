@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 /** @internal */
-export const enum _Message {
-	INDEX_IS_NEGATIVE = 'Index is negative',
-	INDEX_IS_NOT_INT = 'Index is not a safe (positive) integer',
-	INDEX_OUT_OF_BOUNDS = 'Index is out of bounds',
-	LARGER_THAN_MAX = 'Input is larger than maximum length allowed',
-	MAX_IS_NEGATIVE = 'Maximum length is negative',
-	MAX_IS_NOT_INT = 'Maximum length is not a safe (positive) integer',
-	ARRAY_IS_EMPTY = 'SafeArray is empty',
-	ARRAY_IS_FULL = 'SafeArray is full',
+export const enum Message {
+	indexIsNegative = 'Index is negative',
+	indexIsNotInt = 'Index is not a safe (positive) integer',
+	indexOutOfBounds = 'Index is out of bounds',
+	largerThanMax = 'Input is larger than maximum length allowed',
+	maxIsNegative = 'Maximum length is negative',
+	maxIsNotInt = 'Maximum length is not a safe (positive) integer',
+	arrayIsEmpty = 'SafeArray is empty',
+	arrayIsFull = 'SafeArray is full',
 }
 
 /**
@@ -17,6 +17,28 @@ export const enum _Message {
  * @public
  */
 export default class SafeArray<T> {
+	/**
+	 * Creates a new instance of safe-array and copies a safe-array into it.
+	 *
+	 * @nosideeffects
+	 * @throws RangeError
+	 * @param array - The array to copy into the safe-array. It should not have
+	 * more elements than the provided maximum length.
+	 * @param maxLength - Maximum number of elements allowed in the safe-array.
+	 * Must be a positive safe integer. (`+Infinity` for no limitation)
+	 * @returns The new instance of safe-array.
+	 */
+	static from<T> (array: readonly T[], maxLength?: number): SafeArray<T> {
+		const safeArray = new SafeArray<T>(maxLength);
+
+		if (array.length > safeArray._maxLength) {
+			throw new RangeError(Message.largerThanMax);
+		}
+
+		safeArray.push(...array);
+		return safeArray;
+	}
+
 	private readonly _array: T[] = [];
 	private readonly _maxLength: number;
 	private _length = 0;
@@ -41,34 +63,12 @@ export default class SafeArray<T> {
 		this._maxLength = maxLength;
 
 		if (!Number.isSafeInteger(maxLength) && maxLength !== Number.POSITIVE_INFINITY) {
-			throw new RangeError(_Message.MAX_IS_NOT_INT);
+			throw new RangeError(Message.maxIsNotInt);
 		}
 
 		if (maxLength < 0) {
-			throw new RangeError(_Message.MAX_IS_NEGATIVE);
+			throw new RangeError(Message.maxIsNegative);
 		}
-	}
-
-	/**
-	 * Creates a new instance of safe-array and copies a safe-array into it.
-	 *
-	 * @nosideeffects
-	 * @throws RangeError
-	 * @param array - The array to copy into the safe-array. It should not have
-	 * more elements than the provided maximum length.
-	 * @param maxLength - Maximum number of elements allowed in the safe-array.
-	 * Must be a positive safe integer. (`+Infinity` for no limitation)
-	 * @returns The new instance of safe-array.
-	 */
-	static from<T> (array: readonly T[], maxLength?: number): SafeArray<T> {
-		const safeArray = new SafeArray<T>(maxLength);
-
-		if (array.length > safeArray._maxLength) {
-			throw new RangeError(_Message.LARGER_THAN_MAX);
-		}
-
-		safeArray.push(...array);
-		return safeArray;
 	}
 
 	/**
@@ -93,11 +93,11 @@ export default class SafeArray<T> {
 		}
 
 		if (this.length === this._maxLength) {
-			throw new RangeError(_Message.ARRAY_IS_FULL);
+			throw new RangeError(Message.arrayIsFull);
 		}
 
 		if (this.length + items.length > this._maxLength) {
-			throw new RangeError(_Message.LARGER_THAN_MAX);
+			throw new RangeError(Message.largerThanMax);
 		}
 
 		this._length = this._array.push(...items);
@@ -111,7 +111,7 @@ export default class SafeArray<T> {
 	 */
 	pop (): T {
 		if (this._array.length === 0) {
-			throw new RangeError(_Message.ARRAY_IS_EMPTY);
+			throw new RangeError(Message.arrayIsEmpty);
 		}
 
 		this._length--;
@@ -179,15 +179,15 @@ export default class SafeArray<T> {
 
 	private _assertIndex (index: number): void {
 		if (!Number.isSafeInteger(index)) {
-			throw new RangeError(_Message.INDEX_IS_NOT_INT);
+			throw new RangeError(Message.indexIsNotInt);
 		}
 
 		if (index < 0) {
-			throw new RangeError(_Message.INDEX_IS_NEGATIVE);
+			throw new RangeError(Message.indexIsNegative);
 		}
 
 		if (index >= this.length) {
-			throw new RangeError(_Message.INDEX_OUT_OF_BOUNDS);
+			throw new RangeError(Message.indexOutOfBounds);
 		}
 	}
 }

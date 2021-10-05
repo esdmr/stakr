@@ -35,14 +35,14 @@ export interface ExecuteArg {
 }
 
 /** @internal */
-export type _Writable<T> = { -readonly [K in keyof T]: T[K] };
+export type Writable<T> = { -readonly [K in keyof T]: T[K] };
 /** @public */
 export type Executable = (arg: ExecuteArg) => void | Promise<void>;
 /** @public */
-export type ASTTree = readonly ASTNode[];
+export type AstTree = readonly AstNode[];
 
 /** @public */
-export interface ASTNode {
+export interface AstNode {
 	readonly assemble?: (arg: AssembleArg) => void;
 	readonly link?: (arg: LinkArg) => void;
 	readonly execute?: Executable;

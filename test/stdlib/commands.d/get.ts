@@ -1,19 +1,19 @@
 import { test } from 'tap';
-import { get_ } from '#src/stdlib/commands.js';
+import { get } from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('get', async (t) => {
 	const { data, arg } = await createAssets();
 	data.stack.push(true, false, true, 1);
 
-	get_(arg);
+	get(arg);
 
 	t.strictSame(data.stack.toNewArray(), [true, false, true, false],
 		'expected to get the item from the stack');
 
 	data.stack.push(-1);
 
-	get_(arg);
+	get(arg);
 
 	t.strictSame(data.stack.toNewArray(), [true, false, true, false, false],
 		'expected to get with negative address');
@@ -22,7 +22,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if the address is not a integer',
 	);
@@ -32,7 +32,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if accessing past the address',
 	);
@@ -41,7 +41,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if the stack is empty',
 	);
@@ -50,7 +50,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if address is null',
 	);
@@ -59,7 +59,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if address is boolean',
 	);
@@ -68,7 +68,7 @@ await test('get', async (t) => {
 
 	t.throws(
 		() => {
-			get_(arg);
+			get(arg);
 		},
 		'expected to throw if address is a string',
 	);

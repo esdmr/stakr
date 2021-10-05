@@ -1,7 +1,7 @@
-import { CommandsMessage, SafeArrayMessage } from './message.js';
+import * as messages from '#src/messages.js';
+import SafeArray, { Message as SafeArrayMessage } from '#src/util/safe-array.js';
 import { ExecuteData } from '#src/stakr.js';
-import { StackItem } from '#src/types.js';
-import SafeArray from '#src/util/safe-array.js';
+import type { StackItem } from '#src/types.js';
 
 type Command = (...items: StackItem[]) => Promise<{
 	stack: SafeArray<StackItem>;
@@ -15,31 +15,31 @@ export default async function testGoto (
 ): Promise<void> {
 	await t.rejects(
 		async () => command(),
-		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		new RangeError(SafeArrayMessage.arrayIsEmpty),
 		'expected to throw if stack is empty',
 	);
 
 	await t.rejects(
 		async () => command('abc'),
-		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		new RangeError(SafeArrayMessage.arrayIsEmpty),
 		'expected to throw if there is not enough parameters',
 	);
 
 	await t.rejects(
 		async () => command(123),
-		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		new RangeError(SafeArrayMessage.arrayIsEmpty),
 		'expected to throw if only given a number',
 	);
 
 	await t.rejects(
 		async () => command(true, false),
-		new TypeError(CommandsMessage.SOURCE_NAME_IS_NOT_STRING),
+		new TypeError(messages.sourceNameIsNotString),
 		'expected to throw if poped value is not string',
 	);
 
 	await t.rejects(
 		async () => command(true, 'abc'),
-		new RangeError(CommandsMessage.OFFSET_IS_NOT_SAFE_INT),
+		new RangeError(messages.offsetIsNotInt),
 		'expected to throw if poped value is not a safe integer',
 	);
 

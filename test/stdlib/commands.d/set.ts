@@ -1,19 +1,19 @@
 import { test } from 'tap';
-import { set_ } from '#src/stdlib/commands.js';
+import { set } from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('set', async (t) => {
 	const { data, arg } = await createAssets();
 	data.stack.push(true, false, true, 1);
 
-	set_(arg);
+	set(arg);
 
 	t.strictSame(data.stack.toNewArray(), [true, true],
 		'expected to set the item from the stack');
 
 	data.stack.push(false, -1);
 
-	set_(arg);
+	set(arg);
 
 	t.strictSame(data.stack.toNewArray(), [true, false],
 		'expected to set with negative address');
@@ -22,7 +22,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if the address is not a integer',
 	);
@@ -32,7 +32,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if accessing past the address',
 	);
@@ -42,7 +42,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if no value is provided',
 	);
@@ -51,7 +51,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if the stack is empty',
 	);
@@ -60,7 +60,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if address is null',
 	);
@@ -69,7 +69,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if address is boolean',
 	);
@@ -78,7 +78,7 @@ await test('set', async (t) => {
 
 	t.throws(
 		() => {
-			set_(arg);
+			set(arg);
 		},
 		'expected to throw if address is a string',
 	);

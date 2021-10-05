@@ -1,6 +1,6 @@
 import { test } from 'tap';
-import { leave_ } from '#src/stdlib/commands.js';
-import { CommandsMessage } from '#test/test-util/message.js';
+import { leave } from '#src/stdlib/commands.js';
+import * as messages from '#src/messages.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('leave', async (t) => {
@@ -10,7 +10,7 @@ await test('leave', async (t) => {
 	data.stack.push(...array);
 	data.framePointer = 123;
 	data.aux.push(456);
-	leave_(arg);
+	leave(arg);
 
 	t.strictSame(data.stack.toNewArray(), array,
 		'expected to not change the stack');
@@ -25,9 +25,9 @@ await test('leave', async (t) => {
 
 	t.throws(
 		() => {
-			leave_(arg);
+			leave(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not a safe integer',
 	);
 
@@ -35,9 +35,9 @@ await test('leave', async (t) => {
 
 	t.throws(
 		() => {
-			leave_(arg);
+			leave(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not an integer',
 	);
 
@@ -45,9 +45,9 @@ await test('leave', async (t) => {
 
 	t.throws(
 		() => {
-			leave_(arg);
+			leave(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not a safe integer',
 	);
 
@@ -55,9 +55,9 @@ await test('leave', async (t) => {
 
 	t.throws(
 		() => {
-			leave_(arg);
+			leave(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is negative',
 	);
 });

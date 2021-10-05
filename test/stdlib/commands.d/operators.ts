@@ -3,7 +3,7 @@ import t, { test } from 'tap';
 import { isNotUndefined } from '@esdmr/assert/nullables';
 import commands_ from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
-import { CommandsMessage } from '#test/test-util/message.js';
+import * as messages from '#src/messages.js';
 
 // `node-tap`'s `tcompare.format` converts Infinities and possibly NaNs into
 // nulls. This is less than ideal, so we replace it with `util.inspect`.
@@ -73,7 +73,7 @@ for (const key of ['+', '-', '*', '/', '%', '**']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_NUMBER),
+				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the first parameter is invalid',
 			);
 
@@ -82,7 +82,7 @@ for (const key of ['+', '-', '*', '/', '%', '**']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_NUMBER),
+				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the second parameter is invalid',
 			);
 		}
@@ -113,7 +113,7 @@ for (const key of ['and', 'or']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_BOOLEAN),
+				new TypeError(messages.parameterIsNotBoolean),
 				'expected to throw if the first parameter is invalid',
 			);
 
@@ -122,7 +122,7 @@ for (const key of ['and', 'or']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_BOOLEAN),
+				new TypeError(messages.parameterIsNotBoolean),
 				'expected to throw if the second parameter is invalid',
 			);
 		}
@@ -150,7 +150,7 @@ await test('not', async (t) => {
 
 		await t.rejects(
 			async () => func(arg),
-			new TypeError(CommandsMessage.PARAM_IS_NOT_BOOLEAN),
+			new TypeError(messages.parameterIsNotBoolean),
 			'expected to throw if the parameter is invalid',
 		);
 	}
@@ -202,7 +202,7 @@ for (const key of ['>', '>=', '<', '<=']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_NUMBER),
+				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the first parameter is invalid',
 			);
 
@@ -211,7 +211,7 @@ for (const key of ['>', '>=', '<', '<=']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_NUMBER),
+				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the second parameter is invalid',
 			);
 		}
@@ -242,7 +242,7 @@ for (const key of ['&', '|', '^', '<<', '>>', '>>>', '<<|', '|>>']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_SAFE_INT),
+				new TypeError(messages.parameterIsNotInt),
 				'expected to throw if the first parameter is invalid',
 			);
 
@@ -251,7 +251,7 @@ for (const key of ['&', '|', '^', '<<', '>>', '>>>', '<<|', '|>>']) {
 
 			await t.rejects(
 				async () => func(arg),
-				new TypeError(CommandsMessage.PARAM_IS_NOT_SAFE_INT),
+				new TypeError(messages.parameterIsNotInt),
 				'expected to throw if the second parameter is invalid',
 			);
 		}
@@ -279,7 +279,7 @@ await test('~', async (t) => {
 
 		await t.rejects(
 			async () => func(arg),
-			new TypeError(CommandsMessage.PARAM_IS_NOT_SAFE_INT),
+			new TypeError(messages.parameterIsNotInt),
 			'expected to throw if the parameter is invalid',
 		);
 	}

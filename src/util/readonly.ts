@@ -5,6 +5,7 @@ export interface ReadonlyMapConstructor {
 }
 
 /** @internal */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ReadonlyMap = Map as ReadonlyMapConstructor;
 
 /** @internal */
@@ -14,4 +15,5 @@ export interface ReadonlySetConstructor {
 }
 
 /** @internal */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ReadonlySet = Set as ReadonlySetConstructor;

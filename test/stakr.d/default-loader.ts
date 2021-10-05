@@ -1,6 +1,6 @@
 import { test } from 'tap';
 import * as stakr from '#src/stakr.js';
-import { StakrMessage } from '#test/test-util/message.js';
+import * as messages from '#src/messages.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 const loader = new stakr.DefaultLoader();
@@ -8,38 +8,38 @@ const loader = new stakr.DefaultLoader();
 await test('resolve', async (t) => {
 	t.throws(
 		() => loader.resolve('%2f', ''),
-		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
+		new stakr.ResolutionError(messages.loaderInvalid),
 		'expected to throw on invalid character %2f',
 	);
 
 	t.throws(
 		() => loader.resolve('%2F', ''),
-		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
+		new stakr.ResolutionError(messages.loaderInvalid),
 		'expected to throw on invalid character %2F',
 	);
 
 	t.throws(
 		() => loader.resolve('%5c', ''),
-		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
+		new stakr.ResolutionError(messages.loaderInvalid),
 		'expected to throw on invalid character %5c',
 	);
 
 	t.throws(
 		() => loader.resolve('%5C', ''),
-		new stakr.ResolutionError(StakrMessage.LOADER_INVALID),
+		new stakr.ResolutionError(messages.loaderInvalid),
 		'expected to throw on invalid character %5C',
 	);
 
 	await t.test('relative', async (t) => {
 		t.throws(
 			() => loader.resolve('./a', 'b'),
-			new stakr.ResolutionError(StakrMessage.LOADER_NO_RELATIVE),
+			new stakr.ResolutionError(messages.loaderNoRelative),
 			'expected to throw on relative . if parent is not absolute',
 		);
 
 		t.throws(
 			() => loader.resolve('../a', 'b'),
-			new stakr.ResolutionError(StakrMessage.LOADER_NO_RELATIVE),
+			new stakr.ResolutionError(messages.loaderNoRelative),
 			'expected to throw on relative .. if parent is not absolute',
 		);
 

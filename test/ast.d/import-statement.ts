@@ -21,7 +21,7 @@ await test('assemble', async (t) => {
 
 	const { assembleData, assembleArg: arg } = await createAssets({
 		source: [instance],
-		state: SourceState.RAW,
+		state: SourceState.raw,
 	});
 
 	instance.assemble(arg);
@@ -62,7 +62,7 @@ await test('link', async (t) => {
 			new ast.FunctionEnd(),
 		],
 		source: [instance],
-		state: SourceState.ADDED,
+		state: SourceState.added,
 	});
 
 	const { identifiers: libExports } = lib.assemble();

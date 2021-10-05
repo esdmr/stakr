@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { type_, ValueType } from '#src/stdlib/commands.js';
+import { type, ValueType } from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('type', async (t) => {
@@ -7,36 +7,36 @@ await test('type', async (t) => {
 
 	t.throws(
 		() => {
-			type_(arg);
+			type(arg);
 		},
 		'expected to throw if the stack is empty',
 	);
 
 	data.stack.clear();
 	data.stack.push('test');
-	type_(arg);
+	type(arg);
 
-	t.strictSame(data.stack.toNewArray(), [ValueType.STRING],
+	t.strictSame(data.stack.toNewArray(), [ValueType.string],
 		'expected to correctly return for strings');
 
 	data.stack.clear();
 	data.stack.push(123);
-	type_(arg);
+	type(arg);
 
-	t.strictSame(data.stack.toNewArray(), [ValueType.NUMBER],
+	t.strictSame(data.stack.toNewArray(), [ValueType.number],
 		'expected to correctly return for numbers');
 
 	data.stack.clear();
 	data.stack.push(true);
-	type_(arg);
+	type(arg);
 
-	t.strictSame(data.stack.toNewArray(), [ValueType.BOOLEAN],
+	t.strictSame(data.stack.toNewArray(), [ValueType.boolean],
 		'expected to correctly return for boolean');
 
 	data.stack.clear();
 	data.stack.push(null);
-	type_(arg);
+	type(arg);
 
-	t.strictSame(data.stack.toNewArray(), [ValueType.NULL],
+	t.strictSame(data.stack.toNewArray(), [ValueType.null],
 		'expected to correctly return for null');
 });

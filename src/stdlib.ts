@@ -2,7 +2,7 @@ import * as ast from './ast.js';
 import * as stakr from './stakr.js';
 import commands_ from './stdlib/commands.js';
 import log_ from './stdlib/log.js';
-import * as types from './types.js';
+import type * as types from './types.js';
 
 /** @public */
 export const commands = new stakr.Source(
