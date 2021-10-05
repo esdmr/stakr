@@ -1,6 +1,6 @@
 import { test } from 'tap';
-import { frame_ } from '#src/stdlib/commands.js';
-import { CommandsMessage } from '#test/test-util/message.js';
+import { frame } from '#src/stdlib/commands.js';
+import * as messages from '#src/messages.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('frame', async (t) => {
@@ -9,7 +9,7 @@ await test('frame', async (t) => {
 
 	data.stack.push(...array);
 	data.framePointer = 2;
-	frame_(arg);
+	frame(arg);
 
 	t.strictSame(data.stack.toNewArray(), [...array, -1],
 		'expected to push to the stack');
@@ -18,9 +18,9 @@ await test('frame', async (t) => {
 
 	t.throws(
 		() => {
-			frame_(arg);
+			frame(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not an integer',
 	);
 
@@ -28,9 +28,9 @@ await test('frame', async (t) => {
 
 	t.throws(
 		() => {
-			frame_(arg);
+			frame(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is not a safe integer',
 	);
 
@@ -38,9 +38,9 @@ await test('frame', async (t) => {
 
 	t.throws(
 		() => {
-			frame_(arg);
+			frame(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_NOT_VALID),
+		new RangeError(messages.framePointerIsNotValid),
 		'expected to throw if frame pointer is negative',
 	);
 
@@ -48,9 +48,9 @@ await test('frame', async (t) => {
 
 	t.throws(
 		() => {
-			frame_(arg);
+			frame(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_AT_START),
+		new RangeError(messages.framePointerIsAtStart),
 		'expected to throw if frame pointer is zero',
 	);
 
@@ -58,9 +58,9 @@ await test('frame', async (t) => {
 
 	t.throws(
 		() => {
-			frame_(arg);
+			frame(arg);
 		},
-		new RangeError(CommandsMessage.FRAME_POINTER_IS_PAST_END),
+		new RangeError(messages.framePointerIsPastEnd),
 		'expected to throw if frame pointer is more than stack length',
 	);
 });

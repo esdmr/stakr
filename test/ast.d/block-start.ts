@@ -1,6 +1,6 @@
 import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { ASTMessage } from '#test/test-util/message.js';
+import * as messages from '#src/messages.js';
 import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
 await test('offset', async (t) => {
@@ -8,7 +8,7 @@ await test('offset', async (t) => {
 
 	t.throws(
 		() => instance.endOffset,
-		new Error(ASTMessage.BLOCK_START_NOT_INIT),
+		new Error(messages.blockStartNotInit),
 		'expected to throw if not initialized',
 	);
 
@@ -23,7 +23,7 @@ await test('assemble', async (t) => {
 
 	const { assembleArg: arg } = await createAssets({
 		source: [instance],
-		state: SourceState.RAW,
+		state: SourceState.raw,
 	});
 
 	instance.assemble(arg);

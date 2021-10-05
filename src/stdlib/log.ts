@@ -1,5 +1,5 @@
 import * as assert from '@esdmr/assert';
-import * as types from '#src/types.js';
+import type * as types from '#src/types.js';
 import { ReadonlyMap } from '#src/util/readonly.js';
 
 /** @internal */

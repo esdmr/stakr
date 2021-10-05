@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { enter_ } from '#src/stdlib/commands.js';
+import { enter } from '#src/stdlib/commands.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('enter', async (t) => {
@@ -9,7 +9,7 @@ await test('enter', async (t) => {
 	data.stack.push(...array);
 	data.framePointer = 123;
 
-	enter_(arg);
+	enter(arg);
 
 	t.strictSame(data.aux.toNewArray(), [123],
 		'expected to push previous frame pointer to the aux');

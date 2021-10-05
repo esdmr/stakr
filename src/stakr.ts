@@ -1,16 +1,9 @@
 import { DepGraph } from 'dependency-graph';
 import type * as types from './types.js';
 import SafeArray from './util/safe-array.js';
+import * as messages from './messages.js';
 
-/** @internal */
-export const enum _Message {
-	EMPTY_SOURCE_LIST = 'Empty source list',
-	LOADER_NO_RELATIVE = 'Source with a non-absolute name can not resolve a relative path',
-	LOADER_INVALID = 'Invalid source specifier',
-	HALTED_IN_WRONG_SOURCE = 'Halted in a different source than the one started with',
-}
-
-const AUX_MAX_LENGTH = 1024;
+const auxMaxLength = 1024;
 
 /** @public */
 export class AssembleData {
@@ -43,7 +36,7 @@ export class LinkData {
 /** @public */
 export class ExecuteData {
 	readonly stack = new SafeArray<types.StackItem>();
-	readonly aux = new SafeArray<types.StackItem>(AUX_MAX_LENGTH);
+	readonly aux = new SafeArray<types.StackItem>(auxMaxLength);
 	framePointer = -1;
 	sourceName = '';
 	halted = true;
@@ -72,14 +65,14 @@ export class Source {
 		return this.assembleData !== undefined;
 	}
 
-	constructor (readonly name: string, readonly ast: types.ASTTree) {}
+	constructor (readonly name: string, readonly ast: types.AstTree) {}
 
 	assemble () {
 		if (this.assembleData) {
 			return this.assembleData;
 		}
 
-		const arg: types._Writable<types.AssembleArg> = {
+		const arg: types.Writable<types.AssembleArg> = {
 			source: this,
 			blockStack: [] as number[],
 			data: new AssembleData(),
@@ -111,7 +104,7 @@ export class Source {
 
 		const data = new LinkData();
 
-		const arg: types._Writable<types.LinkArg> = {
+		const arg: types.Writable<types.LinkArg> = {
 			context,
 			source: this,
 			data,
@@ -173,7 +166,7 @@ export class DefaultLoader implements types.Loader {
 
 		if (specifier.startsWith('./') || specifier.startsWith('../')) {
 			if (!parentName.startsWith('/')) {
-				throw new ResolutionError(_Message.LOADER_NO_RELATIVE);
+				throw new ResolutionError(messages.loaderNoRelative);
 			}
 
 			resolved = this.resolvePath(parentName, specifier);
@@ -185,7 +178,7 @@ export class DefaultLoader implements types.Loader {
 		}
 
 		if (/%2f|%5c/ui.test(resolved)) {
-			throw new ResolutionError(_Message.LOADER_INVALID);
+			throw new ResolutionError(messages.loaderInvalid);
 		}
 
 		return resolved;
@@ -217,7 +210,7 @@ export class ExecutionContext {
 		const sourceSet = new Set(sources);
 
 		if (sourceSet.size === 0) {
-			throw new Error(_Message.EMPTY_SOURCE_LIST);
+			throw new Error(messages.emptySourceList);
 		}
 
 		for (const sourceName of sourceSet) {
@@ -243,7 +236,7 @@ export class ExecutionContext {
 
 	async executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
-			throw new Error(_Message.EMPTY_SOURCE_LIST);
+			throw new Error(messages.emptySourceList);
 		}
 
 		for (const sourceName of sourceList) {
@@ -266,7 +259,7 @@ export class ExecutionContext {
 		// been made. In addition, the following condition will also detect
 		// missing returns in functions which have exited their boundaries.
 		if (data.sourceName !== sourceName) {
-			throw new Error(_Message.HALTED_IN_WRONG_SOURCE);
+			throw new Error(messages.haltedInWrongSource);
 		}
 	}
 

@@ -1,25 +1,9 @@
+/* eslint-disable no-bitwise */
 import * as assert from '@esdmr/assert';
 import type * as stakr from '../stakr.js';
 import type * as types from '../types.js';
+import * as messages from '../messages.js';
 import { ReadonlyMap } from '#src/util/readonly.js';
-
-/** @internal */
-export const enum _Message {
-	SOURCE_NAME_IS_NOT_STRING = 'Source name is not a string',
-	OFFSET_IS_NOT_SAFE_INT = 'Offset is not a safe integer',
-	CONDITION_IS_NOT_BOOLEAN = 'Condition is not a boolean',
-	FRAME_POINTER_IS_NOT_VALID = 'Frame pointer is not valid',
-	FRAME_POINTER_IS_AT_START = 'Frame pointer points to the start of stack',
-	FRAME_POINTER_IS_PAST_END = 'Frame pointer is past the end of stack',
-	ADDRESS_IS_NOT_SAFE_INT = 'Address is not a number',
-	PARAM_IS_NOT_STRING = 'Parameter is not a string',
-	LENGTH_IS_NOT_SAFE_INT = 'Length is not a safe integer',
-	CODE_POINT_AT = 'Code point at {}',
-	CODE_POINT_IS_INVALID = 'Code point is not valid',
-	PARAM_IS_NOT_NUMBER = 'Parameter is not a number',
-	PARAM_IS_NOT_BOOLEAN = 'Parameter is not a boolean',
-	PARAM_IS_NOT_SAFE_INT = 'Parameter is not a safe integer',
-}
 
 function isSafeInteger (value: unknown): value is number {
 	return Number.isSafeInteger(value);
@@ -31,11 +15,11 @@ function jump (
 	offset: types.StackItem,
 ) {
 	if (typeof sourceName !== 'string') {
-		throw new TypeError(_Message.SOURCE_NAME_IS_NOT_STRING);
+		throw new TypeError(messages.sourceNameIsNotString);
 	}
 
 	if (!isSafeInteger(offset)) {
-		throw new RangeError(_Message.OFFSET_IS_NOT_SAFE_INT);
+		throw new RangeError(messages.offsetIsNotInt);
 	}
 
 	data.sourceName = sourceName;
@@ -47,13 +31,13 @@ function arithmeticBinary (func: (a: number, b: number) => number) {
 		const a = stack.pop();
 
 		if (typeof a !== 'number') {
-			throw new TypeError(_Message.PARAM_IS_NOT_NUMBER);
+			throw new TypeError(messages.parameterIsNotNumber);
 		}
 
 		const b = stack.pop();
 
 		if (typeof b !== 'number') {
-			throw new TypeError(_Message.PARAM_IS_NOT_NUMBER);
+			throw new TypeError(messages.parameterIsNotNumber);
 		}
 
 		stack.push(func(a, b));
@@ -65,13 +49,13 @@ function logicalBinary (func: (a: boolean, b: boolean) => boolean) {
 		const a = stack.pop();
 
 		if (typeof a !== 'boolean') {
-			throw new TypeError(_Message.PARAM_IS_NOT_BOOLEAN);
+			throw new TypeError(messages.parameterIsNotBoolean);
 		}
 
 		const b = stack.pop();
 
 		if (typeof b !== 'boolean') {
-			throw new TypeError(_Message.PARAM_IS_NOT_BOOLEAN);
+			throw new TypeError(messages.parameterIsNotBoolean);
 		}
 
 		stack.push(func(a, b));
@@ -92,13 +76,13 @@ function inequalityBinary (func: (a: number, b: number) => boolean) {
 		const a = stack.pop();
 
 		if (typeof a !== 'number') {
-			throw new TypeError(_Message.PARAM_IS_NOT_NUMBER);
+			throw new TypeError(messages.parameterIsNotNumber);
 		}
 
 		const b = stack.pop();
 
 		if (typeof b !== 'number') {
-			throw new TypeError(_Message.PARAM_IS_NOT_NUMBER);
+			throw new TypeError(messages.parameterIsNotNumber);
 		}
 
 		stack.push(func(a, b));
@@ -110,28 +94,28 @@ function bitwiseBinary (func: (a: number, b: number) => number) {
 		const a = stack.pop();
 
 		if (!isSafeInteger(a)) {
-			throw new TypeError(_Message.PARAM_IS_NOT_SAFE_INT);
+			throw new TypeError(messages.parameterIsNotInt);
 		}
 
 		const b = stack.pop();
 
 		if (!isSafeInteger(b)) {
-			throw new TypeError(_Message.PARAM_IS_NOT_SAFE_INT);
+			throw new TypeError(messages.parameterIsNotInt);
 		}
 
 		stack.push(func(a, b));
 	};
 }
 
-export function halt_ ({ data }: types.ExecuteArg) {
+export function halt ({ data }: types.ExecuteArg) {
 	data.halted = true;
 }
 
-export function goto_ ({ data }: types.ExecuteArg) {
+export function goto ({ data }: types.ExecuteArg) {
 	jump(data, data.stack.pop(), data.stack.pop());
 }
 
-export function call_ ({ data }: types.ExecuteArg) {
+export function call ({ data }: types.ExecuteArg) {
 	data.aux.push(data.offset, data.sourceName);
 	jump(data, data.stack.pop(), data.stack.pop());
 }
@@ -145,7 +129,7 @@ export function if_ ({ data }: types.ExecuteArg) {
 	const condition = data.stack.pop();
 
 	if (typeof condition !== 'boolean') {
-		throw new TypeError(_Message.CONDITION_IS_NOT_BOOLEAN);
+		throw new TypeError(messages.conditionIsNotBoolean);
 	}
 
 	jump(data, data.stack.pop(), data.stack.pop());
@@ -156,73 +140,73 @@ export function if_ ({ data }: types.ExecuteArg) {
 	}
 }
 
-export function enter_ ({ data }: types.ExecuteArg) {
+export function enter ({ data }: types.ExecuteArg) {
 	data.aux.push(data.framePointer);
 	data.framePointer = data.stack.length;
 }
 
-export function leave_ ({ data }: types.ExecuteArg) {
+export function leave ({ data }: types.ExecuteArg) {
 	const framePointer = data.aux.pop();
 
 	if (!isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(messages.framePointerIsNotValid);
 	}
 
 	data.framePointer = framePointer;
 }
 
-export function frame_ ({ data }: types.ExecuteArg) {
+export function frame ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
 	if (!isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(messages.framePointerIsNotValid);
 	}
 
 	if (framePointer === 0) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_AT_START);
+		throw new RangeError(messages.framePointerIsAtStart);
 	}
 
 	if (framePointer > data.stack.length) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_PAST_END);
+		throw new RangeError(messages.framePointerIsPastEnd);
 	}
 
 	data.stack.push(1 - framePointer);
 }
 
-export function local_ ({ data }: types.ExecuteArg) {
+export function local ({ data }: types.ExecuteArg) {
 	const { framePointer } = data;
 
 	if (!isSafeInteger(framePointer) || framePointer < 0) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_NOT_VALID);
+		throw new RangeError(messages.framePointerIsNotValid);
 	}
 
 	if (framePointer > data.stack.length) {
-		throw new RangeError(_Message.FRAME_POINTER_IS_PAST_END);
+		throw new RangeError(messages.framePointerIsPastEnd);
 	}
 
 	data.stack.push(framePointer);
 }
 
-export function pop_ ({ data: { stack } }: types.ExecuteArg) {
+export function pop ({ data: { stack } }: types.ExecuteArg) {
 	stack.pop();
 }
 
-export function get_ ({ data: { stack } }: types.ExecuteArg) {
+export function get ({ data: { stack } }: types.ExecuteArg) {
 	const address = stack.pop();
 
 	if (!isSafeInteger(address)) {
-		throw new TypeError(_Message.ADDRESS_IS_NOT_SAFE_INT);
+		throw new TypeError(messages.addressIsNotInt);
 	}
 
 	stack.push(stack.get(Math.abs(address)));
 }
 
-export function set_ ({ data: { stack } }: types.ExecuteArg) {
+export function set ({ data: { stack } }: types.ExecuteArg) {
 	const address = stack.pop();
 	const value = stack.pop();
 
 	if (!isSafeInteger(address)) {
-		throw new TypeError(_Message.ADDRESS_IS_NOT_SAFE_INT);
+		throw new TypeError(messages.addressIsNotInt);
 	}
 
 	stack.set(Math.abs(address), value);
@@ -230,50 +214,50 @@ export function set_ ({ data: { stack } }: types.ExecuteArg) {
 
 export enum ValueType {
 	/** Latin Capital Letter S */
-	STRING = 83,
+	string = 83,
 	/** Latin Capital Letter N */
-	NUMBER = 78,
+	number = 78,
 	/** Latin Capital Letter B */
-	BOOLEAN = 66,
+	boolean = 66,
 	/** Null Character */
-	NULL = 0,
+	null = 0,
 }
 
-export function type_ ({ data: { stack } }: types.ExecuteArg) {
+export function type ({ data: { stack } }: types.ExecuteArg) {
 	const value = stack.pop();
 	let type;
 
 	switch (typeof value) {
 		case 'string':
-			type = ValueType.STRING;
+			type = ValueType.string;
 			break;
 
 		case 'number':
-			type = ValueType.NUMBER;
+			type = ValueType.number;
 			break;
 
 		case 'boolean':
-			type = ValueType.BOOLEAN;
+			type = ValueType.boolean;
 			break;
 
 		default:
 			assert.isEqual<null>(value, null);
-			type = ValueType.NULL;
+			type = ValueType.null;
 	}
 
 	stack.push(type);
 }
 
-export function stoc_ ({ data: { stack } }: types.ExecuteArg) {
+export function stoc ({ data: { stack } }: types.ExecuteArg) {
 	const string = stack.pop();
 
 	if (typeof string !== 'string') {
-		throw new TypeError(_Message.PARAM_IS_NOT_STRING);
+		throw new TypeError(messages.parameterIsNotString);
 	}
 
 	const chars = [...string].map((char, index) => {
 		const codePoint = char.codePointAt(0);
-		assert.isNotUndefined(codePoint, _Message.CODE_POINT_AT, index);
+		assert.isNotUndefined(codePoint, 'Code point at {}', index);
 		return codePoint;
 	});
 
@@ -282,11 +266,11 @@ export function stoc_ ({ data: { stack } }: types.ExecuteArg) {
 	stack.push(...chars, chars.length);
 }
 
-export function ctos_ ({ data: { stack } }: types.ExecuteArg) {
+export function ctos ({ data: { stack } }: types.ExecuteArg) {
 	const length = stack.pop();
 
 	if (!isSafeInteger(length) || length < 0) {
-		throw new TypeError(_Message.LENGTH_IS_NOT_SAFE_INT);
+		throw new TypeError(messages.lengthIsNotInt);
 	}
 
 	const chars: number[] = [];
@@ -295,7 +279,7 @@ export function ctos_ ({ data: { stack } }: types.ExecuteArg) {
 		const codePoint = stack.pop();
 
 		if (!isSafeInteger(codePoint) || codePoint < 0 || codePoint > 0x10_FF_FF) {
-			throw new TypeError(_Message.CODE_POINT_IS_INVALID);
+			throw new TypeError(messages.codePointIsInvalid);
 		}
 
 		chars.push(codePoint);
@@ -304,99 +288,99 @@ export function ctos_ ({ data: { stack } }: types.ExecuteArg) {
 	stack.push(String.fromCodePoint(...chars));
 }
 
-export const add_ = arithmeticBinary((a, b) => a + b);
-export const subtract_ = arithmeticBinary((a, b) => a - b);
-export const multiply_ = arithmeticBinary((a, b) => a * b);
-export const divide_ = arithmeticBinary((a, b) => a / b);
-export const remainder_ = arithmeticBinary((a, b) => a % b);
-export const power_ = arithmeticBinary((a, b) => a ** b);
+export const add = arithmeticBinary((a, b) => a + b);
+export const subtract = arithmeticBinary((a, b) => a - b);
+export const multiply = arithmeticBinary((a, b) => a * b);
+export const divide = arithmeticBinary((a, b) => a / b);
+export const remainder = arithmeticBinary((a, b) => a % b);
+export const power = arithmeticBinary((a, b) => a ** b);
 
-export const and_ = logicalBinary((a, b) => a && b);
-export const or_ = logicalBinary((a, b) => a || b);
+export const and = logicalBinary((a, b) => a && b);
+export const or = logicalBinary((a, b) => a || b);
 
-export function not_ ({ data: { stack } }: types.ExecuteArg) {
+export function not ({ data: { stack } }: types.ExecuteArg) {
 	const value = stack.pop();
 
 	if (typeof value !== 'boolean') {
-		throw new TypeError(_Message.PARAM_IS_NOT_BOOLEAN);
+		throw new TypeError(messages.parameterIsNotBoolean);
 	}
 
 	stack.push(!value);
 }
 
-export const equal_ = equalityBinary((a, b) => a === b);
-export const notEqual_ = equalityBinary((a, b) => a !== b);
-export const lessThan_ = inequalityBinary((a, b) => a < b);
-export const lessThanOrEqual_ = inequalityBinary((a, b) => a <= b);
-export const greaterThan_ = inequalityBinary((a, b) => a > b);
-export const greaterThanOrEqual_ = inequalityBinary((a, b) => a >= b);
+export const equal = equalityBinary((a, b) => a === b);
+export const notEqual = equalityBinary((a, b) => a !== b);
+export const lessThan = inequalityBinary((a, b) => a < b);
+export const lessThanOrEqual = inequalityBinary((a, b) => a <= b);
+export const greaterThan = inequalityBinary((a, b) => a > b);
+export const greaterThanOrEqual = inequalityBinary((a, b) => a >= b);
 
-export const bitwiseAnd_ = bitwiseBinary((a, b) => a & b);
-export const bitwiseOr_ = bitwiseBinary((a, b) => a | b);
-export const bitwiseXOr_ = bitwiseBinary((a, b) => a ^ b);
+export const bitwiseAnd = bitwiseBinary((a, b) => a & b);
+export const bitwiseOr = bitwiseBinary((a, b) => a | b);
+export const bitwiseExclusiveOr = bitwiseBinary((a, b) => a ^ b);
 
-export function bitwiseNot_ ({ data: { stack } }: types.ExecuteArg) {
+export function bitwiseNot ({ data: { stack } }: types.ExecuteArg) {
 	const value = stack.pop();
 
 	if (!isSafeInteger(value)) {
-		throw new TypeError(_Message.PARAM_IS_NOT_SAFE_INT);
+		throw new TypeError(messages.parameterIsNotInt);
 	}
 
 	stack.push(~value);
 }
 
-export const bitwiseLeftShift_ = bitwiseBinary((a, b) => a << b);
-export const bitwiseRightArithmeticShift_ = bitwiseBinary((a, b) => a >> b);
-export const bitwiseRightLogicalShift_ = bitwiseBinary((a, b) => a >>> b);
-export const bitwiseLeftRotate_ = bitwiseBinary((a, b) => (a << b) | (a >> (32 - b)));
-export const bitwiseRightRotate_ = bitwiseBinary((a, b) => (a >> b) | (a << (32 - b)));
+export const bitwiseLeftShift = bitwiseBinary((a, b) => a << b);
+export const bitwiseRightArithmeticShift = bitwiseBinary((a, b) => a >> b);
+export const bitwiseRightLogicalShift = bitwiseBinary((a, b) => a >>> b);
+export const bitwiseLeftRotate = bitwiseBinary((a, b) => (a << b) | (a >> (32 - b)));
+export const bitwiseRightRotate = bitwiseBinary((a, b) => (a >> b) | (a << (32 - b)));
 
 const commands = new ReadonlyMap<string, types.Executable>([
-	['halt', halt_],
-	['goto', goto_],
-	['call', call_],
+	['halt', halt],
+	['goto', goto],
+	['call', call],
 	['return', return_],
 	['if', if_],
 	['while', if_],
-	['enter', enter_],
-	['leave', leave_],
-	['frame', frame_],
-	['local', local_],
-	['pop', pop_],
-	['get', get_],
-	['set', set_],
-	['type', type_],
-	['stoc', stoc_],
-	['ctos', ctos_],
-	['+', add_],
-	['-', subtract_],
-	['*', multiply_],
-	['/', divide_],
-	['%', remainder_],
-	['**', power_],
+	['enter', enter],
+	['leave', leave],
+	['frame', frame],
+	['local', local],
+	['pop', pop],
+	['get', get],
+	['set', set],
+	['type', type],
+	['stoc', stoc],
+	['ctos', ctos],
+	['+', add],
+	['-', subtract],
+	['*', multiply],
+	['/', divide],
+	['%', remainder],
+	['**', power],
 	// The syntax for referOnly references conflict with the C symbol for the
 	// logical and operator. '&&' can either be parsed as the Logical And
 	// Operator, or a referOnly reference to the Bitwise And Operator. To keep
 	// the logical operators consistent, all the operators are named by a word
 	// instead of a symbol.
-	['and', and_],
-	['or', or_],
-	['not', not_],
-	['==', equal_],
-	['!=', notEqual_],
-	['<', lessThan_],
-	['<=', lessThanOrEqual_],
-	['>', greaterThan_],
-	['>=', greaterThanOrEqual_],
-	['&', bitwiseAnd_],
-	['|', bitwiseOr_],
-	['^', bitwiseXOr_],
-	['~', bitwiseNot_],
-	['<<', bitwiseLeftShift_],
-	['>>', bitwiseRightArithmeticShift_],
-	['>>>', bitwiseRightLogicalShift_],
-	['<<|', bitwiseLeftRotate_],
-	['|>>', bitwiseRightRotate_],
+	['and', and],
+	['or', or],
+	['not', not],
+	['==', equal],
+	['!=', notEqual],
+	['<', lessThan],
+	['<=', lessThanOrEqual],
+	['>', greaterThan],
+	['>=', greaterThanOrEqual],
+	['&', bitwiseAnd],
+	['|', bitwiseOr],
+	['^', bitwiseExclusiveOr],
+	['~', bitwiseNot],
+	['<<', bitwiseLeftShift],
+	['>>', bitwiseRightArithmeticShift],
+	['>>>', bitwiseRightLogicalShift],
+	['<<|', bitwiseLeftRotate],
+	['|>>', bitwiseRightRotate],
 ]);
 
 /** @internal */

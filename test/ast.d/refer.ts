@@ -55,7 +55,7 @@ await test('execute', async (t) => {
 					new ast.ImportStatement('lib', 'test-lib'),
 					instance,
 				],
-				state: SourceState.ADDED,
+				state: SourceState.added,
 				offset: 2,
 			});
 
@@ -123,7 +123,7 @@ await test('execute', async (t) => {
 				new ast.ImportStatement('lib', 'test-lib'),
 				instance,
 			],
-			state: SourceState.ADDED,
+			state: SourceState.added,
 			offset: 2,
 		});
 
@@ -187,7 +187,7 @@ await test('execute', async (t) => {
 				new ast.ImportStatement('lib', 'test-lib'),
 				instance,
 			],
-			state: SourceState.ADDED,
+			state: SourceState.added,
 			offset: 2,
 		});
 

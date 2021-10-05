@@ -1,7 +1,7 @@
 import { test } from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
-import * as types from '#src/types.js';
+import type * as types from '#src/types.js';
 
 await test('name', async (t) => {
 	t.equal(new stakr.Source('test', []).name, 'test',

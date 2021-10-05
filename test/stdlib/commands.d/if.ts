@@ -1,7 +1,8 @@
 import { test } from 'tap';
 import { if_ } from '#src/stdlib/commands.js';
 import testGoto from '#test/test-util/goto.js';
-import { CommandsMessage, SafeArrayMessage } from '#test/test-util/message.js';
+import * as messages from '#src/messages.js';
+import { Message as SafeArrayMessage } from '#src/util/safe-array.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('if', async (t) => {
@@ -11,7 +12,7 @@ await test('if', async (t) => {
 		() => {
 			if_(arg);
 		},
-		new RangeError(SafeArrayMessage.ARRAY_IS_EMPTY),
+		new RangeError(SafeArrayMessage.arrayIsEmpty),
 		'expected to throw if stack is empty',
 	);
 
@@ -21,7 +22,7 @@ await test('if', async (t) => {
 		() => {
 			if_(arg);
 		},
-		new TypeError(CommandsMessage.CONDITION_IS_NOT_BOOLEAN),
+		new TypeError(messages.conditionIsNotBoolean),
 		'expected to throw if poped value is not a boolean',
 	);
 

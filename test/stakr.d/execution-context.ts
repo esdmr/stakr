@@ -3,8 +3,8 @@ import * as process from 'node:process';
 import { test } from 'tap';
 import * as ast from '#src/ast.js';
 import * as stakr from '#src/stakr.js';
-import * as types from '#src/types.js';
-import { StakrMessage } from '#test/test-util/message.js';
+import type * as types from '#src/types.js';
+import * as messages from '#src/messages.js';
 import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
 const nextTick: () => Promise<void> = promisify(process.nextTick);
@@ -13,12 +13,12 @@ await test('link', async (t) => {
 	const { context, lib, source } = await createAssets({
 		lib: [new ast.FunctionStatement('test-function', true)],
 		source: [new ast.ImportStatement('lib', 'test-lib')],
-		state: SourceState.ADDED,
+		state: SourceState.added,
 	});
 
 	await t.rejects(
 		async () => context.link(),
-		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		new Error(messages.emptySourceList),
 		'expected to throw if given no source',
 	);
 
@@ -44,7 +44,7 @@ await test('link', async (t) => {
 		const { context, lib, source } = await createAssets({
 			lib: [new ast.FunctionStatement('test-function', true)],
 			source: [],
-			state: SourceState.ADDED,
+			state: SourceState.added,
 		});
 
 		context.persistentSources.push(lib.name);
@@ -73,7 +73,7 @@ await test('executeAll', async (t) => {
 
 	await t.rejects(
 		async () => context.executeAll([], data),
-		new Error(StakrMessage.EMPTY_SOURCE_LIST),
+		new Error(messages.emptySourceList),
 		'expected to throw if given no source',
 	);
 
@@ -90,7 +90,7 @@ void test('execute', async (t) => {
 	let jumped = true;
 
 	const { context, data, source } = await createAssets({
-		state: SourceState.ASSEMBLED,
+		state: SourceState.assembled,
 		source: [
 			{
 				execute (arg: types.ExecuteArg) {
@@ -204,7 +204,7 @@ void test('execute', async (t) => {
 
 		await t.rejects(
 			async () => context.execute(source.name, data),
-			new Error(StakrMessage.HALTED_IN_WRONG_SOURCE),
+			new Error(messages.haltedInWrongSource),
 			'expected to throw if halted or reached EOF in the wrong file',
 		);
 	});
@@ -228,7 +228,7 @@ await test('addSource', async (t) => {
 
 await test('getSource', async (t) => {
 	const { context, source } = await createAssets({
-		state: SourceState.ASSEMBLED,
+		state: SourceState.assembled,
 	});
 
 	t.throws(() => context.getSource(source.name),

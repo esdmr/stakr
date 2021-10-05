@@ -1,6 +1,6 @@
 import { test } from 'tap';
 import * as stakr from '#src/stakr.js';
-import * as types from '#src/types.js';
+import type * as types from '#src/types.js';
 
 await test('addIdentifier', async (t) => {
 	const instance = new stakr.AssembleData();

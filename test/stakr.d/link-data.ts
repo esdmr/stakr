@@ -1,6 +1,6 @@
 import { test } from 'tap';
 import { Label } from '#src/ast.js';
-import * as types from '#src/types.js';
+import type * as types from '#src/types.js';
 import { createAssets } from '#test/test-util/stakr.js';
 
 await test('importSource', async (t) => {

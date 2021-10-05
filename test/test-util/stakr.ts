@@ -1,17 +1,17 @@
 import * as stakr from '#src/stakr.js';
-import * as types from '#src/types.js';
+import type * as types from '#src/types.js';
 
 export const enum SourceState {
-	RAW,
-	ASSEMBLED,
-	ADDED,
-	LINKED,
+	raw,
+	assembled,
+	added,
+	linked,
 }
 
 export interface Parameters {
 	context?: ConstructorParameters<typeof stakr.ExecutionContext>[0];
-	source?: types.ASTTree;
-	lib?: types.ASTTree;
+	source?: types.AstTree;
+	lib?: types.AstTree;
 	state?: SourceState;
 	executeData?: stakr.ExecuteData;
 	assembleData?: stakr.AssembleData;
@@ -96,9 +96,9 @@ async function createSources (arg: Parameters) {
 	const context = new stakr.ExecutionContext(arg.context);
 	const lib = new stakr.Source('test-lib', arg.lib ?? []);
 	const source = new stakr.Source('test-source', arg.source ?? []);
-	const state = arg.state ?? SourceState.LINKED;
+	const state = arg.state ?? SourceState.linked;
 
-	if (state >= SourceState.ASSEMBLED) {
+	if (state >= SourceState.assembled) {
 		if (arg.lib !== undefined) {
 			lib.assemble();
 		}
@@ -106,7 +106,7 @@ async function createSources (arg: Parameters) {
 		source.assemble();
 	}
 
-	if (state >= SourceState.ADDED) {
+	if (state >= SourceState.added) {
 		if (arg.lib !== undefined) {
 			context.addSource(lib);
 		}
@@ -114,7 +114,7 @@ async function createSources (arg: Parameters) {
 		context.addSource(source);
 	}
 
-	const executeOrder = state >= SourceState.LINKED
+	const executeOrder = state >= SourceState.linked
 		? await context.link(source.name)
 		: [];
 

@@ -1,6 +1,6 @@
 import { test } from 'tap';
 import * as ast from '#src/ast.js';
-import { ASTMessage } from '#test/test-util/message.js';
+import * as messages from '#src/messages.js';
 import { createAssets, SourceState } from '#test/test-util/stakr.js';
 
 await test('offset', async (t) => {
@@ -8,7 +8,7 @@ await test('offset', async (t) => {
 
 	t.throws(
 		() => instance.startOffset,
-		new Error(ASTMessage.BLOCK_END_NOT_INIT),
+		new Error(messages.blockEndNotInit),
 		'expected to throw if not initialized',
 	);
 
@@ -25,7 +25,7 @@ await test('assemble', async (t) => {
 	const { source, lib, assembleData } = await createAssets({
 		source: [start, instance],
 		lib: [{}, instance],
-		state: SourceState.RAW,
+		state: SourceState.raw,
 	});
 
 	t.throws(
@@ -49,7 +49,7 @@ await test('assemble', async (t) => {
 				offset: 1,
 			});
 		},
-		new TypeError(ASTMessage.START_IS_NOT_BLOCK_START),
+		new TypeError(messages.startIsNotBlockStart),
 		'expected to throw if start of block is not a BlockStart',
 	);
 
