@@ -42,7 +42,7 @@ jobs:
           node-version: ${{ env.JOB_NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@bcad811784fb09d282bb1a9a98dfc18f758fbd9e
+        uses: pnpm/action-setup@3c2fe8c59284aae169107529dce6c78999f48956
         with:
           version: ${{ env.JOB_PNPM_VERSION }}
 
