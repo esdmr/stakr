@@ -121,7 +121,7 @@ jobs:
 
       - name: Setup Ruby
         if: success() && steps.skip_check.outputs.should_skip != 'true'
-        uses: ruby/setup-ruby@a6f22865941e122a37e097fbded3dd0b54c39207
+        uses: ruby/setup-ruby@f514fbcdacf28f0e4054fb66bcbdb47b1a3d7b15
         with:
           working-directory: docs
           ruby-version: ${{ env.JOB_RUBY_VERSION }}
