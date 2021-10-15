@@ -134,7 +134,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         if: success() && steps.skip_check.outputs.should_skip != 'true'
-        uses: crazy-max/ghaction-github-pages@8e7a38741f9cdbd9b6c87b43cdc405706dbed1ed
+        uses: crazy-max/ghaction-github-pages@1ae239f7b822f4ef2d57ca2c7792713696508b10
         with:
           target_branch: gh-pages
           build_dir: docs/_site
