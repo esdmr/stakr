@@ -82,9 +82,16 @@
         "peerDependencies"
       ],
       "matchUpdateTypes": [
+        "major",
         "minor"
       ],
-      "automerge": false
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "dependencyDashboardApproval": true
     }
   ]
 }
