@@ -17,47 +17,9 @@ env:
   JOB_PNPM_VERSION: 6
 
 jobs:
-  lint:
-    name: Lint
+  ci:
+    name: CI
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.JOB_NODE_VERSION }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.0.1
-        with:
-          version: ${{ env.JOB_PNPM_VERSION }}
-
-      - name: Set pnpm store-dir
-        run: pnpm config set store-dir ~/.pnpm-store
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.OS }}-pnpm-current-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.OS }}-pnpm-current
-
-      - name: Install packages
-        run: pnpm install
-
-      - name: Run linter
-        run: pnpm run lint
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    # Run after lint so pnpm can utilise the cache
-    needs: lint
-    if: always()
 
     steps:
       - name: Checkout
@@ -89,6 +51,9 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Run linter
+        run: pnpm run lint
 
       - name: Run tests
         run: pnpm run test:coverage -- --no-check-coverage
