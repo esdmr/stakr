@@ -1,6 +1,6 @@
 {
 	"private": true,
 	"dependencies": {
-		"katex": "0.13.18"
+		"katex": "0.13.23"
 	}
 }
