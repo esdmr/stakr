@@ -36,9 +36,12 @@ await test('assemble', async (t) => {
 
 	const sourceDup = new stakr.Source('test', [instance, instance]);
 
-	t.throws(() => {
-		sourceDup.assemble();
-	}, 'expected to throw if identifier already exists');
+	t.throws(
+		() => {
+			sourceDup.assemble();
+		},
+		'expected to throw if identifier already exists',
+	);
 });
 
 await test('execute', async (t) => {
@@ -49,7 +52,7 @@ await test('execute', async (t) => {
 		offset: 1,
 	});
 
-	await testGoto(t, async (...items) => {
+	testGoto(t, (...items) => {
 		data.stack.clear();
 		data.stack.push(...items);
 		instance.execute(arg);

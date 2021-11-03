@@ -13,26 +13,16 @@ export const name = 'stdlib:commands';
  * @returns The `stdlib:log` library.
  */
 export default function log_ (logger: types.Logger) {
-	async function log_ ({ data }: types.ExecuteArg) {
+	function log_ ({ data }: types.ExecuteArg) {
 		const message = data.stack.pop();
 		assert.isString(message);
-
-		const maybePromise = logger.log(message);
-
-		if (maybePromise !== undefined) {
-			await maybePromise;
-		}
+		logger.log(message);
 	}
 
-	async function error_ ({ data }: types.ExecuteArg) {
+	function error_ ({ data }: types.ExecuteArg) {
 		const message = data.stack.pop();
 		assert.isString(message);
-
-		const maybePromise = logger.error(message);
-
-		if (maybePromise !== undefined) {
-			await maybePromise;
-		}
+		logger.error(message);
 	}
 
 	return new ReadonlyMap<string, types.Executable>([

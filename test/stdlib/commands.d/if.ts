@@ -40,7 +40,7 @@ await test('if', async (t) => {
 		'expected to pop twice from the stack even if the condition is true');
 
 	await t.test('goto', async (t) => {
-		await testGoto(t, async (...items) => {
+		testGoto(t, (...items) => {
 			data.stack.clear();
 			data.stack.push(...items, false);
 			if_(arg);

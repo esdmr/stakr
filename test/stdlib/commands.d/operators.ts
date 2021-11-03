@@ -61,7 +61,7 @@ for (const key of ['+', '-', '*', '/', '%', '**']) {
 			for (const b of floatValues) {
 				data.stack.clear();
 				data.stack.push(b, a);
-				await func(arg);
+				func(arg);
 				t.matchSnapshot(data.stack.toNewArray(),
 					`expected to match snapshot: ${a} ${key} ${b}`);
 			}
@@ -71,8 +71,10 @@ for (const key of ['+', '-', '*', '/', '%', '**']) {
 			data.stack.clear();
 			data.stack.push(0, a);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the first parameter is invalid',
 			);
@@ -80,8 +82,10 @@ for (const key of ['+', '-', '*', '/', '%', '**']) {
 			data.stack.clear();
 			data.stack.push(a, 0);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the second parameter is invalid',
 			);
@@ -101,7 +105,7 @@ for (const key of ['and', 'or']) {
 			for (const b of booleanValues) {
 				data.stack.clear();
 				data.stack.push(b, a);
-				await func(arg);
+				func(arg);
 				t.matchSnapshot(data.stack.toNewArray(),
 					`expected to match snapshot: ${String(a)} ${key} ${String(b)}`);
 			}
@@ -111,8 +115,10 @@ for (const key of ['and', 'or']) {
 			data.stack.clear();
 			data.stack.push(true, a);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotBoolean),
 				'expected to throw if the first parameter is invalid',
 			);
@@ -120,8 +126,10 @@ for (const key of ['and', 'or']) {
 			data.stack.clear();
 			data.stack.push(a, true);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotBoolean),
 				'expected to throw if the second parameter is invalid',
 			);
@@ -139,7 +147,7 @@ await test('not', async (t) => {
 	for (const a of booleanValues) {
 		data.stack.clear();
 		data.stack.push(a);
-		await func(arg);
+		func(arg);
 		t.matchSnapshot(data.stack.toNewArray(),
 			`expected to match snapshot: not ${String(a)}`);
 	}
@@ -148,8 +156,10 @@ await test('not', async (t) => {
 		data.stack.clear();
 		data.stack.push(a);
 
-		await t.rejects(
-			async () => func(arg),
+		t.throws(
+			() => {
+				func(arg);
+			},
 			new TypeError(messages.parameterIsNotBoolean),
 			'expected to throw if the parameter is invalid',
 		);
@@ -168,7 +178,7 @@ for (const key of ['==', '!=']) {
 			for (const b of anyValues) {
 				data.stack.clear();
 				data.stack.push(b, a);
-				await func(arg);
+				func(arg);
 				t.matchSnapshot(data.stack.toNewArray(),
 					`expected to match snapshot: (${String(a)}) ${key} (${String(b)})`);
 			}
@@ -190,7 +200,7 @@ for (const key of ['>', '>=', '<', '<=']) {
 			for (const b of floatValues) {
 				data.stack.clear();
 				data.stack.push(b, a);
-				await func(arg);
+				func(arg);
 				t.matchSnapshot(data.stack.toNewArray(),
 					`expected to match snapshot: ${a} ${key} ${b}`);
 			}
@@ -200,8 +210,10 @@ for (const key of ['>', '>=', '<', '<=']) {
 			data.stack.clear();
 			data.stack.push(0, a);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the first parameter is invalid',
 			);
@@ -209,8 +221,10 @@ for (const key of ['>', '>=', '<', '<=']) {
 			data.stack.clear();
 			data.stack.push(a, 0);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotNumber),
 				'expected to throw if the second parameter is invalid',
 			);
@@ -230,7 +244,7 @@ for (const key of ['&', '|', '^', '<<', '>>', '>>>', '<<|', '|>>']) {
 			for (const b of integerValues) {
 				data.stack.clear();
 				data.stack.push(b, a);
-				await func(arg);
+				func(arg);
 				t.matchSnapshot(data.stack.toNewArray(),
 					`expected to match snapshot: ${a} ${key} ${b}`);
 			}
@@ -240,8 +254,10 @@ for (const key of ['&', '|', '^', '<<', '>>', '>>>', '<<|', '|>>']) {
 			data.stack.clear();
 			data.stack.push(0, a);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotInt),
 				'expected to throw if the first parameter is invalid',
 			);
@@ -249,8 +265,10 @@ for (const key of ['&', '|', '^', '<<', '>>', '>>>', '<<|', '|>>']) {
 			data.stack.clear();
 			data.stack.push(a, 0);
 
-			await t.rejects(
-				async () => func(arg),
+			t.throws(
+				() => {
+					func(arg);
+				},
 				new TypeError(messages.parameterIsNotInt),
 				'expected to throw if the second parameter is invalid',
 			);
@@ -268,7 +286,7 @@ await test('~', async (t) => {
 	for (const a of integerValues) {
 		data.stack.clear();
 		data.stack.push(a);
-		await func(arg);
+		func(arg);
 		t.matchSnapshot(data.stack.toNewArray(),
 			`expected to match snapshot: ~ ${a}`);
 	}
@@ -277,8 +295,10 @@ await test('~', async (t) => {
 		data.stack.clear();
 		data.stack.push(a);
 
-		await t.rejects(
-			async () => func(arg),
+		t.throws(
+			() => {
+				func(arg);
+			},
 			new TypeError(messages.parameterIsNotInt),
 			'expected to throw if the parameter is invalid',
 		);

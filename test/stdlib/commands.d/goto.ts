@@ -6,7 +6,7 @@ import { createAssets } from '#test/test-util/stakr.js';
 await test('goto', async (t) => {
 	const { data, arg } = await createAssets();
 
-	await testGoto(t, async (...items) => {
+	testGoto(t, (...items) => {
 		data.stack.clear();
 		data.stack.push(...items);
 		goto(arg);
