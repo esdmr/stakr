@@ -59,8 +59,10 @@ await test('execute', async (t) => {
 				offset: 2,
 			});
 
-			await t.rejects(
-				async () => context.execute(source.name, data),
+			t.throws(
+				() => {
+					context.execute(source.name, data);
+				},
 				'expected to throw if function is not found',
 			);
 
@@ -127,8 +129,10 @@ await test('execute', async (t) => {
 			offset: 2,
 		});
 
-		await t.rejects(
-			async () => context.execute(source.name, data),
+		t.throws(
+			() => {
+				context.execute(source.name, data);
+			},
 			'expected to throw if function is not found',
 		);
 
@@ -191,8 +195,10 @@ await test('execute', async (t) => {
 			offset: 2,
 		});
 
-		await t.rejects(
-			async () => context.execute(source.name, data),
+		t.throws(
+			() => {
+				context.execute(source.name, data);
+			},
 			'expected to throw if function is not found',
 		);
 

@@ -37,7 +37,7 @@ export interface ExecuteArg {
 /** @internal */
 export type Writable<T> = { -readonly [K in keyof T]: T[K] };
 /** @public */
-export type Executable = (arg: ExecuteArg) => void | Promise<void>;
+export type Executable = (arg: ExecuteArg) => void;
 /** @public */
 export type AstTree = readonly AstNode[];
 
@@ -63,8 +63,8 @@ export interface Loader {
 
 /** @public */
 export interface Logger {
-	readonly log: (message: string) => void | Promise<void>;
-	readonly error: (message: string) => void | Promise<void>;
+	readonly log: (message: string) => void;
+	readonly error: (message: string) => void;
 }
 
 /** @public */

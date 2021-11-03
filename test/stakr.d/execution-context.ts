@@ -1,13 +1,9 @@
-import { promisify } from 'node:util';
-import * as process from 'node:process';
 import { test } from 'tap';
 import * as ast from '#src/ast.js';
+import * as messages from '#src/messages.js';
 import * as stakr from '#src/stakr.js';
 import type * as types from '#src/types.js';
-import * as messages from '#src/messages.js';
 import { createAssets, SourceState } from '#test/test-util/stakr.js';
-
-const nextTick: () => Promise<void> = promisify(process.nextTick);
 
 await test('link', async (t) => {
 	const { context, lib, source } = await createAssets({
@@ -71,14 +67,16 @@ await test('executeAll', async (t) => {
 
 	const { source, data } = await createAssets();
 
-	await t.rejects(
-		async () => context.executeAll([], data),
+	t.throws(
+		() => {
+			context.executeAll([], data);
+		},
 		new Error(messages.emptySourceList),
 		'expected to throw if given no source',
 	);
 
 	await t.test('execute', async (t) => {
-		await context.executeAll([source.name], data);
+		context.executeAll([source.name], data);
 
 		t.equal(data.sourceName, source.name,
 			'expected to jump to source');
@@ -162,34 +160,18 @@ void test('execute', async (t) => {
 		],
 	});
 
-	await t.rejects(
-		async () => context.execute(source.name, data),
+	t.throws(
+		() => {
+			context.execute(source.name, data);
+		},
 		'expected to throw if given source is not added',
 	);
 
 	context.addSource(source);
-	await context.execute(source.name, data);
+	context.execute(source.name, data);
 
 	t.ok(called,
 		'expected to execute source');
-
-	await t.test('async', async (t) => {
-		let called = false;
-
-		const { context, source, data } = await createAssets({
-			source: [{
-				async execute () {
-					await nextTick();
-					called = true;
-				},
-			}],
-		});
-
-		await context.execute(source.name, data);
-
-		t.ok(called,
-			'expected to await all ast items when executing them');
-	});
 
 	await t.test('halt in wrong source', async (t) => {
 		const { context, source, lib, data } = await createAssets({
@@ -202,8 +184,10 @@ void test('execute', async (t) => {
 			}],
 		});
 
-		await t.rejects(
-			async () => context.execute(source.name, data),
+		t.throws(
+			() => {
+				context.execute(source.name, data);
+			},
 			new Error(messages.haltedInWrongSource),
 			'expected to throw if halted or reached EOF in the wrong file',
 		);
@@ -231,8 +215,10 @@ await test('getSource', async (t) => {
 		state: SourceState.assembled,
 	});
 
-	t.throws(() => context.getSource(source.name),
-		'expected to throw if source is not found');
+	t.throws(
+		() => context.getSource(source.name),
+		'expected to throw if source is not found',
+	);
 
 	context.addSource(source);
 

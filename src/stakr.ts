@@ -127,7 +127,7 @@ export class Source {
 	}
 
 	/** @internal */
-	async _execute (
+	_execute (
 		context: ExecutionContext,
 		data: ExecuteData,
 	) {
@@ -145,11 +145,7 @@ export class Source {
 				break;
 			}
 
-			const value = item.execute?.(arg);
-
-			if (value !== undefined) {
-				await value;
-			}
+			item.execute?.(arg);
 		}
 	}
 }
@@ -234,24 +230,24 @@ export class ExecutionContext {
 		return deps.overallOrder();
 	}
 
-	async executeAll (sourceList: readonly string[], data: ExecuteData) {
+	executeAll (sourceList: readonly string[], data: ExecuteData) {
 		if (sourceList.length === 0) {
 			throw new Error(messages.emptySourceList);
 		}
 
 		for (const sourceName of sourceList) {
-			await this.execute(sourceName, data);
+			this.execute(sourceName, data);
 		}
 	}
 
-	async execute (sourceName: string, data: ExecuteData) {
+	execute (sourceName: string, data: ExecuteData) {
 		data.sourceName = sourceName;
 		data.offset = 0;
 		data.halted = false;
 
 		while (!data.halted) {
 			const source = this.getSource(data.sourceName);
-			await source._execute(this, data);
+			source._execute(this, data);
 		}
 
 		// In stakr, Assertions can happen by forcefully halting the execution.

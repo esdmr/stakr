@@ -6,7 +6,7 @@ import { createAssets } from '#test/test-util/stakr.js';
 await test('return', async (t) => {
 	const { data, arg } = await createAssets();
 
-	await testGoto(t, async (...items) => {
+	testGoto(t, (...items) => {
 		data.aux.clear();
 		data.aux.push(...items);
 		return_(arg);
