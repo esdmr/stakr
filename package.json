@@ -45,7 +45,7 @@
     "dependency-graph": "0.11.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.16.0",
+    "@babel/eslint-parser": "7.16.3",
     "@changesets/cli": "2.18.0",
     "@istanbuljs/esm-loader-hook": "0.1.2",
     "@types/node": "16.11.7",
