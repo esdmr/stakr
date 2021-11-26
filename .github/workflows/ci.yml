@@ -58,10 +58,14 @@ jobs:
       - name: Run tests
         run: pnpm run test:coverage -- --no-check-coverage
 
-      - name: Export coverage report
-        run: pnpm run test:coverage-lcov -- --no-check-coverage
-
-      - name: Upload report to CodeCov
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./coverage/lcov.info
+      ## Until esdmr/template@v2.1 is merged, coverage report will probably not
+      ## work. I have commented this so the CI does not send empty coverage
+      ## reports to CodeCov.
+      #
+      #- name: Export coverage report
+      #  run: pnpm run test:coverage-lcov -- --no-check-coverage
+      #
+      #- name: Upload report to CodeCov
+      #  uses: codecov/codecov-action@v2
+      #  with:
+      #    files: ./coverage/lcov.info
