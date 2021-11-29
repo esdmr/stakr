@@ -15,7 +15,7 @@ specifiers:
   '@types/tap': 15.0.5
   dependency-graph: 0.11.0
   rimraf: 3.0.2
-  tap: 15.1.2
+  tap: 15.1.5
   typescript: 4.5.2
   xo: 0.47.0
 
@@ -30,7 +30,7 @@ devDependencies:
   '@types/node': 16.11.10
   '@types/tap': 15.0.5
   rimraf: 3.0.2
-  tap: 15.1.2_typescript@4.5.2
+  tap: 15.1.5_typescript@4.5.2
   typescript: 4.5.2
   xo: 0.47.0
 
@@ -4088,8 +4088,8 @@ packages:
       yaml: 1.10.2
     dev: true
 
-  /tap/15.1.2_typescript@4.5.2:
-    resolution: {integrity: sha512-32FftTGFDnWs6/mcaLm2d6AZ1kMq94w8ybhpnwL4CZYtWIHcp6FyT+NFaZZcajI8NqSXCYku88PMEDMY6vykEw==}
+  /tap/15.1.5_typescript@4.5.2:
+    resolution: {integrity: sha512-ha9ify0cagIOENV5D+T8ys+FFOWqPaWAKk66hjtUWjywXdGmnL8LRxloZa8sHiaB+Az1GYx4ufEaflOpedSCbQ==}
     engines: {node: '>=10'}
     hasBin: true
     peerDependencies:
@@ -4134,7 +4134,7 @@ packages:
       - ink
       - treport
       - '@types/react'
-      - import-jsx
+      - '@isaacs/import-jsx'
       - react
 
   /tapable/0.1.10:
