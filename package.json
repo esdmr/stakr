@@ -48,7 +48,7 @@
     "@babel/eslint-parser": "7.16.5",
     "@changesets/cli": "2.18.1",
     "@istanbuljs/esm-loader-hook": "0.1.2",
-    "@types/node": "16.11.12",
+    "@types/node": "16.11.14",
     "@types/tap": "15.0.5",
     "rimraf": "3.0.2",
     "tap": "15.1.5",
