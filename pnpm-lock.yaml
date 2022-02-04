@@ -7,7 +7,7 @@ overrides:
 packageExtensionsChecksum: c6269d4d2b8f53749e9a6ff01733da3a
 
 specifiers:
-  '@babel/eslint-parser': 7.16.5
+  '@babel/eslint-parser': 7.17.0
   '@changesets/cli': 2.20.0
   '@esdmr/assert': 1.1.0
   '@istanbuljs/esm-loader-hook': 0.1.2
@@ -24,7 +24,7 @@ dependencies:
   dependency-graph: 0.11.0
 
 devDependencies:
-  '@babel/eslint-parser': 7.16.5
+  '@babel/eslint-parser': 7.17.0
   '@changesets/cli': 2.20.0
   '@istanbuljs/esm-loader-hook': 0.1.2
   '@types/node': 16.11.21
@@ -71,8 +71,8 @@ packages:
       - supports-color
     dev: true
 
-  /@babel/eslint-parser/7.16.5:
-    resolution: {integrity: sha512-mUqYa46lgWqHKQ33Q6LNCGp/wPR3eqOYTUixHFsfrSQqRxH0+WOzca75iEjFr5RDGH1dDz622LaHhLOzOuQRUA==}
+  /@babel/eslint-parser/7.17.0:
+    resolution: {integrity: sha512-PUEJ7ZBXbRkbq3qqM/jZ2nIuakUBqCYc7Qf52Lj7dlZ6zERnqisdHioL0l4wwQZnmskMeasqUNzLBFKs3nylXA==}
     engines: {node: ^10.13.0 || ^12.13.0 || >=14.0.0}
     peerDependencies:
       '@babel/core': '>=7.11.0'
@@ -83,8 +83,8 @@ packages:
       semver: 6.3.0
     dev: true
 
-  /@babel/eslint-parser/7.16.5_@babel+core@7.16.12+eslint@8.8.0:
-    resolution: {integrity: sha512-mUqYa46lgWqHKQ33Q6LNCGp/wPR3eqOYTUixHFsfrSQqRxH0+WOzca75iEjFr5RDGH1dDz622LaHhLOzOuQRUA==}
+  /@babel/eslint-parser/7.17.0_@babel+core@7.16.12+eslint@8.8.0:
+    resolution: {integrity: sha512-PUEJ7ZBXbRkbq3qqM/jZ2nIuakUBqCYc7Qf52Lj7dlZ6zERnqisdHioL0l4wwQZnmskMeasqUNzLBFKs3nylXA==}
     engines: {node: ^10.13.0 || ^12.13.0 || >=14.0.0}
     peerDependencies:
       '@babel/core': '>=7.11.0'
@@ -1701,7 +1701,7 @@ packages:
       eslint: '>=7.0.0'
     dependencies:
       '@babel/core': 7.16.12
-      '@babel/eslint-parser': 7.16.5_@babel+core@7.16.12+eslint@8.8.0
+      '@babel/eslint-parser': 7.17.0_@babel+core@7.16.12+eslint@8.8.0
       eslint: 8.8.0
       eslint-visitor-keys: 2.1.0
       esquery: 1.4.0
