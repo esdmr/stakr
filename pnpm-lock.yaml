@@ -15,7 +15,7 @@ specifiers:
   '@types/tap': 15.0.7
   dependency-graph: 0.11.0
   rimraf: 3.0.2
-  tap: 16.1.0
+  tap: 16.2.0
   typescript: 4.6.4
   xo: 0.47.0
 
@@ -30,7 +30,7 @@ devDependencies:
   '@types/node': 16.11.33
   '@types/tap': 15.0.7
   rimraf: 3.0.2
-  tap: 16.1.0_typescript@4.6.4
+  tap: 16.2.0_typescript@4.6.4
   typescript: 4.6.4
   xo: 0.47.0
 
@@ -3790,8 +3790,8 @@ packages:
       yaml: 1.10.2
     dev: true
 
-  /tap/16.1.0_typescript@4.6.4:
-    resolution: {integrity: sha512-EFERYEEDCLjvsT+B+z/qAVuxh5JPEmtn0aGh1ZT/2BN5nVLm6VbcL9fR/Y2FtsxvHuEC3Q2xLc1n1h7mnWVP9w==}
+  /tap/16.2.0_typescript@4.6.4:
+    resolution: {integrity: sha512-ikfNLy701p2+sH3R0pAXQ/Aen6ZByaguUY7UsoTLL4AXa2c9gYQL+pI21p13lq54R7/CEoLaViC1sexcWG32ig==}
     engines: {node: '>=12'}
     hasBin: true
     peerDependencies:
